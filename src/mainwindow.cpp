@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//#include <curl/curl.h>
 #include <QDebug>
 
 #include <QTime>
