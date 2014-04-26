@@ -186,9 +186,9 @@ QString findBestSize(const QStringList& listSizes, int sizeToFit){
     return choosedSized;
 }
 
-QList<Film> TheMovieDBScraper::parseResultset(const QJsonDocument& resultset) const{
+FilmPrtList TheMovieDBScraper::parseResultset(const QJsonDocument& resultset) const{
 
-    QList<Film> films;
+    FilmPrtList films;
 
     if (!resultset.isObject()){
         return films;
@@ -207,12 +207,16 @@ QList<Film> TheMovieDBScraper::parseResultset(const QJsonDocument& resultset) co
     {
         QJsonObject obj = value.toObject();
 
-        Film film;
-        film.originalTitle= obj["original_title"].toString();
-        film.title= obj["title"].toString();
-        film.productionYear =QDate::fromString(obj["release_date"].toString(), "yyyy-MM-dd").toString("yyyy");
-        film.code= QString::number(obj["id"].toDouble());
-        film.posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
+        FilmPtr film(new Film());
+
+        film->originalTitle= obj["original_title"].toString();
+        film->title= obj["title"].toString();
+        if (film->title.isEmpty()){
+            film->title=film->originalTitle;
+        }
+        film->productionYear =QDate::fromString(obj["release_date"].toString(), "yyyy-MM-dd").toString("yyyy");
+        film->code= QString::number(obj["id"].toDouble());
+        film->posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
 
         films.append(film);
     }

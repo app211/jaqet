@@ -216,6 +216,43 @@ bool AlloCineScraper::findSaisonInfo(const QString& seasonCode, const QString& e
 
     return false;
 }
+
+bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo &result){
+
+    if (!resultset.isObject()){
+        return false;
+    }
+    QJsonObject jsonObject = resultset.object();
+
+    if (!jsonObject["episode"].isObject()){
+        return false;
+    }
+
+    QJsonObject episodeObject = jsonObject["episode"].toObject();
+
+    result.synopsis=episodeObject["synopsis"].toString();
+    result.code=episodeObject["code"].toString();
+    result.title=episodeObject["title"].toString();
+    result.originalTitle=episodeObject["title"].toString();
+
+    QJsonArray jsonArray = episodeObject["link"].toArray();
+
+    foreach (const QJsonValue & value, jsonArray)
+    {
+        QJsonObject link = value.toObject();
+
+        if (link["rel"].toString()=="aco:web"){
+            result.linkName=link["name"].toString();
+            if (result.linkName.isEmpty()){
+                result.linkName=result.title;
+            }
+            result.linkHref=link["href"].toString();
+            break;
+        }
+    }
+    return true;
+}
+
 bool AlloCineScraper::findEpisodeInfo(const QString& episodeCode, SearchEpisodeInfo &result) const{
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(episodeCode);
@@ -230,13 +267,16 @@ bool AlloCineScraper::findEpisodeInfo(const QString& episodeCode, SearchEpisodeI
         QJsonParseError e;
         QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
         if (e.error== QJsonParseError::NoError){
-
+            if(parseEpisodeTVSerieInfo(doc,result)){
+                 return true;
+             }
         }
 
         qDebug() << e.errorString();
     }
 
-    return false;}
+    return false;
+}
 bool AlloCineScraper::findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const{
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(showCode);
@@ -256,6 +296,7 @@ bool AlloCineScraper::findEpisodeInfo(const QString& showCode, const QString&  s
                 QString episodeCode;
                 if(findSaisonInfo(seasonCode, epidode,episodeCode)){
                     if (findEpisodeInfo(episodeCode,result)){
+                        return true;
                      }
                 }
             }
@@ -292,6 +333,7 @@ bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovie
 
         if (link["rel"].toString()=="aco:web"){
             info.linkName=link["name"].toString();
+
             info.linkHref=link["href"].toString();
             break;
         }
@@ -304,9 +346,9 @@ QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& s
     return filePath;
 }
 
-QList<Film> AlloCineScraper::parseResultset(const QJsonDocument& resultset) const{
+FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) const{
 
-    QList<Film> films;
+    FilmPrtList films;
 
     if (!resultset.isObject()){
         return films;
@@ -330,13 +372,17 @@ QList<Film> AlloCineScraper::parseResultset(const QJsonDocument& resultset) cons
     {
         QJsonObject obj = value.toObject();
 
-        Film film;
-        film.originalTitle= obj["originalTitle"].toString();
-        film.title= obj["title"].toString();
-        film.productionYear = QString::number(obj["productionYear"].toDouble());
-        film.code= QString::number(obj["code"].toDouble());
+        FilmPtr film(new Film());
+
+        film->originalTitle= obj["originalTitle"].toString();
+        film->title= obj["title"].toString();
+        if (film->title.isEmpty()){
+            film->title=film->originalTitle;
+        }
+        film->productionYear = QString::number(obj["productionYear"].toDouble());
+        film->code= QString::number(obj["code"].toDouble());
         if(obj["poster"].isObject()){
-            film.posterHref = obj["poster"].toObject()["href"].toString();
+            film->posterHref = obj["poster"].toObject()["href"].toString();
         }
 
         films.append(film);

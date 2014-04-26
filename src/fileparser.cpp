@@ -81,12 +81,23 @@ QStringList FileParser::readBlacklist()
 
 
 
-bool FileParser::isSeries(const QString &name)
+bool FileParser::isSeries(const QString &name, QString &season, QString& episode)
 {
     // Check if the file is a series.
     QRegExp regex;
 
-    QStringList::const_iterator constIterator;
+    regex.setPattern("[sS]([0-9]+)\\s*[eE]([0-9]+)(.*)"); // S00E00
+    if (regex.lastIndexIn(name) != -1) {
+        QStringList list = regex.capturedTexts();
+        if (list.size()>2){
+            season=list.at(1);
+            episode=list.at(2);
+            return true;
+        }
+    }
+
+
+    /* QStringList::const_iterator constIterator;
     for (constIterator = REGEXSERIES.constBegin(); constIterator != REGEXSERIES.constEnd(); ++constIterator) {
         regex.setPattern(*constIterator);
         if (regex.lastIndexIn(name) != -1) {
@@ -94,7 +105,7 @@ bool FileParser::isSeries(const QString &name)
                 return true;
             }
         }
-    }
+    }*/
     return false;
 }
 

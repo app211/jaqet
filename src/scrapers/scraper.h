@@ -10,7 +10,7 @@
 #include <QList>
 #include <QStringList>
 #include <QSize>
-
+#include <QSharedPointer>
 
 class Film {
 public:
@@ -30,12 +30,16 @@ public:
     QString posterHref;
 };
 
+typedef QSharedPointer<Film> FilmPtr;
+typedef QList<FilmPtr> FilmPrtList;
+
 class SearchResult {
 public:
     bool searchOk;
     QString error;
-    QList<Film> films;
+    FilmPrtList films;
 };
+
 
 class SearchTVResult {
 public:
@@ -58,7 +62,10 @@ public:
 class SearchEpisodeInfo {
 public:
     bool searchOk;
+    QString code;
     QString error;
+    QString title;
+    QString originalTitle;
     QString synopsis;
     QString posterHref;
     QString backdropHref;

@@ -52,7 +52,7 @@ public :
     }
 
     void populate(){
-        currentDir.setFilter(QDir::AllDirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks | QDir::NoDot);
+        currentDir.setFilter(QDir::AllDirs | QDir::Files | QDir::NoSymLinks | QDir::NoDot);
 
         setStringList(currentDir.entryList());
     }

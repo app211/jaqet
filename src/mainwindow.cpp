@@ -20,7 +20,6 @@
 #include "scrapers/allocinescraper.h"
 #include "scrapers/themoviedbscraper.h"
 #include "filedownloader.h"
-#include "myproxymodel.h"
 
 #include "webfile.h"
 #include <QSortFilterProxyModel>
@@ -135,11 +134,9 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
         QString filteredName = FileParser::filterBlacklist(name);
         ui->labelAllo->setText(filteredName);
 
-        _tvShowTV = FileParser::isSeries(baseName);
+        _tvShowTV = FileParser::isSeries(baseName,_seasonTV,_episodeTV);
         ui->labelType->setText(_tvShowTV?"T":"M");
 
-        _episodeTV="01";
-        _seasonTV="01";
 
                 // static avprobe av;
                 //  av.getInfo(fileInfo.absoluteFilePath());
@@ -176,9 +173,8 @@ void MainWindow::searchScraper(){
         SearchResult a;
         if (currentScraper->searchFilm(ui->labelAllo->text(),a)){
             for (int i=0; i<(a.films.size());i++){
-                ui->comboBoxProposition->addItem(a.films.at(i).title+" "+ a.films.at(i).productionYear, a.films.at(i).code);
-                qDebug() << a.films.at(i).originalTitle << " " << a.films.at(i).productionYear << " " << a.films.at(i).posterHref << a.films.at(i).code;
-                /*   */
+                ui->comboBoxProposition->addItem(a.films.at(i)->title+" "+ a.films.at(i)->productionYear, a.films.at(i)->code);
+
             }
         }
     } else {
@@ -254,6 +250,16 @@ void MainWindow::searchAllocineMovie(){
     if (this->_tvShowTV){
         SearchEpisodeInfo b;
         if (!currentScraper->findEpisodeInfo(code,this->_seasonTV,this->_episodeTV,b)){
+
+        } else {
+            ui->synopsis->setText(b.synopsis);
+
+            if (!b.linkHref.isEmpty()){
+                ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
+                ui->labelUrl->setTextFormat(Qt::RichText);
+                ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
+                ui->labelUrl->setOpenExternalLinks(true);
+            }
 
         }
     } else {

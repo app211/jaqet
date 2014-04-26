@@ -10,7 +10,7 @@ class FileParser
 public:
     FileParser();
 
-    static bool isSeries(const QString& name);
+    static bool isSeries(const QString &name, QString &season, QString& episode);
     static QString cleanName(const QString& name);
     static QString filterBlacklist(const QString& name);
     static QString baseName(const QFileInfo &fileInfo);

@@ -8,7 +8,7 @@ class TheMovieDBScraper: public Scraper
     static const QString API_KEY;
     static int randInt(int low, int high) ;
 
-    QList<Film> parseResultset(const QJsonDocument& ) const;
+    FilmPrtList parseResultset(const QJsonDocument& ) const;
     QList<Show> parseTVResultset(const QJsonDocument&) const;
     bool parseConfiguration(const QJsonDocument& );
     QString  baseUrl;
