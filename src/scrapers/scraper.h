@@ -19,6 +19,7 @@ public:
     QString title;
     QString productionYear;
     QString posterHref;
+
 };
 
 class Show {
@@ -58,6 +59,11 @@ public:
     QStringList postersHref;
     QString linkName;
     QString linkHref;
+    QStringList directors;
+    QStringList actors;
+    int productionYear;
+    int runtime;
+
 };
 class SearchEpisodeInfo {
 public:

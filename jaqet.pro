@@ -21,7 +21,8 @@ SOURCES += src/main.cpp\
     src/third/networktest-1-3-0_src/httpfileinfo.cpp \
     src/third/networktest-1-3-0_src/weberror.cpp \
     src/third/networktest-1-3-0_src/webfile.cpp \
-     src/fileparser.cpp
+     src/fileparser.cpp \
+    src/myqstringlistmodel.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -51,7 +52,8 @@ HEADERS  += src/mainwindow.h \
     src/third/networktest-1-3-0_src/weberror.h \
     src/third/networktest-1-3-0_src/webfile.h \
     src/filedownloader.h \
-    src/fileparser.h
+    src/fileparser.h \
+    src/myqstringlistmodel.h
 
 
 FORMS    += src/mainwindow.ui

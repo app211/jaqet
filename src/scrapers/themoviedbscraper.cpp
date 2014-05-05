@@ -33,49 +33,49 @@ QString TheMovieDBScraper::createURL(const QString& type, const QMap<QString, QS
     return fullQuery;
 }
 
- bool TheMovieDBScraper::searchTV(const QString& toSearch, SearchTVResult &result){
-     QMap<QString,QString> params;
+bool TheMovieDBScraper::searchTV(const QString& toSearch, SearchTVResult &result){
+    QMap<QString,QString> params;
 
-     QByteArray headerData;
-     QByteArray data;
+    QByteArray headerData;
+    QByteArray data;
 
-     if (execCommand("configuration", params, headerData,data)){
-         qDebug() << data;
-         QJsonParseError e;
-         QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-         if (e.error== QJsonParseError::NoError){
-             if (!parseConfiguration(doc)){
-                 return false;
-             }
-         } else {
-             return false;
-         }
-     } else {
-         return false;
-     }
+    if (execCommand("configuration", params, headerData,data)){
+        qDebug() << data;
+        QJsonParseError e;
+        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+        if (e.error== QJsonParseError::NoError){
+            if (!parseConfiguration(doc)){
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 
-     headerData.clear();
-     data.clear();
-     params["query"]=QUrl::toPercentEncoding(toSearch);
-     params["language"]="fr";
+    headerData.clear();
+    data.clear();
+    params["query"]=QUrl::toPercentEncoding(toSearch);
+    params["language"]="fr";
 
-     if (execCommand("search/tv", params, headerData,data)){
-         qDebug() << data;
+    if (execCommand("search/tv", params, headerData,data)){
+        qDebug() << data;
 
-         QJsonParseError e;
-         QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-         if (e.error== QJsonParseError::NoError){
-             result.searchOk = true;
-             result.shows=this->parseTVResultset(doc);
-             return true;
-         }
+        QJsonParseError e;
+        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+        if (e.error== QJsonParseError::NoError){
+            result.searchOk = true;
+            result.shows=this->parseTVResultset(doc);
+            return true;
+        }
 
-         qDebug() << e.errorString();
+        qDebug() << e.errorString();
 
-     }
+    }
 
-     return false;
- }
+    return false;
+}
 
 
 bool TheMovieDBScraper::searchFilm( const QString& toSearch, SearchResult& result) {
@@ -259,11 +259,11 @@ QList<Show> TheMovieDBScraper::parseTVResultset(const QJsonDocument& resultset) 
 }
 
 bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const{
+
     if (!resultset.isObject()){
         return false;
     }
     QJsonObject movieObject = resultset.object();
-
 
     info.synopsis=movieObject["overview"].toString();
     info.posterHref =   QString().append(baseUrl).append("original").append(movieObject["poster_path"].toString());
@@ -271,8 +271,44 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
     info.postersHref.append(movieObject["poster_path"].toString());
     info.backdropsHref.append(movieObject["backdrop_path"].toString());
 
+    if (movieObject["credits"].isObject()){
+        QJsonObject creditsObject=movieObject["credits"].toObject();
+        if (creditsObject["cast"].isArray()){
+            QJsonArray jsonArray = creditsObject["cast"].toArray();
+
+            foreach (const QJsonValue & value, jsonArray)
+            {
+                if (value.isObject() &&  value.toObject()["name"].isString()){
+                    info.actors.append(value.toObject()["name"].toString());
+                }
+            }
+        }
+
+        if (creditsObject["crew"].isArray()){
+            QJsonArray jsonArray = creditsObject["crew"].toArray();
+
+            foreach (const QJsonValue & value, jsonArray)
+            {
+                if (value.isObject() &&  value.toObject()["job"].isString() && value.toObject()["job"].toString().compare("Director",Qt::CaseInsensitive)==0 &&  value.toObject()["name"].isString()){
+                    info.directors.append(value.toObject()["name"].toString());
+                }
+            }
+        }
+    }
+
+    info.productionYear=0;
+    if (movieObject["release_date"].isString() ){
+        QDate releaseDate=QDate::fromString(movieObject["release_date"].toString(), "yyyy-MM-dd");
+        if (releaseDate.isValid()){
+            info.productionYear=releaseDate.year();
+        }
+    }
+
+    info.runtime=movieObject["runtime"].toInt()*60;
+
     return true;
 }
+
 bool TheMovieDBScraper::findMovieInfo( const QString& movieCode, SearchMovieInfo& result) const {
 
     QMap<QString,QString> params;
@@ -280,6 +316,7 @@ bool TheMovieDBScraper::findMovieInfo( const QString& movieCode, SearchMovieInfo
     QByteArray data;
 
     params["language"]="fr";
+    params["append_to_response"]="credits";
 
     if (execCommand(QString("movie/").append(movieCode), params, headerData,data)){
         qDebug() << data;

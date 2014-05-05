@@ -8,60 +8,10 @@
 #include <QStringListModel>
 #include <QPixmap>
 
-class MyQStringListModel : public QStringListModel {
-public :
 
-    QDir currentDir;
-
-    explicit MyQStringListModel(QObject *parent = 0, const QString& path=""):
-        QStringListModel(parent){
-        setPath(path);
-    }
-    void cdUp(){
-        currentDir.cdUp();
-        populate();
-    }
-
-    void cd(const QString& path){
-        if (QFileInfo(currentDir,path).isDir()){
-            currentDir.cd(path);
-            populate();
-        }
-    }
-    void setPath(const QString& path){
-        currentDir =QDir(path);
-        populate();
-    }
-
-    bool isDir( const QModelIndex & index){
-
-        if (index.isValid()){
-             return QFileInfo(currentDir,data(index,Qt::DisplayRole).toString()).isDir();
-        }
-
-        return false;
-    }
-
-    QFileInfo fileInfo(const QModelIndex & index){
-
-        if (index.isValid()){
-             return QFileInfo(currentDir,data(index,Qt::DisplayRole).toString());
-        }
-
-        return QFileInfo();
-    }
-
-    void populate(){
-        currentDir.setFilter(QDir::AllDirs | QDir::Files | QDir::NoSymLinks | QDir::NoDot);
-
-        setStringList(currentDir.entryList());
-    }
-    Qt::ItemFlags flags ( const QModelIndex & index ) const{
-        return Qt::ItemIsSelectable | Qt::ItemIsEnabled ;
-    }
-};
 
 class MyProxyModel;
+class MyQStringListModel;
 
 namespace Ui {
 class MainWindow;
@@ -91,8 +41,8 @@ private slots:
     void ctxMenu(const QPoint &pos) ;
     void changeFileName();
     void doubleClicked ( const QModelIndex & index );
-    void setSynopsis();
-    void setPoster (const QString& url, Scraper* scrape );
+    void setMovieInfo( const SearchMovieInfo&);
+     void setPoster (const QString& url, Scraper* scrape );
     void setBackdrop(const QString& url, Scraper *scrape);
     void buildTvix();
 
@@ -109,14 +59,16 @@ private:
     FileDownloader* m_pImgCtrl;
     QStringList keywordsList;
     QFileInfo fileInfo;
+
     ScraperResource _poster;
     ScraperResource _backdrop;
-    QString _synopsis;
+    QMap<QString,QString> _texts;
 
 
     QString _episodeTV;
     QString _seasonTV;
     bool _tvShowTV=false;
 };
+
 
 #endif // MAINWINDOW_H

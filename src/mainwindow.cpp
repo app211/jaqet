@@ -34,6 +34,7 @@
 #include "template/templateyadis.h"
 
 #include "av/avprobe.h"
+#include "myqstringlistmodel.h"
 
 #include <QProgressDialog>
 
@@ -57,11 +58,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
-    //b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-    //   b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
-    b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+    //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+  //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
+  //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+      b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+   // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
     // Create seed for the random
     // That is needed only once on application startup
     QTime time = QTime::currentTime();
@@ -282,14 +283,14 @@ void MainWindow::searchAllocineMovie(){
             }
 
             ui->synopsis->setText(b.synopsis);
-            /*  if (!b.posterHref.isEmpty()){
-        QPixmap buttonImage;
-        loadPixmap(b.posterHref,buttonImage);
-        ui->label->setPixmap(buttonImage);
-    }
-*/
-            scene->clear();
 
+            ui->toolButtonSysnopsis->disconnect();
+            QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
+            {
+                setMovieInfo(b);
+            });
+
+            scene->clear();
 
 
             ui->graphicsViewPosters->setScene(NULL);
@@ -318,6 +319,7 @@ void MainWindow::searchAllocineMovie(){
                     {
                         setPoster(url,currentScraper);
                     });
+
                     QGraphicsProxyWidget* button = scene->addWidget(b);
                     button->setPos(x,h);
 
@@ -369,7 +371,7 @@ void MainWindow::searchAllocineMovie(){
 }
 
 void MainWindow::buildTvix() {
-    ui->labelPoster->setPixmap(b.createTivx(_poster, _backdrop,_synopsis));
+    ui->labelPoster->setPixmap(b.createTivx(_poster, _backdrop,_texts));
 }
 
 void MainWindow::setPoster (const QString& url, Scraper *_currentScrape){
@@ -381,9 +383,19 @@ void MainWindow::setPoster (const QString& url, Scraper *_currentScrape){
 
 }
 
-void MainWindow::setSynopsis(){
+void MainWindow::setMovieInfo( const SearchMovieInfo& searchMovieInfo){
 
-    this->_synopsis=this->ui->synopsis->toPlainText();
+    this->_texts["synopsis"]=searchMovieInfo.synopsis;
+    this->_texts["actors"]=searchMovieInfo.actors.join(',');
+    this->_texts["directors"]=searchMovieInfo.directors.join(',');
+
+    if (searchMovieInfo.productionYear>0){
+         this->_texts["year"]=QString::number(searchMovieInfo.productionYear);
+    }
+
+    if (searchMovieInfo.runtime>0){
+         this->_texts["runtime"]=QString::number(searchMovieInfo.runtime);
+    }
 
     buildTvix();
 
@@ -396,12 +408,13 @@ void MainWindow::setBackdrop(const QString& url, Scraper *_currentScrape){
     buildTvix();
 
 }
+
 void MainWindow::chooseTizzBirdFolder() {
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     if (dialog.exec()){
-        modelB->setPath(dialog.selectedFiles().at(0));
+        modelB->cd(dialog.selectedFiles().at(0));
     }
 }
 
