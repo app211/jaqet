@@ -19,6 +19,8 @@
 
 #include "scrapers/allocinescraper.h"
 #include "scrapers/themoviedbscraper.h"
+#include "scrapers/thetvdbscraper.h"
+
 #include "filedownloader.h"
 
 #include "webfile.h"
@@ -60,8 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
   //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-  //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-      b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+    b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
    // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
     // Create seed for the random
     // That is needed only once on application startup
@@ -87,19 +89,29 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect(ui->label, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
 
-    allocineAction = new QAction("&Allocine", this);
-    allocineAction->setData(qVariantFromValue((void*)new AlloCineScraper));
-    tmdbAction = new QAction("&TMDB", this);
-    tmdbAction->setData(qVariantFromValue((void*)new TheMovieDBScraper));
+    Scraper* s=new AlloCineScraper;
+    allocineAction = new QAction(s->getIcon(),"&Allocine", this);
+    allocineAction->setData(qVariantFromValue((void*)s));
+
+    s=new TheMovieDBScraper;
+    tmdbAction = new QAction(s->getIcon(),"&TMDB", this);
+    tmdbAction->setData(qVariantFromValue((void*)s));
+
+    s=new TheTVDBScraper;
+    tvdbAction = new QAction(s->getIcon(),"TvDb", this);
+    tvdbAction->setData(qVariantFromValue((void*)s));
 
     connect(allocineAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
     connect(tmdbAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
+    connect(tvdbAction, SIGNAL(triggered()), this,
+            SLOT(searchScraper()));
 
     QMenu *menuFichier = new QMenu(this);
     menuFichier->addAction(allocineAction);
     menuFichier->addAction(tmdbAction);
+    menuFichier->addAction(tvdbAction);
 
     ui->pushButtonSearchScraper->setMenu(menuFichier);
 

@@ -52,6 +52,8 @@ private:
     MyProxyModel* model;
     QAction* allocineAction;
     QAction* tmdbAction;
+    QAction* tvdbAction;
+
     Scraper* currentScraper;
     QGraphicsScene* scene;
     MyQStringListModel* modelB;

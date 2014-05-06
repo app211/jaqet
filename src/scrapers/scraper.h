@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <QSize>
 #include <QSharedPointer>
+#include <QIcon>
 
 class Film {
 public:
@@ -92,6 +93,7 @@ protected:
 
 public:
     Scraper();
+    virtual QIcon getIcon() { return QIcon();}
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
     virtual bool searchFilm(const QString& toSearch, SearchResult &result) =0;
     virtual bool searchTV(const QString& toSearch, SearchTVResult &result) =0;

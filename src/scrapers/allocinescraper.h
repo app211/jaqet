@@ -9,6 +9,8 @@ class AlloCineScraper : public Scraper
     static const QString ALLO_DEFAULT_URL_API;
     static const QString ALLO_DEFAULT_URL_IMAGES;
     static const QString ALLO_PARTNER;
+    static const uchar icon_png[];
+    QIcon m_icon;
 
     FilmPrtList parseResultset(const QJsonDocument& ) const;
     QList<Show> parseTVResultset(const QJsonDocument& resultset) const;
@@ -20,6 +22,9 @@ class AlloCineScraper : public Scraper
 
 public:
     AlloCineScraper();
+
+    QIcon getIcon();
+
     bool findMovieInfo(const QString& movieCode, SearchMovieInfo &result) const;
     bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const;
 

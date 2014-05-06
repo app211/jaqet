@@ -22,7 +22,8 @@ SOURCES += src/main.cpp\
     src/third/networktest-1-3-0_src/weberror.cpp \
     src/third/networktest-1-3-0_src/webfile.cpp \
      src/fileparser.cpp \
-    src/myqstringlistmodel.cpp
+    src/myqstringlistmodel.cpp \
+    src/scrapers/thetvdbscraper.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -53,7 +54,8 @@ HEADERS  += src/mainwindow.h \
     src/third/networktest-1-3-0_src/webfile.h \
     src/filedownloader.h \
     src/fileparser.h \
-    src/myqstringlistmodel.h
+    src/myqstringlistmodel.h \
+    src/scrapers/thetvdbscraper.h
 
 
 FORMS    += src/mainwindow.ui
