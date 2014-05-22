@@ -1,12 +1,13 @@
 #ifndef TEMPLATEYADIS_H
 #define TEMPLATEYADIS_H
 
+#include <QObject>
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QPixmap>
 
 class QDomElement;
-class QPixmap;
 class templateYadis;
 class ScraperResource;
 
@@ -36,14 +37,52 @@ class  templateYadis_image  {
 
     friend templateYadis;
 };
-class templateYadis
+
+
+enum class FAN_ART {
+    UNKNOWN, NONE, ERROR, OK, CANCELED
+};
+
+enum class POSTER {
+    UNKNOWN, NONE, ERROR, OK
+};
+class QNetworkAccessManager;
+
+#include "../promise.h"
+
+class templateYadis :public QObject
 {
+    Q_OBJECT
+
 public:
     templateYadis();
     bool loadTemplate(const QString& fileName);
-    QPixmap createTivx(const ScraperResource &poster, const ScraperResource &backdrop, QMap<QString, QString> texts);
+
+public slots:
+
+    void createTivx(QNetworkAccessManager & manager, const ScraperResource &poster, const ScraperResource &backdrop, QMap<QString, QString> texts);
 
 private:
+    QPixmap m_fanArtPixmap;
+QMap<QString, QString> texts;
+
+    FAN_ART fa=FAN_ART::UNKNOWN;
+    POSTER po=POSTER::NONE;
+
+    void setFanArt(FAN_ART fa){
+        if (this->fa != fa){
+        this->fa=fa;
+        update();
+        }
+    }
+    void setPoster(POSTER po){
+        if (this->po != po){
+        this->po=po;
+        update();
+        }
+     }
+    void update();
+
     void parseMovie(const QDomElement& e);
     void parseMoviePoster(const QDomElement& e);
     QString absoluteTemplateFilePath;
@@ -64,6 +103,9 @@ public:
     QList<templateYadis_image> movie_synopsis_images;
     QList<templateYadis_text> movie_synopsis_texts;
 
+Q_SIGNALS:
+    void tivxOk(QPixmap result);
+    void canceled();
 };
 
 #endif // TEMPLATEYADIS_H

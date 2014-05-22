@@ -16,6 +16,7 @@
 #include <QGraphicsProxyWidget>
 #include <QInputDialog>
 #include <QStandardPaths>
+#include <QNetworkAccessManager>
 
 #include "scrapers/allocinescraper.h"
 #include "scrapers/themoviedbscraper.h"
@@ -23,7 +24,6 @@
 
 #include "filedownloader.h"
 
-#include "webfile.h"
 #include <QSortFilterProxyModel>
 #include <QStringListModel>
 #include <QCoreApplication>
@@ -54,17 +54,19 @@ void MainWindow::doubleClicked ( const QModelIndex & index){
         }
     }
 }
-templateYadis b;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
-  //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-    b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
+    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
     //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
-   // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+    // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+
+    b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
     // Create seed for the random
     // That is needed only once on application startup
     QTime time = QTime::currentTime();
@@ -86,6 +88,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->listView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
             this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&)));
+
+    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(s_clicked_texte(QPixmap )));
 
     //connect(ui->label, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
 
@@ -151,8 +155,8 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
         ui->labelType->setText(_tvShowTV?"T":"M");
 
 
-                // static avprobe av;
-                //  av.getInfo(fileInfo.absoluteFilePath());
+        // static avprobe av;
+        //  av.getInfo(fileInfo.absoluteFilePath());
 
 
 
@@ -165,7 +169,7 @@ void MainWindow::searchScraper(){
 
     QAction *action = qobject_cast<QAction *>(this->sender());
 
-    if(action == 0)
+    if(action == nullptr)
     {
         return;
     }
@@ -173,7 +177,7 @@ void MainWindow::searchScraper(){
     action->data();
 
     Scraper* scraper= (Scraper*)action->data().value<void *>();
-    if(scraper == 0)
+    if(scraper == nullptr)
     {
         return;
     }
@@ -208,38 +212,6 @@ void MainWindow::searchScraper(){
     ui->pushButtonSearchFilm->setEnabled(true);
 }
 
-bool loadPixmap(const QString& url, QPixmap& pixmap){
-    webfile f;
-    f.setUrl(url);
-
-    qDebug()<< url;
-
-    if (f.open())
-    {
-        QByteArray b;
-        char buffer[1024];
-        qint64  nSize = 0;
-
-
-        while ((nSize = f.read(buffer, sizeof(buffer))) > 0)
-        {
-            b.append(buffer,nSize);
-        }
-
-        f.close();
-
-        if (f.error())
-        {
-            return false; // m_webfile.errorString()
-        }
-
-        pixmap.loadFromData(b);
-    } else {
-        return false; // m_webfile.errorString()
-    }
-
-    return true;
-}
 
 void MainWindow::changeFileName(){
     bool ok;
@@ -251,6 +223,53 @@ void MainWindow::changeFileName(){
     }
 }
 
+QPixmap createDefaultPoster(int w, int h){
+    QPixmap result(w,h);
+    result.fill(Qt::white);
+
+    QPainter pixPaint(&result);
+
+    QPixmap icon;
+    icon.load(":/DownloadIcon.png");
+    pixPaint.drawPixmap((w-icon.width())/2,(h-icon.height())/2,icon.width(),icon.height(),icon);
+
+    return result;
+}
+
+void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
+
+    if (itemToUpdate==nullptr){
+        // Nothing to do
+        return;
+    } else {
+        bool itemSeemsToExistsAnymore=false;
+        QList<QGraphicsItem*> all = this->scene->items();
+        for (int i = 0; i < all.size(); i++)
+        {
+            if (itemToUpdate==all[i]){
+                itemSeemsToExistsAnymore=true;
+                break;
+            }
+        }
+
+        if (!itemSeemsToExistsAnymore){
+            // Nothing to do
+            return;
+        }
+    }
+
+    QPixmap pixmap;
+    pixmap.loadFromData(qb);
+    QPixmap scaled = (pixmap.width()>w || pixmap.height()>h) ? pixmap.scaled(w,h,Qt::KeepAspectRatio):pixmap;
+    itemToUpdate->setPixmap(scaled);
+    itemToUpdate->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+}
+
+#include "promise.h"
+
+
+
+
 void MainWindow::searchAllocineMovie(){
     QString code = ui->comboBoxProposition->itemData( ui->comboBoxProposition->currentIndex()).toString();
 
@@ -258,6 +277,7 @@ void MainWindow::searchAllocineMovie(){
     QProgressDialog progress("Task in progress...", "Cancel", 0, 0, this);
     progress.setWindowModality(Qt::WindowModal);
     progress.show();
+
 
 
     if (this->_tvShowTV){
@@ -312,18 +332,34 @@ void MainWindow::searchAllocineMovie(){
             int w=200;
             int h=200;
 
+            QSet<QString> urls;
+
             if (!b.postersHref.isEmpty()){
                 foreach (const QString& url , b.postersHref){
                     progress.setValue(curVal++);
-                    QPixmap buttonImage;
-                    loadPixmap(currentScraper->getBestImageUrl(url,QSize(w,h)),buttonImage);
+
+                    QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+                    if (urls.contains(realUrl)){
+                        continue;
+                    }
+
+                    urls.insert(realUrl);
 
                     scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
 
-                    QPixmap scaled = (buttonImage.width()>w || buttonImage.height()>h) ? buttonImage.scaled(w,h,Qt::KeepAspectRatio):buttonImage;
+                    QPixmap scaled = createDefaultPoster(w,h);
 
                     QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
                     pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+                    Promise* promise=Promise::loadAsync(manager,realUrl);
+                    QObject::connect(promise, &Promise::completed, [=]()
+                    {
+                        if (promise->reply->error() ==QNetworkReply::NoError){
+                            QByteArray qb=promise->reply->readAll();
+                            setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                        }
+                    });
 
                     QPushButton* b = new QPushButton("Plus");
 
@@ -337,9 +373,9 @@ void MainWindow::searchAllocineMovie(){
 
                     x+=w+10;
 
-                    if (progress.wasCanceled())
+                    if (progress.wasCanceled()){
                         return;
-
+                    }
                 }
             }
 
@@ -347,15 +383,28 @@ void MainWindow::searchAllocineMovie(){
                 foreach (const QString& url , b.backdropsHref){
                     progress.setValue(curVal++);
 
-                    QPixmap buttonImage;
-                    loadPixmap(currentScraper->getBestImageUrl(url,QSize(w,h)),buttonImage);
+                    QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+                    if (urls.contains(realUrl)){
+                        continue;
+                    }
+
+                    urls.insert(realUrl);
 
                     scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
 
-                    QPixmap scaled = (buttonImage.width()>w || buttonImage.height()>h) ? buttonImage.scaled(w,h,Qt::KeepAspectRatio):buttonImage;
+                    QPixmap scaled = createDefaultPoster(w,h);
 
                     QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
                     pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+                    Promise* promise=Promise::loadAsync(manager,realUrl);
+                    QObject::connect(promise, &Promise::completed, [=]()
+                    {
+                        if (promise->reply->error() ==QNetworkReply::NoError){
+                            QByteArray qb=promise->reply->readAll();
+                            setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                        }
+                    });
 
                     QPushButton* b = new QPushButton("Plus");
 
@@ -370,8 +419,9 @@ void MainWindow::searchAllocineMovie(){
 
                     x+=w+10;
 
-                    if (progress.wasCanceled())
+                    if (progress.wasCanceled()){
                         return;
+                    }
                 }
             }
 
@@ -383,7 +433,12 @@ void MainWindow::searchAllocineMovie(){
 }
 
 void MainWindow::buildTvix() {
-    ui->labelPoster->setPixmap(b.createTivx(_poster, _backdrop,_texts));
+    b.createTivx(this->manager,_poster, _backdrop,_texts);
+ //   b.canceled();
+}
+
+void MainWindow::s_clicked_texte(QPixmap result){
+   ui->labelPoster->setPixmap(result);
 }
 
 void MainWindow::setPoster (const QString& url, Scraper *_currentScrape){
@@ -402,11 +457,11 @@ void MainWindow::setMovieInfo( const SearchMovieInfo& searchMovieInfo){
     this->_texts["directors"]=searchMovieInfo.directors.join(',');
 
     if (searchMovieInfo.productionYear>0){
-         this->_texts["year"]=QString::number(searchMovieInfo.productionYear);
+        this->_texts["year"]=QString::number(searchMovieInfo.productionYear);
     }
 
     if (searchMovieInfo.runtime>0){
-         this->_texts["runtime"]=QString::number(searchMovieInfo.runtime);
+        this->_texts["runtime"]=QString::number(searchMovieInfo.runtime);
     }
 
     buildTvix();

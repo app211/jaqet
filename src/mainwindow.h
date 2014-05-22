@@ -7,11 +7,13 @@
 #include <QGraphicsScene>
 #include <QStringListModel>
 #include <QPixmap>
+#include "template/templateyadis.h"
 
 
 
 class MyProxyModel;
 class MyQStringListModel;
+#include <QNetworkAccessManager>
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +49,7 @@ private slots:
     void buildTvix();
 
     void savePix();
+void s_clicked_texte(QPixmap result);
 
 private:
     MyProxyModel* model;
@@ -70,6 +73,12 @@ private:
     QString _episodeTV;
     QString _seasonTV;
     bool _tvShowTV=false;
+
+    QNetworkAccessManager manager;
+    templateYadis b;
+
+    void setImageFromInternet(QByteArray &qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
+
 };
 
 

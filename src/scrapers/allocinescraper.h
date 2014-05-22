@@ -32,7 +32,7 @@ public:
     bool searchFilm(const QString& toSearch, SearchResult &result) ;
     bool searchTV(const QString& toSearch, SearchTVResult &result);
 
-    QString getBestImageUrl(const QString& filePath, const QSize& size) const;
+    QString getBestImageUrl(const QString& filePath, const QSize& ) const;
 
 };
 #endif // ALLOCINESCRAPER_H

@@ -65,6 +65,7 @@ bool AlloCineScraper::searchFilm(const QString& toSearch, SearchResult &result) 
 
     return false;
 }
+
 bool AlloCineScraper::searchTV(const QString& toSearch, SearchTVResult &result)  {
     QMap<QString,QString> params;
     params["filter"]="tvseries";
@@ -89,6 +90,7 @@ bool AlloCineScraper::searchTV(const QString& toSearch, SearchTVResult &result) 
 
     return false;
 }
+
 bool AlloCineScraper::findMovieInfo( const QString& movieCode, SearchMovieInfo& result) const {
 
     QMap<QString,QString> params;
@@ -280,6 +282,7 @@ bool AlloCineScraper::findEpisodeInfo(const QString& episodeCode, SearchEpisodeI
 
     return false;
 }
+
 bool AlloCineScraper::findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const{
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(showCode);
@@ -355,7 +358,7 @@ bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovie
     return true;
 }
 
-QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& size) const{
+QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& ) const{
     return filePath;
 }
 

@@ -233,7 +233,6 @@ QString findBestSize(const QStringList& listSizes, int sizeToFit){
 
     foreach (const QString& size, listSizes)
     {
-        qDebug() << size;
         if (sizeRegExp.exactMatch(size) && sizeRegExp.captureCount()==1) {
             int curSize=sizeRegExp.cap(1).toInt();
             if (delta==0 || qAbs(curSize-sizeToFit)<delta){
