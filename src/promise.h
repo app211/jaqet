@@ -10,14 +10,14 @@ class Promise : public QObject
 {
     Q_OBJECT
 
-    public:
-        Promise();
- QNetworkReply * reply;
- static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url);
+public:
+    Promise();
+    QNetworkReply * reply=nullptr;
+    static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url);
 
-    Q_SIGNALS:
-        void completed();
-        void canceled();
+Q_SIGNALS:
+    void completed();
+    void canceled();
 
 };
 

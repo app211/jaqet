@@ -348,7 +348,7 @@ void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, co
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 if(parseImageInfo(doc,newResult)){
-                    emit found(newResult);
+                    emit found(this,newResult);
                 } else {
                     qDebug() <<data;
                 }

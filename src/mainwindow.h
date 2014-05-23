@@ -36,30 +36,28 @@ private:
 private slots:
 
     void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
-    void searchAllocineMovie();
-    void searchScraper();
+    void search(QFileInfo f);
     void chooseTizzBirdFolder();
     void loadImage();
     void ctxMenu(const QPoint &pos) ;
-    void changeFileName();
+
     void doubleClicked ( const QModelIndex & index );
     void setMovieInfo( const SearchMovieInfo&);
-     void setPoster (const QString& url, Scraper* scrape );
-    void setBackdrop(const QString& url, Scraper *scrape);
+     void setPoster (const QString& url, const Scraper *scrape );
+    void setBackdrop(const QString& url, const Scraper *scrape);
     void buildTvix();
 
     void savePix();
     void s_clicked_texte(QPixmap result);
-    void found(FilmPrtList result);
+    void proceed(Scraper* fromScraper, const QString& code);
 
-    void test(SearchMovieInfo b);
+    void test(const Scraper *scraper, SearchMovieInfo b);
 private:
     MyProxyModel* model;
     QAction* allocineAction;
     QAction* tmdbAction;
     QAction* tvdbAction;
 
-    Scraper* currentScraper;
     QGraphicsScene* scene;
     MyQStringListModel* modelB;
     Ui::MainWindow *ui;
@@ -78,6 +76,8 @@ private:
 
     QNetworkAccessManager manager;
     templateYadis b;
+
+    QList<Scraper*> scrapes;
 
     void setImageFromInternet(QByteArray &qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
 

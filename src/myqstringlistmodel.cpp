@@ -2,7 +2,7 @@
 
 void MyQStringListModel::cdUp(){
     if (currentDir.cdUp()){
-    populate();
+        populate();
     }
 }
 
@@ -12,6 +12,20 @@ void MyQStringListModel::cd(const QString& path){
         populate();
     }
 }
+
+MyQStringListModel::TypeItem MyQStringListModel::getTypeItem( const QModelIndex & index) const{
+    if (index.isValid()){
+        QFileInfo f(currentDir,data(index,Qt::DisplayRole).toString());
+        if (f.isDir()){
+            return TypeItem::DIR;
+        } else if (f.isFile()){
+            return TypeItem::PROCEEDABLE;
+        }
+    }
+
+    return TypeItem::UNKWON;
+}
+
 
 bool MyQStringListModel::isDir( const QModelIndex & index) const {
 

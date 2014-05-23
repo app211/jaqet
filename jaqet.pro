@@ -27,7 +27,8 @@ SOURCES += src/main.cpp\
     src/scrapers/httpaccess.cpp \
     src/scrapers/curlaccess.cpp \
     src/scrapers/cncclassificationwrapper.cpp \
-    src/promise.cpp
+    src/promise.cpp \
+    src/searchscraperdialog.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -51,10 +52,12 @@ HEADERS  += src/mainwindow.h \
     src/scrapers/httpaccess.h \
     src/scrapers/curlaccess.h \
     src/scrapers/cncclassificationwrapper.h \
-    src/promise.h
+    src/promise.h \
+    src/searchscraperdialog.h
 
 
-FORMS    += src/mainwindow.ui
+FORMS    += src/mainwindow.ui \
+    src/searchscraperdialog.ui
 
 
 win32:LIBS += -LC:\Developpement\curl-7.33.0-devel-mingw32\lib -lcurldll

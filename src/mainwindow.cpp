@@ -60,13 +60,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
     //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
     // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
     //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
     // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 
-    b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
+   // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
     // Create seed for the random
     // That is needed only once on application startup
     QTime time = QTime::currentTime();
@@ -101,28 +101,25 @@ MainWindow::MainWindow(QWidget *parent) :
     tmdbAction = new QAction(s->getIcon(),"&TMDB", this);
     tmdbAction->setData(qVariantFromValue((void*)s));
 
+    this->scrapes.append(s);
     /*  s=new TheTVDBScraper;
     tvdbAction = new QAction(s->getIcon(),"TvDb", this);
     tvdbAction->setData(qVariantFromValue((void*)s));
 */
     /*  connect(allocineAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));*/
-    connect(tmdbAction, SIGNAL(triggered()), this,
-            SLOT(searchScraper()));
+/*    connect(tmdbAction, SIGNAL(triggered()), this,
+            SLOT(searchScraper()));*/
     /*    connect(tvdbAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
 */
-    connect(s, SIGNAL(found(FilmPrtList)), this,
-            SLOT(found(FilmPrtList)));
-    connect(s, SIGNAL(found(SearchMovieInfo)), this,
-            SLOT(test(SearchMovieInfo)));
+     connect(s, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
+            SLOT(test(const Scraper*,SearchMovieInfo)));
 
     QMenu *menuFichier = new QMenu(this);
     //menuFichier->addAction(allocineAction);
     menuFichier->addAction(tmdbAction);
     //  menuFichier->addAction(tvdbAction);
-
-    ui->pushButtonSearchScraper->setMenu(menuFichier);
 
     scene = new QGraphicsScene(this);
     ui->graphicsViewPosters->setScene(scene);
@@ -136,104 +133,38 @@ void MainWindow::ctxMenu(const QPoint &pos) {
     //menu->exec(ui->label->mapToGlobal(pos));
 }
 
+#include "searchscraperdialog.h"
 
+void MainWindow::search(QFileInfo f){
+    qDebug() << f.absoluteFilePath();
+
+      SearchScraperDialog* d= new SearchScraperDialog(this, f , this->scrapes, &this->manager);
+
+      connect(d, SIGNAL(proceed(Scraper *,const QString& )), this, SLOT(proceed(Scraper *,const QString& )));
+
+      d->setModal(true);
+      d->show();
+}
 
 
 void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex & previous ){
 
-    ui->comboBoxProposition->clear();
-    ui->comboBoxProposition->setEnabled(false);
-    ui->pushButtonSearchFilm->setEnabled(false);
 
-    if (!modelB->isDir(current)){
+    MyQStringListModel::TypeItem typeItem=modelB->getTypeItem(current);
 
-        //ui->scrollAreaScrapResult->setVisible(false);
+    if (typeItem==MyQStringListModel::TypeItem::PROCEEDABLE){
+        ui->stackedWidget->setCurrentIndex(0);
 
         fileInfo=modelB->fileInfo(current);
 
-        QString baseName = FileParser::baseName(fileInfo);
-        QString name = FileParser::cleanName(baseName);
-        QString filteredName = FileParser::filterBlacklist(name);
-        ui->labelAllo->setText(filteredName);
+        ui->Proceed->disconnect();
+        QObject::connect(ui->Proceed, &QPushButton::released, [=]()
+        {
+            search(fileInfo);
+        });
 
-        _tvShowTV = FileParser::isSeries(baseName,_seasonTV,_episodeTV);
-        ui->labelType->setText(_tvShowTV?"T":"M");
-
-
-        // static avprobe av;
-        //  av.getInfo(fileInfo.absoluteFilePath());
-
-
-
-    }
-}
-
-
-
-void MainWindow::searchScraper(){
-
-    QAction *action = qobject_cast<QAction *>(this->sender());
-
-    if(action == nullptr)
-    {
-        return;
-    }
-
-    action->data();
-
-    Scraper* scraper= (Scraper*)action->data().value<void *>();
-    if(scraper == nullptr)
-    {
-        return;
-    }
-
-    this->currentScraper = scraper;
-
-    ui->comboBoxProposition->clear();
-
-    if (!this->_tvShowTV){
-        SearchResult a;
-        currentScraper->searchFilm(&this->manager,ui->labelAllo->text());
-        /* {
-            for (int i=0; i<(a.films.size());i++){
-                ui->comboBoxProposition->addItem(a.films.at(i)->title+" "+ a.films.at(i)->productionYear, a.films.at(i)->code);
-
-            }
-        }*/
-    } else {
-        SearchTVResult a;
-        if (currentScraper->searchTV(ui->labelAllo->text(),a)){
-            for (int i=0; i<(a.shows.size());i++){
-                ui->comboBoxProposition->addItem(a.shows.at(i).title+" "+ a.shows.at(i).productionYear, a.shows.at(i).code);
-                qDebug() << a.shows.at(i).originalTitle << " " << a.shows.at(i).productionYear << " " << a.shows.at(i).posterHref << a.shows.at(i).code;
-                /*   */
-            }
-        }
-
-    }
-
-    //ui->scrollAreaScrapResult->setVisible(false);
-
-}
-
-void MainWindow::found(FilmPrtList result){
-    for (int i=0; i<(result.size());i++){
-        ui->comboBoxProposition->addItem(result.at(i)->title+" "+ result.at(i)->productionYear, result.at(i)->code);
-
-    }
-
-    ui->comboBoxProposition->setEnabled(true);
-    ui->pushButtonSearchFilm->setEnabled(true);
-
-}
-
-void MainWindow::changeFileName(){
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                         tr("User name:"), QLineEdit::Normal,
-                                         ui->labelAllo->text(), &ok);
-    if (ok && !text.isEmpty()){
-        ui->labelAllo->setText(text);
+    } else if (typeItem==MyQStringListModel::TypeItem::DIR){
+        ui->stackedWidget->setCurrentIndex(2);
     }
 }
 
@@ -284,12 +215,11 @@ void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* item
 
 
 
-void MainWindow::searchAllocineMovie(){
-    QString code = ui->comboBoxProposition->itemData( ui->comboBoxProposition->currentIndex()).toString();
+void MainWindow::proceed(Scraper* fromScraper, const QString& code){
 
     if (this->_tvShowTV){
         SearchEpisodeInfo b;
-        if (!currentScraper->findEpisodeInfo(code,this->_seasonTV,this->_episodeTV,b)){
+        if (!fromScraper->findEpisodeInfo(code,this->_seasonTV,this->_episodeTV,b)){
 
         } else {
             ui->synopsis->setText(b.synopsis);
@@ -304,12 +234,13 @@ void MainWindow::searchAllocineMovie(){
         }
     } else {
         SearchMovieInfo b;
-        currentScraper->findMovieInfo(&this->manager,code);
+        fromScraper->findMovieInfo(&this->manager,code);
     }
 }
 
-void MainWindow::test(SearchMovieInfo b){
+void MainWindow::test(const Scraper* scraper,SearchMovieInfo b){
 
+    ui->stackedWidget->setCurrentIndex(1);
     if (!b.linkHref.isEmpty()){
         ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
         ui->labelUrl->setTextFormat(Qt::RichText);
@@ -340,7 +271,7 @@ void MainWindow::test(SearchMovieInfo b){
     if (!b.postersHref.isEmpty()){
         foreach (const QString& url , b.postersHref){
 
-            QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
             if (urls.contains(realUrl)){
                 continue;
             }
@@ -367,7 +298,7 @@ void MainWindow::test(SearchMovieInfo b){
 
             QObject::connect(b, &QPushButton::released, [=]()
             {
-                setPoster(url,currentScraper);
+                setPoster(url,scraper);
             });
 
             QGraphicsProxyWidget* button = scene->addWidget(b);
@@ -381,7 +312,7 @@ void MainWindow::test(SearchMovieInfo b){
     if (!b.backdropsHref.isEmpty()){
         foreach (const QString& url , b.backdropsHref){
 
-            QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
             if (urls.contains(realUrl)){
                 continue;
             }
@@ -408,7 +339,7 @@ void MainWindow::test(SearchMovieInfo b){
 
             QObject::connect(b, &QPushButton::released, [=]()
             {
-                setBackdrop(url,currentScraper);
+                setBackdrop(url,scraper);
             });
 
             QGraphicsProxyWidget* button = scene->addWidget(b);
@@ -436,7 +367,7 @@ void MainWindow::s_clicked_texte(QPixmap result){
     ui->labelPoster->setPixmap(result);
 }
 
-void MainWindow::setPoster (const QString& url, Scraper *_currentScrape){
+void MainWindow::setPoster (const QString& url, const Scraper *_currentScrape){
 
 
     this->_poster=ScraperResource(url,_currentScrape);
@@ -463,7 +394,7 @@ void MainWindow::setMovieInfo( const SearchMovieInfo& searchMovieInfo){
 
 }
 
-void MainWindow::setBackdrop(const QString& url, Scraper *_currentScrape){
+void MainWindow::setBackdrop(const QString& url, const Scraper *_currentScrape){
 
     this->_backdrop=ScraperResource(url,_currentScrape);
 

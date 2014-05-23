@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <widget class="QWidget" name="widget_2" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -40,83 +40,23 @@
          <widget class="QWidget" name="widget_3" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QTabWidget" name="tabWidget">
+            <widget class="QStackedWidget" name="stackedWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
-             <widget class="QWidget" name="tab">
-              <attribute name="title">
-               <string>Scraper</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout">
+             <widget class="QWidget" name="pageProceed">
+              <layout class="QVBoxLayout" name="verticalLayout_7">
                <item>
-                <widget class="QWidget" name="widget_4" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
+                <widget class="QPushButton" name="Proceed">
+                 <property name="text">
+                  <string>PushButton</string>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="labelAllo">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>TextLabel</string>
-                    </property>
-                    <property name="scaledContents">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QComboBox" name="comboBoxProposition"/>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QPushButton" name="pushButtonSearchScraper">
-                    <property name="text">
-                     <string>Rechercher</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="3">
-                   <widget class="QPushButton" name="pushButtonSearchFilm">
-                    <property name="text">
-                     <string>Rechercher</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QToolButton" name="toolButton">
-                    <property name="text">
-                     <string>...</string>
-                    </property>
-                    <property name="toolButtonStyle">
-                     <enum>Qt::ToolButtonFollowStyle</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="labelType">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>T</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
                 </widget>
                </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_2">
+              <layout class="QVBoxLayout" name="verticalLayout_8">
                <item>
                 <widget class="QTabWidget" name="tabWidget_2">
                  <property name="currentIndex">
@@ -168,20 +108,20 @@
                 </widget>
                </item>
                <item>
-                <widget class="QScrollArea" name="scrollArea">
+                <widget class="QScrollArea" name="scrollArea_2">
                  <property name="widgetResizable">
                   <bool>true</bool>
                  </property>
-                 <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <widget class="QWidget" name="scrollAreaWidgetContents_2">
                   <property name="geometry">
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>424</width>
-                    <height>76</height>
+                    <width>426</width>
+                    <height>90</height>
                    </rect>
                   </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <layout class="QVBoxLayout" name="verticalLayout_9">
                    <item>
                     <widget class="QPushButton" name="pushButton">
                      <property name="text">
@@ -202,6 +142,7 @@
                </item>
               </layout>
              </widget>
+             <widget class="QWidget" name="page"/>
             </widget>
            </item>
           </layout>
@@ -252,70 +193,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>pushButtonSearchScraper</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>searchAllocine()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>820</x>
-     <y>120</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonSearchFilm</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>searchAllocineMovie()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>764</x>
-     <y>140</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>changeFileName()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>658</x>
-     <y>119</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>pressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>savePix()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>658</x>
-     <y>419</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>searchAllocine()</slot>
@@ -324,5 +201,6 @@
   <slot>changeFileName()</slot>
   <slot>setSynopsis()</slot>
   <slot>savePix()</slot>
+  <slot>search()</slot>
  </slots>
 </ui>

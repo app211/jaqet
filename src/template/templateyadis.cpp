@@ -270,13 +270,15 @@ void templateYadis::createTivx(QNetworkAccessManager & manager, const ScraperRes
     if (!fanArt.resources.isEmpty()){
         QString url=fanArt.scraper->getBestImageUrl(fanArt.resources,QSize(w,h));
 
+        qDebug() << url;
+
         Promise* promise=Promise::loadAsync(manager,url);
 
         QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
-           if (promise->reply->error() ==QNetworkReply::NoError){
+            if (promise->reply->error() ==QNetworkReply::NoError){
                 QByteArray qb=promise->reply->readAll();
                 QPixmap fanArtPixmap;
                 if (fanArtPixmap.loadFromData(qb)){
@@ -325,7 +327,12 @@ void templateYadis::update(){
         foreach (const templateYadis_image& image, movie_synopsis_images){
             qDebug() << image.type << image.value;
             if (image.type=="fanart" && this->fa==FAN_ART::OK && !m_fanArtPixmap.isNull()){
-                pixPaint.drawPixmap(image.x,image.y,image.w,image.h,m_fanArtPixmap);
+                QPixmap scaled=m_fanArtPixmap.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                int x= image.x+ (image.w-scaled.width())/2;
+                int y= image.y+ (image.h-scaled.height())/2;
+                int w= scaled.width();
+                int h=scaled.height();
+                pixPaint.drawPixmap(x,y,w,h,scaled);
 
             } else if (image.type=="static" && !image.value.isEmpty()){
                 QPixmap pstatic;
@@ -345,60 +352,60 @@ void templateYadis::update(){
 
         }
 
-       foreach (const templateYadis_text& text, movie_synopsis_texts){
-        if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,0,text.value);
+        foreach (const templateYadis_text& text, movie_synopsis_texts){
+            if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,0,text.value);
 
-        } else if (text.type=="plot" && texts.contains("synopsis")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["synopsis"]);
+            } else if (text.type=="plot" && texts.contains("synopsis")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["synopsis"]);
 
-        } else if (text.type=="cast" && texts.contains("actors")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["actors"]);
+            } else if (text.type=="cast" && texts.contains("actors")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["actors"]);
 
-        } else if (text.type=="director" && texts.contains("directors")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["directors"]);
+            } else if (text.type=="director" && texts.contains("directors")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["directors"]);
 
-        } else if (text.type=="year" && texts.contains("year")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["year"]);
+            } else if (text.type=="year" && texts.contains("year")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["year"]);
 
-        } else if (text.type=="runtime" && texts.contains("runtime")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["runtime"]);
+            } else if (text.type=="runtime" && texts.contains("runtime")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["runtime"]);
 
-        }else if (text.type=="title" && texts.contains("title")){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["title"]);
+            }else if (text.type=="title" && texts.contains("title")){
+                QFont font(text.font);
+                font.setPixelSize(text.size);
+                pixPaint.setFont(font);
+                pixPaint.setPen(QPen(QColor(text.color)));
+                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["title"]);
+
+            }
+
 
         }
-
-
-    }
 
         emit tivxOk(result);
     }

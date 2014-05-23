@@ -110,15 +110,15 @@ public:
 
 Q_SIGNALS:
     void found(FilmPrtList films);
-    void found(SearchMovieInfo films);
+    void found(const Scraper* scraper,SearchMovieInfo films);
 };
 
 
 class ScraperResource {
 public:
     QString resources;
-    Scraper* scraper;
-    ScraperResource(const QString& resources, Scraper* scraper){
+    const Scraper* scraper;
+    ScraperResource(const QString& resources, const Scraper* scraper){
         this->resources=resources;
         this->scraper=scraper;
     }

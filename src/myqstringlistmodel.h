@@ -8,6 +8,10 @@
 class MyQStringListModel : public QStringListModel {
 public :
 
+    enum class TypeItem {
+        PROCEEDABLE, PROCEEDED, UNKWON, DIR
+    };
+
     QDir currentDir;
 
     explicit MyQStringListModel(QObject *parent = 0, const QString& path=""):
@@ -20,6 +24,8 @@ public :
     bool isDir( const QModelIndex & index) const;
     QFileInfo fileInfo(const QModelIndex & index)const;
     Qt::ItemFlags flags ( const QModelIndex & index ) const;
+
+    TypeItem getTypeItem( const QModelIndex & index) const;
 
 private :
     void populate();
