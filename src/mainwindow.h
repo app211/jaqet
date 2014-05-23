@@ -49,8 +49,10 @@ private slots:
     void buildTvix();
 
     void savePix();
-void s_clicked_texte(QPixmap result);
+    void s_clicked_texte(QPixmap result);
+    void found(FilmPrtList result);
 
+    void test(SearchMovieInfo b);
 private:
     MyProxyModel* model;
     QAction* allocineAction;

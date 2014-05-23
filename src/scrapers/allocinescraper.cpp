@@ -1,3 +1,4 @@
+#if 0
 #include "allocinescraper.h"
 
 #include <QCryptographicHash>
@@ -587,3 +588,4 @@ QIcon AlloCineScraper::getIcon() {
 
     return m_icon;
 }
+#endif

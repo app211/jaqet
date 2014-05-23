@@ -39,7 +39,7 @@ const QString FileParser::REGEXSEPARATORS = "[_]";
  * \W Matches a non-word character.
  * Thank you Giuseppe Calà
  */
-const QString FileParser::REGEXSPECIAL = "[^\\w\\s]";
+const QString FileParser::REGEXSPECIAL = "[^\\w\\s-]";
 
 /* REGEXBRACKETS
  * \\(               Include opening bracket
@@ -125,38 +125,50 @@ QString FileParser::cleanName(const QString &name)
 {
     QString clean = name.simplified();
 
+    qDebug() << "Clean" << name;
+
     //Ignore all information between brackets.
     QRegExp regex(REGEXBRACKETS);
     clean.replace(regex, " ");
     clean = clean.trimmed();
 
+    qDebug() << "Clean" << name;
+
     // Remove the series detection part from the name.
     QStringList::const_iterator constIterator;
     for (constIterator = REGEXSERIES.constBegin(); constIterator != REGEXSERIES.constEnd(); ++constIterator) {
+        qDebug() << "Clean" << *constIterator;
         regex.setPattern(*constIterator);
         clean.remove(regex);
     }
 
     // Remove the year from the name.
     if (clean.length() > 4) //movie 2012
+    {
         regex.setPattern(REGEXYEAR);
     clean.remove(regex);
-
+}
     return clean.simplified();
 }
 
 QString FileParser::filterBlacklist(const QString &name)
 {
     QString clean = name;
+    qDebug() << "TOCLEAN :" <<clean;
 
-    // Remove dots
-    clean.replace(".", " ");
+    // Remove double char
+    clean.replace("..", ".");
+    clean.replace("  ", " ");
+    clean.replace("__", "_");
+   // qDebug() << "TOCLEAN :" <<clean;
 
     //Remove special characters.
     QRegExp regex(REGEXSPECIAL);
-    clean.remove(regex);
+   // clean.remove(regex);
+    qDebug() << "TOCLEAN :" <<clean;
 
     clean = clean.toUpper();
+    qDebug() << "TOCLEAN :" <<clean;
 
     if (REGEXBLACKLIST.isEmpty()){
         REGEXBLACKLIST=readBlacklist();
@@ -164,10 +176,14 @@ QString FileParser::filterBlacklist(const QString &name)
 
     //Remove blacklisted regexp
     foreach(const QString & pattern, REGEXBLACKLIST) {
+        qDebug() << "filterBlacklist" <<pattern;
 
         QRegularExpression reg(pattern);
         clean.replace(reg, " ");
     }
+
+    clean.replace(".", " ");
+    clean.replace("_", " ");
 
     return clean.simplified();
 }

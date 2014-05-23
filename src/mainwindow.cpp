@@ -93,29 +93,34 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect(ui->label, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
 
-    Scraper* s=new AlloCineScraper;
+    /*Scraper* s=new AlloCineScraper;
     allocineAction = new QAction(s->getIcon(),"&Allocine", this);
     allocineAction->setData(qVariantFromValue((void*)s));
-
-    s=new TheMovieDBScraper;
+*/
+    Scraper* s=new TheMovieDBScraper;
     tmdbAction = new QAction(s->getIcon(),"&TMDB", this);
     tmdbAction->setData(qVariantFromValue((void*)s));
 
-    s=new TheTVDBScraper;
+    /*  s=new TheTVDBScraper;
     tvdbAction = new QAction(s->getIcon(),"TvDb", this);
     tvdbAction->setData(qVariantFromValue((void*)s));
-
-    connect(allocineAction, SIGNAL(triggered()), this,
-            SLOT(searchScraper()));
+*/
+    /*  connect(allocineAction, SIGNAL(triggered()), this,
+            SLOT(searchScraper()));*/
     connect(tmdbAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
-    connect(tvdbAction, SIGNAL(triggered()), this,
+    /*    connect(tvdbAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
+*/
+    connect(s, SIGNAL(found(FilmPrtList)), this,
+            SLOT(found(FilmPrtList)));
+    connect(s, SIGNAL(found(SearchMovieInfo)), this,
+            SLOT(test(SearchMovieInfo)));
 
     QMenu *menuFichier = new QMenu(this);
-    menuFichier->addAction(allocineAction);
+    //menuFichier->addAction(allocineAction);
     menuFichier->addAction(tmdbAction);
-    menuFichier->addAction(tvdbAction);
+    //  menuFichier->addAction(tvdbAction);
 
     ui->pushButtonSearchScraper->setMenu(menuFichier);
 
@@ -188,12 +193,13 @@ void MainWindow::searchScraper(){
 
     if (!this->_tvShowTV){
         SearchResult a;
-        if (currentScraper->searchFilm(ui->labelAllo->text(),a)){
+        currentScraper->searchFilm(&this->manager,ui->labelAllo->text());
+        /* {
             for (int i=0; i<(a.films.size());i++){
                 ui->comboBoxProposition->addItem(a.films.at(i)->title+" "+ a.films.at(i)->productionYear, a.films.at(i)->code);
 
             }
-        }
+        }*/
     } else {
         SearchTVResult a;
         if (currentScraper->searchTV(ui->labelAllo->text(),a)){
@@ -208,10 +214,18 @@ void MainWindow::searchScraper(){
 
     //ui->scrollAreaScrapResult->setVisible(false);
 
-    ui->comboBoxProposition->setEnabled(true);
-    ui->pushButtonSearchFilm->setEnabled(true);
 }
 
+void MainWindow::found(FilmPrtList result){
+    for (int i=0; i<(result.size());i++){
+        ui->comboBoxProposition->addItem(result.at(i)->title+" "+ result.at(i)->productionYear, result.at(i)->code);
+
+    }
+
+    ui->comboBoxProposition->setEnabled(true);
+    ui->pushButtonSearchFilm->setEnabled(true);
+
+}
 
 void MainWindow::changeFileName(){
     bool ok;
@@ -273,13 +287,6 @@ void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* item
 void MainWindow::searchAllocineMovie(){
     QString code = ui->comboBoxProposition->itemData( ui->comboBoxProposition->currentIndex()).toString();
 
-
-    QProgressDialog progress("Task in progress...", "Cancel", 0, 0, this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.show();
-
-
-
     if (this->_tvShowTV){
         SearchEpisodeInfo b;
         if (!currentScraper->findEpisodeInfo(code,this->_seasonTV,this->_episodeTV,b)){
@@ -297,148 +304,136 @@ void MainWindow::searchAllocineMovie(){
         }
     } else {
         SearchMovieInfo b;
-        if (!currentScraper->findMovieInfo(code,b)){
+        currentScraper->findMovieInfo(&this->manager,code);
+    }
+}
 
-        } else{
+void MainWindow::test(SearchMovieInfo b){
 
-            progress.setMaximum(b.postersHref.size()+b.backdropsHref.size());
+    if (!b.linkHref.isEmpty()){
+        ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
+        ui->labelUrl->setTextFormat(Qt::RichText);
+        ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        ui->labelUrl->setOpenExternalLinks(true);
+    }
 
-            int curVal=0;
+    ui->synopsis->setText(b.synopsis);
 
-            progress.setValue(curVal++);
+    ui->toolButtonSysnopsis->disconnect();
+    QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
+    {
+        setMovieInfo(b);
+    });
 
-            if (!b.linkHref.isEmpty()){
-                ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
-                ui->labelUrl->setTextFormat(Qt::RichText);
-                ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                ui->labelUrl->setOpenExternalLinks(true);
+    scene->clear();
+
+
+    ui->graphicsViewPosters->setScene(NULL);
+
+    int x=0;
+    int y=20;
+    int w=200;
+    int h=200;
+
+    QSet<QString> urls;
+
+    if (!b.postersHref.isEmpty()){
+        foreach (const QString& url , b.postersHref){
+
+            QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+            if (urls.contains(realUrl)){
+                continue;
             }
 
-            ui->synopsis->setText(b.synopsis);
+            urls.insert(realUrl);
 
-            ui->toolButtonSysnopsis->disconnect();
-            QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
+            scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
+
+            QPixmap scaled = createDefaultPoster(w,h);
+
+            QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
+            pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+            Promise* promise=Promise::loadAsync(manager,realUrl);
+            QObject::connect(promise, &Promise::completed, [=]()
             {
-                setMovieInfo(b);
+                if (promise->reply->error() ==QNetworkReply::NoError){
+                    QByteArray qb=promise->reply->readAll();
+                    setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                }
             });
 
-            scene->clear();
+            QPushButton* b = new QPushButton("Plus");
 
+            QObject::connect(b, &QPushButton::released, [=]()
+            {
+                setPoster(url,currentScraper);
+            });
 
-            ui->graphicsViewPosters->setScene(NULL);
+            QGraphicsProxyWidget* button = scene->addWidget(b);
+            button->setPos(x,h);
 
-            int x=0;
-            int y=20;
-            int w=200;
-            int h=200;
+            x+=w+10;
 
-            QSet<QString> urls;
-
-            if (!b.postersHref.isEmpty()){
-                foreach (const QString& url , b.postersHref){
-                    progress.setValue(curVal++);
-
-                    QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
-                    if (urls.contains(realUrl)){
-                        continue;
-                    }
-
-                    urls.insert(realUrl);
-
-                    scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
-
-                    QPixmap scaled = createDefaultPoster(w,h);
-
-                    QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
-                    pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
-
-                    Promise* promise=Promise::loadAsync(manager,realUrl);
-                    QObject::connect(promise, &Promise::completed, [=]()
-                    {
-                        if (promise->reply->error() ==QNetworkReply::NoError){
-                            QByteArray qb=promise->reply->readAll();
-                            setImageFromInternet( qb, pi,  x,  y,  w,  h);
-                        }
-                    });
-
-                    QPushButton* b = new QPushButton("Plus");
-
-                    QObject::connect(b, &QPushButton::released, [=]()
-                    {
-                        setPoster(url,currentScraper);
-                    });
-
-                    QGraphicsProxyWidget* button = scene->addWidget(b);
-                    button->setPos(x,h);
-
-                    x+=w+10;
-
-                    if (progress.wasCanceled()){
-                        return;
-                    }
-                }
-            }
-
-            if (!b.backdropsHref.isEmpty()){
-                foreach (const QString& url , b.backdropsHref){
-                    progress.setValue(curVal++);
-
-                    QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
-                    if (urls.contains(realUrl)){
-                        continue;
-                    }
-
-                    urls.insert(realUrl);
-
-                    scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
-
-                    QPixmap scaled = createDefaultPoster(w,h);
-
-                    QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
-                    pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
-
-                    Promise* promise=Promise::loadAsync(manager,realUrl);
-                    QObject::connect(promise, &Promise::completed, [=]()
-                    {
-                        if (promise->reply->error() ==QNetworkReply::NoError){
-                            QByteArray qb=promise->reply->readAll();
-                            setImageFromInternet( qb, pi,  x,  y,  w,  h);
-                        }
-                    });
-
-                    QPushButton* b = new QPushButton("Plus");
-
-                    QObject::connect(b, &QPushButton::released, [=]()
-                    {
-                        setBackdrop(url,currentScraper);
-                    });
-
-                    QGraphicsProxyWidget* button = scene->addWidget(b);
-
-                    button->setPos(x,h);
-
-                    x+=w+10;
-
-                    if (progress.wasCanceled()){
-                        return;
-                    }
-                }
-            }
-
-            ui->graphicsViewPosters->setScene(scene);
-
-            //ui->scrollAreaScrapResult->setVisible(true);
         }
     }
+
+    if (!b.backdropsHref.isEmpty()){
+        foreach (const QString& url , b.backdropsHref){
+
+            QString realUrl=currentScraper->getBestImageUrl(url,QSize(w,h));
+            if (urls.contains(realUrl)){
+                continue;
+            }
+
+            urls.insert(realUrl);
+
+            scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
+
+            QPixmap scaled = createDefaultPoster(w,h);
+
+            QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
+            pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+            Promise* promise=Promise::loadAsync(manager,realUrl);
+            QObject::connect(promise, &Promise::completed, [=]()
+            {
+                if (promise->reply->error() ==QNetworkReply::NoError){
+                    QByteArray qb=promise->reply->readAll();
+                    setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                }
+            });
+
+            QPushButton* b = new QPushButton("Plus");
+
+            QObject::connect(b, &QPushButton::released, [=]()
+            {
+                setBackdrop(url,currentScraper);
+            });
+
+            QGraphicsProxyWidget* button = scene->addWidget(b);
+
+            button->setPos(x,h);
+
+            x+=w+10;
+
+        }
+    }
+
+    ui->graphicsViewPosters->setScene(scene);
+
+    //ui->scrollAreaScrapResult->setVisible(true);
+
+
 }
 
 void MainWindow::buildTvix() {
     b.createTivx(this->manager,_poster, _backdrop,_texts);
- //   b.canceled();
+    //   b.canceled();
 }
 
 void MainWindow::s_clicked_texte(QPixmap result){
-   ui->labelPoster->setPixmap(result);
+    ui->labelPoster->setPixmap(result);
 }
 
 void MainWindow::setPoster (const QString& url, Scraper *_currentScrape){

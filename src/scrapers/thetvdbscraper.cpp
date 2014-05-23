@@ -1,3 +1,4 @@
+#if 0
 #include "thetvdbscraper.h"
 #include <QUrl>
 #include <QDebug>
@@ -218,3 +219,4 @@ QIcon TheTVDBScraper::getIcon() {
 
     return m_icon;
 }
+#endif

@@ -1,6 +1,7 @@
 #ifndef SCRAPER_H
 #define SCRAPER_H
 
+#include <QObject>
 #include <QString>
 #include <QMap>
 #include <QJsonDocument>
@@ -12,6 +13,8 @@
 #include <QSize>
 #include <QSharedPointer>
 #include <QIcon>
+
+class QNetworkAccessManager;
 
 class Film {
 public:
@@ -82,8 +85,9 @@ public:
     QString linkHref;
 };
 
-class Scraper
+class Scraper : public QObject
 {
+    Q_OBJECT
 protected:
     static int randInt(int low, int high) ;
     static QString getRandomUserAgent() ;
@@ -95,11 +99,18 @@ public:
     Scraper();
     virtual QIcon getIcon() { return QIcon();}
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
-    virtual bool searchFilm(const QString& toSearch, SearchResult &result) =0;
+
+    virtual void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) =0;
+    virtual void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
+
     virtual bool searchTV(const QString& toSearch, SearchTVResult &result) =0;
-    virtual bool findMovieInfo(const QString& movieCode, SearchMovieInfo &result) const=0;
+
     virtual bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const=0;
     virtual QString getBestImageUrl(const QString& filePath, const QSize& size) const=0;
+
+Q_SIGNALS:
+    void found(FilmPrtList films);
+    void found(SearchMovieInfo films);
 };
 
 
