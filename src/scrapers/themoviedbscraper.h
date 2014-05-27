@@ -8,14 +8,13 @@ class TheMovieDBScraper: public Scraper
     Q_OBJECT
 
     static const QString API_KEY;
-    static const uchar icon_png[];
-    QIcon m_icon;
 
     FilmPrtList parseResultset(const QJsonDocument& ) const;
-    QList<Show> parseTVResultset(const QJsonDocument&) const;
+    ShowPtrList parseTVResultset(const QJsonDocument&) const;
     bool parseConfiguration(const QJsonDocument& );
     QString  baseUrl;
     bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
+    bool parseEpisodeInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info, const int season, const int episode) const;
 
     void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode,  SearchMovieInfo &result) const;
     bool parseImageInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
@@ -24,15 +23,16 @@ class TheMovieDBScraper: public Scraper
     bool findSaisonInfo(const QString& showCode, const QString& season, SearchEpisodeInfo &result) const;
     bool findTVInfo(const QString& showCode, SearchEpisodeInfo &result) const;
     void searchFilmConfigurationOk( QNetworkAccessManager* manager, const QString& toSearch);
+    void searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch);
 
 public:
     TheMovieDBScraper();
-    QIcon getIcon();
+    QIcon getIcon() const;
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    void searchFilm( QNetworkAccessManager* manager, const QString& toSearch)  ;
-    bool searchTV(const QString& toSearch, SearchTVResult &result);
+    void searchFilm( QNetworkAccessManager* manager, const QString& toSearch) ;
+    void searchTV(QNetworkAccessManager* manager, const QString& toSearch);
     void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
-    bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& episode, SearchEpisodeInfo &result) const ;
+    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const ;
     QString getBestImageUrl(const QString& filePath, const QSize& size) const;
 
 

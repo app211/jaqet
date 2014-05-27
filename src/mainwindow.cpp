@@ -36,7 +36,7 @@
 #include "template/templateyadis.h"
 
 #include "av/avprobe.h"
-#include "myqstringlistmodel.h"
+#include "tvixengine.h"
 
 #include <QProgressDialog>
 
@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
-    modelB=new MyQStringListModel(this, QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation).at(0));
+    modelB=new TVIXEngine(this, QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation).at(0));
 
     QSortFilterProxyModel* f =new QSortFilterProxyModel(this);
     f->setSourceModel(modelB);
@@ -113,8 +113,11 @@ MainWindow::MainWindow(QWidget *parent) :
     /*    connect(tvdbAction, SIGNAL(triggered()), this,
             SLOT(searchScraper()));
 */
-     connect(s, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
-            SLOT(test(const Scraper*,SearchMovieInfo)));
+    connect(s, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
+           SLOT(test(const Scraper*,SearchMovieInfo)));
+
+    connect(s, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
+           SLOT(test2(const Scraper*,SearchEpisodeInfo)));
 
     QMenu *menuFichier = new QMenu(this);
     //menuFichier->addAction(allocineAction);
@@ -138,21 +141,26 @@ void MainWindow::ctxMenu(const QPoint &pos) {
 void MainWindow::search(QFileInfo f){
     qDebug() << f.absoluteFilePath();
 
-      SearchScraperDialog* d= new SearchScraperDialog(this, f , this->scrapes, &this->manager);
+    SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
+    if (fd.exec()==QDialog::Accepted){
+        if (!fd.getResult().isNull()){
+            if (!fd.getResult().isTV()){
+                fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
+            } else {
+                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
+            }
+        }
+    }
 
-      connect(d, SIGNAL(proceed(Scraper *,const QString& )), this, SLOT(proceed(Scraper *,const QString& )));
-
-      d->setModal(true);
-      d->show();
 }
 
 
 void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex & previous ){
 
 
-    MyQStringListModel::TypeItem typeItem=modelB->getTypeItem(current);
+    Engine::TypeItem typeItem=modelB->getTypeItem(current);
 
-    if (typeItem==MyQStringListModel::TypeItem::PROCEEDABLE){
+    if (typeItem==Engine::TypeItem::PROCEEDABLE){
         ui->stackedWidget->setCurrentIndex(0);
 
         fileInfo=modelB->fileInfo(current);
@@ -163,7 +171,7 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
             search(fileInfo);
         });
 
-    } else if (typeItem==MyQStringListModel::TypeItem::DIR){
+    } else if (typeItem==Engine::TypeItem::DIR){
         ui->stackedWidget->setCurrentIndex(2);
     }
 }
@@ -213,32 +221,33 @@ void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* item
 #include "promise.h"
 
 
+void MainWindow::test2(const Scraper* scraper,SearchEpisodeInfo b){
+    qDebug() << b.code << b.title;
+    ui->labelMovieScraper->setPixmap(scraper->getIcon().pixmap(16));
+    ui->stackedWidget->setCurrentIndex(1);
+    ui->synopsis->setText(b.synopsis);
 
+    ui->labelEpisodeTitle->setVisible(true);
+    ui->labelSeasonEpisode->setVisible(true);
 
-void MainWindow::proceed(Scraper* fromScraper, const QString& code){
+    ui->labelEpisodeTitle->setText(b.title);
 
-    if (this->_tvShowTV){
-        SearchEpisodeInfo b;
-        if (!fromScraper->findEpisodeInfo(code,this->_seasonTV,this->_episodeTV,b)){
-
-        } else {
-            ui->synopsis->setText(b.synopsis);
-
-            if (!b.linkHref.isEmpty()){
-                ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
-                ui->labelUrl->setTextFormat(Qt::RichText);
-                ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
-                ui->labelUrl->setOpenExternalLinks(true);
-            }
-
-        }
-    } else {
-        SearchMovieInfo b;
-        fromScraper->findMovieInfo(&this->manager,code);
-    }
+    ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));
 }
 
 void MainWindow::test(const Scraper* scraper,SearchMovieInfo b){
+    ui->labelEpisodeTitle->setVisible(false);
+    ui->labelSeasonEpisode->setVisible(false);
+
+    ui->labelMovieScraper->setPixmap(scraper->getIcon().pixmap(16));
+    if (!b.linkHref.isEmpty()){
+        ui->labelMovieTitle->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
+        ui->labelMovieTitle->setTextFormat(Qt::RichText);
+        ui->labelMovieTitle->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        ui->labelMovieTitle->setOpenExternalLinks(true);
+    } else {
+        ui->labelMovieTitle->setText(b.title);
+    }
 
     ui->stackedWidget->setCurrentIndex(1);
     if (!b.linkHref.isEmpty()){

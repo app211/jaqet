@@ -22,13 +22,17 @@ SOURCES += src/main.cpp\
     src/scrapers/scraper.cpp \
     src/scrapers/themoviedbscraper.cpp \
      src/fileparser.cpp \
-    src/myqstringlistmodel.cpp \
     src/scrapers/thetvdbscraper.cpp \
     src/scrapers/httpaccess.cpp \
     src/scrapers/curlaccess.cpp \
     src/scrapers/cncclassificationwrapper.cpp \
     src/promise.cpp \
-    src/searchscraperdialog.cpp
+    src/searchscraperdialog.cpp \
+    src/engine.cpp \
+    src/tvixengine.cpp \
+    src/scanner/filenamescanner.cpp \
+    src/scanner/scanner.cpp \
+    src/chooseitemdialog.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -47,17 +51,22 @@ HEADERS  += src/mainwindow.h \
     src/template/templateyadis.h \
     src/filedownloader.h \
     src/fileparser.h \
-    src/myqstringlistmodel.h \
     src/scrapers/thetvdbscraper.h \
     src/scrapers/httpaccess.h \
     src/scrapers/curlaccess.h \
     src/scrapers/cncclassificationwrapper.h \
     src/promise.h \
-    src/searchscraperdialog.h
+    src/searchscraperdialog.h \
+    src/engine.h \
+    src/tvixengine.h \
+    src/scanner/filenamescanner.h \
+    src/scanner/scanner.h \
+    src/chooseitemdialog.h
 
 
 FORMS    += src/mainwindow.ui \
-    src/searchscraperdialog.ui
+    src/searchscraperdialog.ui \
+    src/chooseitemdialog.ui
 
 
 win32:LIBS += -LC:\Developpement\curl-7.33.0-devel-mingw32\lib -lcurldll

@@ -31,49 +31,55 @@ QString TheMovieDBScraper::createURL(const QString& type, const QMap<QString, QS
     return fullQuery;
 }
 
-bool TheMovieDBScraper::searchTV(const QString& toSearch, SearchTVResult &result){
+void TheMovieDBScraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch){
+    QMap<QString,QString> params;
+    QString url=createURL("configuration",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
+            if (e.error== QJsonParseError::NoError){
+                if (!parseConfiguration(doc)){
+                    // return false;
+                } else {
+                    searchTVConfigurationOk(manager,toSearch);
+                }
+            } else {
+                // return false;
+
+
+            }
+        }
+    });
+}
+
+void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch) {
     QMap<QString,QString> params;
 
     QByteArray headerData;
     QByteArray data;
-
-
-    if (execCommand("configuration", params, headerData,data)){
-        qDebug() << data;
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            if (!parseConfiguration(doc)){
-                return false;
-            }
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
 
     headerData.clear();
     data.clear();
     params["query"]=QUrl::toPercentEncoding(toSearch);
     params["language"]="fr";
 
-    if (execCommand("search/tv", params, headerData,data)){
-        qDebug() << data;
+    QString url=createURL("search/tv",params);
+    Promise* promise=Promise::loadAsync(*manager, url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
 
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            result.searchOk = true;
-            result.shows=this->parseTVResultset(doc);
-            return true;
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
+            if (e.error== QJsonParseError::NoError){
+                emit found(parseTVResultset(doc));
+            }
+            qDebug() << e.errorString();
         }
-
-        qDebug() << e.errorString();
-
-    }
-
-    return false;
+    });
 }
 
 
@@ -224,9 +230,9 @@ FilmPrtList TheMovieDBScraper::parseResultset(const QJsonDocument& resultset) co
     return films;
 }
 
-QList<Show> TheMovieDBScraper::parseTVResultset(const QJsonDocument& resultset) const{
+ShowPtrList TheMovieDBScraper::parseTVResultset(const QJsonDocument& resultset) const{
 
-    QList<Show> shows;
+    ShowPtrList shows;
 
     if (!resultset.isObject()){
         return shows;
@@ -245,12 +251,13 @@ QList<Show> TheMovieDBScraper::parseTVResultset(const QJsonDocument& resultset) 
     {
         QJsonObject obj = value.toObject();
 
-        Show show;
-        show.originalTitle= obj["original_name"].toString();
-        show.title= obj["name"].toString();
-        show.productionYear =QDate::fromString(obj["first_air_date"].toString(), "yyyy-MM-dd").toString("yyyy");
-        show.code= QString::number(obj["id"].toDouble());
-        show.posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
+        ShowPtr show(new Show());
+
+        show->originalTitle= obj["original_name"].toString();
+        show->title= obj["name"].toString();
+        show->productionYear =QDate::fromString(obj["first_air_date"].toString(), "yyyy-MM-dd").toString("yyyy");
+        show->code= QString::number(obj["id"].toDouble());
+        show->posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
 
         shows.append(show);
     }
@@ -265,6 +272,7 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
     }
     QJsonObject movieObject = resultset.object();
 
+    info.title = movieObject["title"].toString();
     info.synopsis=movieObject["overview"].toString();
     info.posterHref =   QString().append(baseUrl).append("original").append(movieObject["poster_path"].toString());
     info.backdropHref =   QString().append(baseUrl).append("original").append(movieObject["backdrop_path"].toString());
@@ -324,7 +332,7 @@ void TheMovieDBScraper::findMovieInfo( QNetworkAccessManager* manager, const QSt
             QJsonParseError e;
             QByteArray data=promise->reply->readAll();
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-               qDebug() <<data;
+            qDebug() <<data;
             if (e.error== QJsonParseError::NoError){
                 if(parseMovieInfo(doc,result)){
                     findMovieInfoGetImage(manager,movieCode, result);
@@ -409,31 +417,46 @@ bool TheMovieDBScraper::findSaisonInfo(const QString& showCode, const QString& s
     return false;
 }
 
-bool TheMovieDBScraper::findEpisodeInfo(const QString& showCode, const QString& season, const QString& episode, SearchEpisodeInfo &result) const {
+void TheMovieDBScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
 
     QMap<QString,QString> params;
-    QByteArray headerData;
-    QByteArray data;
+  //  params["language"]="fr";
 
-    params["language"]="fr";
 
-    if (execCommand(QString("tv/").append(showCode).append("/season/").append(season).append("/episode/").append(episode), params, headerData,data)){
-        qDebug() << data;
-
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            /*if(parseMovieInfo(doc,result)){
-                        return getImage(movieCode, result);
-                    }*/
+    QString url=createURL(QString("tv/%1/season/%2/episode/%3").arg(showCode).arg(season).arg(episode),params);
+    Promise* promise=Promise::loadAsync(*manager, url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            SearchEpisodeInfo result;
+            QJsonParseError e;
+            QByteArray data=promise->reply->readAll();
+            qDebug() <<data;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                if(parseEpisodeInfo(doc,result,season, episode)){
+                    emit found(this,result);
+                }
+            }
         }
+    });
+}
 
-        qDebug() << e.errorString();
+bool TheMovieDBScraper::parseEpisodeInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info, const int season, const int episode) const{
+    if (!resultset.isObject()){
+        return false;
     }
 
-    findSaisonInfo(showCode, season, result);
+    info.season=season;
+    info.episode=episode;
 
-    return false;
+    QJsonObject episodeObject = resultset.object();
+
+    info.title = episodeObject["name"].toString();
+    info.code = episodeObject["id"].toString();
+    info.synopsis = episodeObject["overview"].toString();
+
+    return true;
 }
 
 bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const{
@@ -475,7 +498,7 @@ QString TheMovieDBScraper::getBestImageUrl(const QString& filePath, const QSize&
 
 const QString TheMovieDBScraper::API_KEY="470fd2ec8853e25d2f8d86f685d2270e";
 
-const uchar TheMovieDBScraper::icon_png[] = {
+static const uchar icon_png[] = {
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
     0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x10, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0xf3, 0xff,
     0x61, 0x00, 0x00, 0x00, 0x06, 0x62, 0x4b, 0x47, 0x44, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0xa0,
@@ -530,10 +553,12 @@ const uchar TheMovieDBScraper::icon_png[] = {
     0x54, 0x31, 0x34, 0x3a, 0x30, 0x38, 0x3a, 0x35, 0x33, 0x2d, 0x30, 0x34, 0x3a, 0x30, 0x30, 0x05,
     0x34, 0x3e, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82} ;
 
-QIcon TheMovieDBScraper::getIcon() {
+static QIcon m_icon;
+
+QIcon TheMovieDBScraper::getIcon() const {
     if (m_icon.isNull()){
         QPixmap pixmap;
-        if (pixmap.loadFromData(TheMovieDBScraper::icon_png, sizeof(TheMovieDBScraper::icon_png)/sizeof(uchar))){
+        if (pixmap.loadFromData(icon_png, sizeof(icon_png)/sizeof(uchar))){
             m_icon=QIcon(pixmap);
         }
     }

@@ -4,11 +4,14 @@
 #include <QDebug>
 
 #include "fileparser.h"
+#include "scanner/filenamescanner.h"
+#include "chooseitemdialog.h"
 
 SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileInfo, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
     QDialog(parent),
     ui(new Ui::SearchScraperDialog),
     m_manager(manager)
+
 {
     ui->setupUi(this);
 
@@ -16,6 +19,9 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     QString name = FileParser::cleanName(baseName);
     QString filteredName = FileParser::filterBlacklist(name);
     ui->labelAllo->setText(filteredName);
+
+    FileNameScanner fns;
+    analyse=fns.analyze(fileInfo);
 
     // _tvShowTV = FileParser::isSeries(baseName,_seasonTV,_episodeTV);
     //ui->labelType->setText(_tvShowTV?"T":"M");
@@ -33,6 +39,8 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
         connect(scraper, SIGNAL(found(FilmPrtList)), this,
                 SLOT(found(FilmPrtList)));
 
+        connect(scraper, SIGNAL(found(ShowPtrList )), this,
+                SLOT(found(ShowPtrList )));
 
     }
 
@@ -56,58 +64,59 @@ void SearchScraperDialog::searchScraper(){
         return;
     }
 
-    ui->comboBoxProposition->clear();
-
-    if (true /*!this->_tvShowTV*/){
-        SearchResult a;
-        scraper->searchFilm(m_manager,ui->labelAllo->text());
-        /* {
-            for (int i=0; i<(a.films.size());i++){
-                ui->comboBoxProposition->addItem(a.films.at(i)->title+" "+ a.films.at(i)->productionYear, a.films.at(i)->code);
-
-            }
-        }*/
+    if (analyse.isValidForTV()){
+        scraper->searchTV(m_manager,ui->labelAllo->text());
     } else {
-        SearchTVResult a;
-        if (scraper->searchTV(ui->labelAllo->text(),a)){
-            for (int i=0; i<(a.shows.size());i++){
-                ui->comboBoxProposition->addItem(a.shows.at(i).title+" "+ a.shows.at(i).productionYear, a.shows.at(i).code);
-                qDebug() << a.shows.at(i).originalTitle << " " << a.shows.at(i).productionYear << " " << a.shows.at(i).posterHref << a.shows.at(i).code;
-                /*   */
-            }
-        }
-
-    }
-
-    //ui->scrollAreaScrapResult->setVisible(false);
-
-}
-
-void SearchScraperDialog::proceed(Scraper *scraper){
-    if (ui->comboBoxProposition->currentIndex()>=0){
-        QString code = ui->comboBoxProposition->itemData( ui->comboBoxProposition->currentIndex()).toString();
-        emit proceed(scraper, code);
-        close();
+        scraper->searchFilm(m_manager,ui->labelAllo->text());
     }
 }
+
 
 void SearchScraperDialog::found(FilmPrtList result){
-    for (int i=0; i<(result.size());i++){
-        ui->comboBoxProposition->addItem(result.at(i)->title+" "+ result.at(i)->productionYear, result.at(i)->code);
-
-    }
-
-    ui->comboBoxProposition->setEnabled(true);
-    ui->pushButtonSearchFilm->setEnabled(true);
-
     Scraper *scraper = qobject_cast<Scraper *>(this->sender());
 
-    ui->pushButtonSearchFilm->disconnect();
-    QObject::connect(ui->pushButtonSearchFilm, &QPushButton::released, [=]()
-    {
-        proceed(scraper);
-    });
+    if (result.size()>1){
+        ChooseItemDialog ch(this);
+        ch.setList(result);
+        if (ch.exec()==QDialog::Accepted){
+            accept(scraper, ch.getSelectedFilm());
+        }
+    } else if (result.size()==1){
+        accept(scraper, result.at(0));
+    }
 }
+
+void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
+    if (!filmPtr.isNull()){
+        result= FoundResult(scraper, filmPtr->code);
+        done(QDialog::Accepted);
+    }
+}
+
+void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
+    if (!showPtr.isNull()){
+        result= FoundResult(scraper, showPtr->code, analyse.season, analyse.episode);
+        done(QDialog::Accepted);
+    }
+}
+void SearchScraperDialog::found(ShowPtrList shows){
+    Scraper *scraper = qobject_cast<Scraper *>(this->sender());
+
+    if (shows.size()>1){
+        ChooseItemDialog ch;
+        ch.setList(shows);
+        if (ch.exec()==QDialog::Accepted){
+            accept(scraper, ch.getSelectedShow());
+        }
+    } else if (shows.size()==1){
+        accept(scraper, shows.at(0));
+    }
+}
+
+SearchScraperDialog::FoundResult SearchScraperDialog::getResult() const {
+    return result;
+}
+
 SearchScraperDialog::~SearchScraperDialog()
 {
     delete ui;

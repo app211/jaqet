@@ -17,8 +17,8 @@ public:
     QIcon getIcon();
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    bool searchFilm(const QString& toSearch, SearchResult &result)  ;
-    bool searchTV(const QString& toSearch, SearchTVResult &result);
+    //bool searchFilm(const QString& toSearch, SearchResult &result)  ;
+   // bool searchTV(const QString& toSearch, SearchTVResult &result);
     bool findMovieInfo(const QString& movieCode, SearchMovieInfo &result) const;
     bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& episode, SearchEpisodeInfo &result) const ;
     QString getBestImageUrl(const QString& filePath, const QSize& size) const;

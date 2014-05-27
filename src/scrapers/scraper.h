@@ -37,25 +37,15 @@ public:
 
 typedef QSharedPointer<Film> FilmPtr;
 typedef QList<FilmPtr> FilmPrtList;
+typedef QSharedPointer<Show> ShowPtr;
+typedef QList<ShowPtr> ShowPtrList;
 
-class SearchResult {
-public:
-    bool searchOk;
-    QString error;
-    FilmPrtList films;
-};
-
-
-class SearchTVResult {
-public:
-    bool searchOk;
-    QString error;
-    QList<Show> shows;
-};
 class SearchMovieInfo {
 public:
     bool searchOk;
     QString error;
+    QString originalTitle;
+    QString title;
     QString synopsis;
     QString posterHref;
     QString backdropHref;
@@ -83,6 +73,11 @@ public:
     QStringList postersHref;
     QString linkName;
     QString linkHref;
+    int season;
+    int episode;
+    QString showTitle;
+    QString originalShowTitle;
+
 };
 
 class Scraper : public QObject
@@ -97,21 +92,23 @@ protected:
 
 public:
     Scraper();
-    virtual QIcon getIcon() { return QIcon();}
+    virtual QIcon getIcon() const { return QIcon();}
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
     virtual void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) =0;
     virtual void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
 
-    virtual bool searchTV(const QString& toSearch, SearchTVResult &result) =0;
+    virtual void searchTV(QNetworkAccessManager* manager, const QString& toSearch) =0;
+    virtual void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;
 
-    virtual bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const=0;
     virtual QString getBestImageUrl(const QString& filePath, const QSize& size) const=0;
 
 Q_SIGNALS:
     void found(FilmPrtList films);
+    void found(ShowPtrList shows);
     void found(const Scraper* scraper,SearchMovieInfo films);
-};
+    void found(const Scraper* scraper,SearchEpisodeInfo films);
+ };
 
 
 class ScraperResource {

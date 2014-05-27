@@ -12,7 +12,7 @@
 
 
 class MyProxyModel;
-class MyQStringListModel;
+class Engine;
 #include <QNetworkAccessManager>
 
 namespace Ui {
@@ -49,9 +49,9 @@ private slots:
 
     void savePix();
     void s_clicked_texte(QPixmap result);
-    void proceed(Scraper* fromScraper, const QString& code);
 
     void test(const Scraper *scraper, SearchMovieInfo b);
+    void test2(const Scraper *scraper, SearchEpisodeInfo b);
 private:
     MyProxyModel* model;
     QAction* allocineAction;
@@ -59,7 +59,7 @@ private:
     QAction* tvdbAction;
 
     QGraphicsScene* scene;
-    MyQStringListModel* modelB;
+    Engine* modelB;
     Ui::MainWindow *ui;
     FileDownloader* m_pImgCtrl;
     QStringList keywordsList;

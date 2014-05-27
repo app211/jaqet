@@ -29,8 +29,8 @@ public:
     bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const;
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    bool searchFilm(const QString& toSearch, SearchResult &result) ;
-    bool searchTV(const QString& toSearch, SearchTVResult &result);
+  //  bool searchFilm(const QString& toSearch, SearchResult &result) ;
+ //   bool searchTV(const QString& toSearch, SearchTVResult &result);
 
     QString getBestImageUrl(const QString& filePath, const QSize& ) const;
 
