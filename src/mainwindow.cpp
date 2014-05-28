@@ -222,13 +222,15 @@ void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* item
 
 
 void MainWindow::test2(const Scraper* scraper,SearchEpisodeInfo b){
-    qDebug() << b.code << b.title;
-    ui->labelMovieScraper->setPixmap(scraper->getIcon().pixmap(16));
-    ui->stackedWidget->setCurrentIndex(1);
-    ui->synopsis->setText(b.synopsis);
+
+    ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
     ui->labelEpisodeTitle->setVisible(true);
     ui->labelSeasonEpisode->setVisible(true);
+
+    ui->stackedWidget->setCurrentIndex(1);
+    ui->synopsis->setText(b.synopsis);
+
 
     ui->labelEpisodeTitle->setText(b.title);
 
@@ -236,10 +238,11 @@ void MainWindow::test2(const Scraper* scraper,SearchEpisodeInfo b){
 }
 
 void MainWindow::test(const Scraper* scraper,SearchMovieInfo b){
+    ui->toolButtonRescrap->setIcon(scraper->getIcon());
+
     ui->labelEpisodeTitle->setVisible(false);
     ui->labelSeasonEpisode->setVisible(false);
 
-    ui->labelMovieScraper->setPixmap(scraper->getIcon().pixmap(16));
     if (!b.linkHref.isEmpty()){
         ui->labelMovieTitle->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
         ui->labelMovieTitle->setTextFormat(Qt::RichText);
