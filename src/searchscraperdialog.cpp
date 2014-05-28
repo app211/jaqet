@@ -6,6 +6,7 @@
 #include "fileparser.h"
 #include "scanner/filenamescanner.h"
 #include "chooseitemdialog.h"
+#include <QPushButton>
 
 SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileInfo, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
     QDialog(parent),
@@ -23,11 +24,17 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     FileNameScanner fns;
     analyse=fns.analyze(fileInfo);
 
-    // _tvShowTV = FileParser::isSeries(baseName,_seasonTV,_episodeTV);
-    //ui->labelType->setText(_tvShowTV?"T":"M");
-
     QMenu *menuFichier = new QMenu(this);
 
+    ui->labelFilename->setText(fileInfo.fileName());
+    if (analyse.isValidForTV()){
+        ui->radioTV->setChecked(true);
+        ui->spinBoxSeason->setValue(analyse.season);
+        ui->spinBoxEpisode->setValue(analyse.episode);
+    } else {
+        ui->radioMovie->setChecked(true);
+
+    }
     foreach (Scraper* scraper,scrapers){
         QAction* scraperAction = new QAction(scraper->getIcon(),"&TMDB", this);
         scraperAction->setData(qVariantFromValue((void*)scraper));
@@ -44,7 +51,13 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
 
     }
 
-    ui->pushButtonSearchScraper->setMenu(menuFichier);
+
+    QPushButton* findButton = new QPushButton(tr("&Search"));
+
+    findButton->setMenu(menuFichier);
+
+    ui->buttonBox->addButton(findButton, QDialogButtonBox::AcceptRole);
+
 }
 
 void SearchScraperDialog::searchScraper(){
@@ -99,6 +112,7 @@ void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
         done(QDialog::Accepted);
     }
 }
+
 void SearchScraperDialog::found(ShowPtrList shows){
     Scraper *scraper = qobject_cast<Scraper *>(this->sender());
 

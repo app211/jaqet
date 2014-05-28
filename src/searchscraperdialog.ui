@@ -6,77 +6,328 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
-    <height>63</height>
+    <width>642</width>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_4">
    <item>
-    <widget class="QWidget" name="widget_4" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
-       <widget class="QToolButton" name="toolButton">
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonFollowStyle</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="labelType">
+    <widget class="QWidget" name="widget_3" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QWidget" name="widget_4" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text">
-         <string>T</string>
-        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="1">
+          <widget class="QToolButton" name="toolButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonFollowStyle</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelAllo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="pushButtonSearchScraper">
-        <property name="text">
-         <string>Rechercher</string>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Info</string>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="labelAllo">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="pushCancel">
-        <property name="text">
-         <string>Cancel</string>
-        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <layout class="QFormLayout" name="formLayout">
+           <item row="1" column="0">
+            <widget class="QLabel" name="testLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filename :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QTextEdit" name="labelFilename">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="detectedLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detected :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QWidget" name="widget" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="Teddy" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>58</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>58</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="baseSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QWidget#widgetRadio {
+margin:0;
+padding:0;
+border: 0;
+}
+
+QRadioButton {
+border: 0;
+margin:0;
+padding:0;
+background-repeat: none;
+/*width:0; height:0;*/
+}
+
+QRadioButton::indicator {
+width: 29px;
+height: 30px;
+}
+
+QRadioButton#radioTV::indicator::unchecked {
+background-image: url(:/resources/images/view-toggle-inactive-right.png);
+image: url(:/resources/images/tv.png);
+}
+QRadioButton#radioTV::indicator::checked {
+background-image: url(:/resources/images/view-toggle-active-right.png);
+image: url(:/resources/images/tv.png);
+}
+QRadioButton#radioTV::indicator::pressed {
+background-image: url(:/resources/images/view-toggle-pressed-right.png);
+image: url(:/resources/images/tv.png);
+}
+
+QRadioButton#radioMovie::indicator::unchecked {
+  background-image: url(:/resources/images/view-toggle-inactive-left.png);
+image: url(:/resources/images/movie.png);
+}
+QRadioButton#radioMovie::indicator::checked {
+ background-image: url(:/resources/images/view-toggle-active-left.png);
+image: url(:/resources/images/movie.png);
+}
+QRadioButton#radioMovie::indicator::pressed {
+  background-image: url(:/resources/images/view-toggle-pressed-left.png);
+ image: url(:/resources/images/movie.png);
+}</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetNoConstraint</enum>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QRadioButton" name="radioMovie">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>Movie detected</string>
+                   </property>
+                   <property name="statusTip">
+                    <string/>
+                   </property>
+                   <property name="whatsThis">
+                    <string/>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radioTV">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>TV detected</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_2" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Season :</string>
+                   </property>
+                   <property name="buddy">
+                    <cstring>spinBoxSeason</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spinBoxSeason"/>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>Episode :</string>
+                   </property>
+                   <property name="buddy">
+                    <cstring>spinBoxEpisode</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spinBoxEpisode"/>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel</set>
+     </property>
     </widget>
    </item>
   </layout>
@@ -84,18 +335,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushCancel</sender>
-   <signal>released()</signal>
+   <sender>radioTV</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget_2</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>137</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>283</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioMovie</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget_2</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>143</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>282</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>SearchScraperDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>31</y>
+     <x>731</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
-     <x>376</x>
-     <y>31</y>
+     <x>414</x>
+     <y>244</y>
     </hint>
    </hints>
   </connection>
