@@ -312,7 +312,7 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
         }
     }
 
-    info.runtime=movieObject["runtime"].toInt()*60;
+    //info.runtime=movieObject["runtime"].toInt()*60;
 
     return true;
 }

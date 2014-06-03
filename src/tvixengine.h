@@ -8,8 +8,13 @@ class TVIXEngine : public Engine
     QStringList visibleFileExtensions;
 public:
     TVIXEngine(QObject *parent = 0, const QString& path="");
-    virtual TypeItem getTypeItem( const QModelIndex & index) const;
-    virtual QStringList getVisibleFileExtensions() const;
+     virtual QStringList getVisibleFileExtensions() const;
+    virtual QGraphicsScene* preview(const QFileInfo &f);
+protected:
+    virtual TypeItem getTypeItem(const QFileInfo &f) const;
+
+private:
+     QGraphicsScene result;
 };
 
 #endif // TVIXENGINE_H

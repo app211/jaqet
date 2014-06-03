@@ -32,7 +32,8 @@ SOURCES += src/main.cpp\
     src/tvixengine.cpp \
     src/scanner/filenamescanner.cpp \
     src/scanner/scanner.cpp \
-    src/chooseitemdialog.cpp
+    src/chooseitemdialog.cpp \
+    src/inprogressdialog.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -61,12 +62,14 @@ HEADERS  += src/mainwindow.h \
     src/tvixengine.h \
     src/scanner/filenamescanner.h \
     src/scanner/scanner.h \
-    src/chooseitemdialog.h
+    src/chooseitemdialog.h \
+    src/inprogressdialog.h
 
 
 FORMS    += src/mainwindow.ui \
     src/searchscraperdialog.ui \
-    src/chooseitemdialog.ui
+    src/chooseitemdialog.ui \
+    src/inprogressdialog.ui
 
 
 win32:LIBS += -LC:\Developpement\curl-7.33.0-devel-mingw32\lib -lcurldll
