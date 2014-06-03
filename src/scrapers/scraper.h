@@ -86,9 +86,6 @@ class Scraper : public QObject
 protected:
     static int randInt(int low, int high) ;
     static QString getRandomUserAgent() ;
-    static size_t curl_write_data(void *data, size_t size, size_t nmemb, void *pointer);
-    static size_t curl_header(void *data, size_t size, size_t nmemb, void *pointer);
-    bool execCommand(const QString& url, QMap<QString,QString>& params, QByteArray& headerData,QByteArray& data) const;
 
 public:
     Scraper();

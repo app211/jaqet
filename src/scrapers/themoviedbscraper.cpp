@@ -367,52 +367,52 @@ void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, co
 
 bool TheMovieDBScraper::findTVInfo(const QString& showCode, SearchEpisodeInfo &result) const{
 
-    QMap<QString,QString> params;
-    QByteArray headerData;
-    QByteArray data;
+//    QMap<QString,QString> params;
+//    QByteArray headerData;
+//    QByteArray data;
 
-    params["language"]="fr";
+//    params["language"]="fr";
 
-    if (execCommand(QString("tv/").append(showCode), params, headerData,data)){
-        qDebug() << data;
+//    if (execCommand(QString("tv/").append(showCode), params, headerData,data)){
+//        qDebug() << data;
 
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            /*if(parseMovieInfo(doc,result)){
-                        return getImage(movieCode, result);
-                    }*/
-        }
+//        QJsonParseError e;
+//        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+//        if (e.error== QJsonParseError::NoError){
+//            /*if(parseMovieInfo(doc,result)){
+//                        return getImage(movieCode, result);
+//                    }*/
+//        }
 
-        qDebug() << e.errorString();
-    }
+//        qDebug() << e.errorString();
+//    }
 
     return false;
 }
 
 bool TheMovieDBScraper::findSaisonInfo(const QString& showCode, const QString& season, SearchEpisodeInfo &result) const{
 
-    QMap<QString,QString> params;
-    QByteArray headerData;
-    QByteArray data;
+//    QMap<QString,QString> params;
+//    QByteArray headerData;
+//    QByteArray data;
 
-    params["language"]="fr";
+//    params["language"]="fr";
 
-    if (execCommand(QString("tv/").append(showCode).append("/season/").append(season), params, headerData,data)){
-        qDebug() << data;
+//    if (execCommand(QString("tv/").append(showCode).append("/season/").append(season), params, headerData,data)){
+//        qDebug() << data;
 
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            /*if(parseMovieInfo(doc,result)){
-                        return getImage(movieCode, result);
-                    }*/
-        }
+//        QJsonParseError e;
+//        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+//        if (e.error== QJsonParseError::NoError){
+//            /*if(parseMovieInfo(doc,result)){
+//                        return getImage(movieCode, result);
+//                    }*/
+//        }
 
-        qDebug() << e.errorString();
-    }
+//        qDebug() << e.errorString();
+//    }
 
-    findTVInfo(showCode,result);
+//    findTVInfo(showCode,result);
 
     return false;
 }

@@ -1,17 +1,11 @@
-QT       += core gui network xml widgets
+TARGET = jaqet
 
-win32:INCLUDEPATH += C:\Developpement\curl-7.33.0-devel-mingw32\include
-INCLUDEPATH+=src/third/networktest-1-3-0_src
-
-win32:LIBS += -LC:\Developpement\curl-7.33.0-devel-mingw32\lib -lcurldll
-win32:LIBS += -LC:\bin\MediaInfo_DLL_0.7.69_Windows_i386_WithoutInstaller -lMediaInfo
-
-linux-g++:LIBS += -lcurl
-
-TARGET = tizzbird
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++11
+
+QT       += core gui network xml widgets
+
 
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
@@ -24,7 +18,6 @@ SOURCES += src/main.cpp\
      src/fileparser.cpp \
     src/scrapers/thetvdbscraper.cpp \
     src/scrapers/httpaccess.cpp \
-    src/scrapers/curlaccess.cpp \
     src/scrapers/cncclassificationwrapper.cpp \
     src/promise.cpp \
     src/searchscraperdialog.cpp \
@@ -54,7 +47,6 @@ HEADERS  += src/mainwindow.h \
     src/fileparser.h \
     src/scrapers/thetvdbscraper.h \
     src/scrapers/httpaccess.h \
-    src/scrapers/curlaccess.h \
     src/scrapers/cncclassificationwrapper.h \
     src/promise.h \
     src/searchscraperdialog.h \
@@ -70,10 +62,6 @@ FORMS    += src/mainwindow.ui \
     src/searchscraperdialog.ui \
     src/chooseitemdialog.ui \
     src/inprogressdialog.ui
-
-
-win32:LIBS += -LC:\Developpement\curl-7.33.0-devel-mingw32\lib -lcurldll
-linux-g++:LIBS += -lcurl
 
 RESOURCES += \
     resources/resources.qrc

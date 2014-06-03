@@ -55,80 +55,80 @@ QString Scraper::getRandomUserAgent()
     return agents.at(randInt(0,agents.size()-1));
 }
 
-size_t Scraper::curl_write_data(void *data, size_t size, size_t nmemb,
-                                        void *pointer)
-{
-    size_t data_size = size * nmemb;
+//size_t Scraper::curl_write_data(void *data, size_t size, size_t nmemb,
+//                                        void *pointer)
+//{
+//    size_t data_size = size * nmemb;
 
-    QByteArray* ptr=(QByteArray*)pointer;
+//    QByteArray* ptr=(QByteArray*)pointer;
 
-    ptr->append(QByteArray::fromRawData((const char*)data,data_size));
+//    ptr->append(QByteArray::fromRawData((const char*)data,data_size));
 
-    return data_size;
-}
+//    return data_size;
+//}
 
-size_t Scraper::curl_header(void *data, size_t size, size_t nmemb,
-                                    void *pointer)
-{
-    size_t data_size = size * nmemb;
+//size_t Scraper::curl_header(void *data, size_t size, size_t nmemb,
+//                                    void *pointer)
+//{
+//    size_t data_size = size * nmemb;
 
-    QByteArray* ptr=(QByteArray*)pointer;
+//    QByteArray* ptr=(QByteArray*)pointer;
 
-    ptr->append(QByteArray::fromRawData((const char*)data,data_size));
+//    ptr->append(QByteArray::fromRawData((const char*)data,data_size));
 
-    return data_size;
-}
+//    return data_size;
+//}
 
-bool Scraper::execCommand(const QString& urlCommand, QMap<QString,QString>& params, QByteArray& headerData, QByteArray& data) const{
+//bool Scraper::execCommand(const QString& urlCommand, QMap<QString,QString>& params, QByteArray& headerData, QByteArray& data) const{
 
-    bool result=false;
+//    bool result=false;
 
-    QString userAgent=getRandomUserAgent();
+//    QString userAgent=getRandomUserAgent();
 
-    QString ip = QString("%1.%1.%1.%1").arg(randInt(0, 255),randInt(0, 255),randInt(0, 255),randInt(0, 255));
+//    QString ip = QString("%1.%1.%1.%1").arg(randInt(0, 255),randInt(0, 255),randInt(0, 255),randInt(0, 255));
 
-    CURL *curl;
-    CURLcode res;
+//    CURL *curl;
+//    CURLcode res;
 
-    curl = curl_easy_init();
-    if(curl) {
-        QString url=createURL(urlCommand,params);
+//    curl = curl_easy_init();
+//    if(curl) {
+//        QString url=createURL(urlCommand,params);
 
-        char errorBuffer[CURL_ERROR_SIZE];
-        memset(errorBuffer,0,CURL_ERROR_SIZE);
+//        char errorBuffer[CURL_ERROR_SIZE];
+//        memset(errorBuffer,0,CURL_ERROR_SIZE);
 
-        curl_easy_setopt(curl, CURLOPT_URL, qPrintable(url));
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
-        // curl_easy_setopt(curl, CURLOPT_RETURNTRANSFER, true);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, qPrintable(userAgent));
-     //   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+//        curl_easy_setopt(curl, CURLOPT_URL, qPrintable(url));
+//        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
+//        // curl_easy_setopt(curl, CURLOPT_RETURNTRANSFER, true);
+//        curl_easy_setopt(curl, CURLOPT_USERAGENT, qPrintable(userAgent));
+//     //   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-        struct curl_slist *headers=NULL; // init to NULL is important
-        curl_slist_append(headers, qPrintable(QString("REMOTE_ADDR: %1").arg(ip)));
-        curl_slist_append(headers, qPrintable(QString("HTTP_X_FORWARDED_FOR: %1").arg(ip)));
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_data);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curl_header);
+//        struct curl_slist *headers=NULL; // init to NULL is important
+//        curl_slist_append(headers, qPrintable(QString("REMOTE_ADDR: %1").arg(ip)));
+//        curl_slist_append(headers, qPrintable(QString("HTTP_X_FORWARDED_FOR: %1").arg(ip)));
+//        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+//        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+//        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_data);
+//        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curl_header);
 
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
-        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &headerData);
+//        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+//        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &headerData);
 
-        /* Perform the request, res will get the return code */
-        res = curl_easy_perform(curl);
+//        /* Perform the request, res will get the return code */
+//        res = curl_easy_perform(curl);
 
-        if (res==0) {
-            if (headerData.startsWith("HTTP/1.1 200 OK")){
-                result=true;
-            } else {
-                qDebug() << headerData << data;
-            }
-        } else {
-            qDebug("HttpStreamReader: curl thread finished with code %d (%s)", res, errorBuffer);
-        }
-        /* always cleanup */
-        curl_easy_cleanup(curl);
-    }
+//        if (res==0) {
+//            if (headerData.startsWith("HTTP/1.1 200 OK")){
+//                result=true;
+//            } else {
+//                qDebug() << headerData << data;
+//            }
+//        } else {
+//            qDebug("HttpStreamReader: curl thread finished with code %d (%s)", res, errorBuffer);
+//        }
+//        /* always cleanup */
+//        curl_easy_cleanup(curl);
+//    }
 
-    return result;
- }
+//    return result;
+// }
