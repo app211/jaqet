@@ -6,9 +6,10 @@
 #include <QList>
 #include <QMap>
 #include <QPixmap>
+#include "../scanner/scanner.h"
 
 class QDomElement;
-class templateYadis;
+class TemplateYadis;
 class ScraperResource;
 
 
@@ -24,7 +25,7 @@ class  templateYadis_text {
     int h;
     int size;
 
-    friend templateYadis;
+    friend TemplateYadis;
 };
 
 class  templateYadis_image  {
@@ -35,53 +36,24 @@ class  templateYadis_image  {
     int h;
     QString value;
 
-    friend templateYadis;
+    friend TemplateYadis;
 };
 
-
-enum class FAN_ART {
-    UNKNOWN, NONE, ERROR, OK, CANCELED
-};
-
-enum class POSTER {
-    UNKNOWN, NONE, ERROR, OK
-};
-class QNetworkAccessManager;
-
-#include "../promise.h"
-
-class templateYadis :public QObject
+class TemplateYadis :public QObject
 {
     Q_OBJECT
 
 public:
-    templateYadis();
+    TemplateYadis();
     bool loadTemplate(const QString& fileName);
+    QSize getSize();
 
 public slots:
 
-    void createTivx(QNetworkAccessManager & manager, const ScraperResource &poster, const ScraperResource &backdrop, QMap<QString, QString> texts);
+    void create(const QPixmap &poster, const QPixmap &backdrop, QMap<QString, QString> texts, const MediaInfo &mediaInfo);
 
 private:
-    QPixmap m_fanArtPixmap;
-QMap<QString, QString> texts;
-
-    FAN_ART fa=FAN_ART::UNKNOWN;
-    POSTER po=POSTER::NONE;
-
-    void setFanArt(FAN_ART fa){
-        if (this->fa != fa){
-        this->fa=fa;
-        update();
-        }
-    }
-    void setPoster(POSTER po){
-        if (this->po != po){
-        this->po=po;
-        update();
-        }
-     }
-    void update();
+     QMap<QString, QString> texts;
 
     void parseMovie(const QDomElement& e);
     void parseMoviePoster(const QDomElement& e);

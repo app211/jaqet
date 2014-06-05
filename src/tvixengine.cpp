@@ -21,9 +21,9 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
                               ,"*.wmv"
                               ,"*.wvx"
                               ,"*.xvid"
-                              ,"*.mp3"
+                             /* ,"*.mp3"
                               ,"*.ogg"
-                              ,"*.wav"
+                              ,"*.wav"*/
                               ,"*.wma"
                             };
     cd(path);

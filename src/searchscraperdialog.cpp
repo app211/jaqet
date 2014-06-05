@@ -27,10 +27,10 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     QMenu *menuFichier = new QMenu(this);
 
     ui->labelFilename->setText(fileInfo.fileName());
-    if (analyse.isValidForTV()){
+    if (analyse.mediaType.isValidForTV()){
         ui->radioTV->setChecked(true);
-        ui->spinBoxSeason->setValue(analyse.season);
-        ui->spinBoxEpisode->setValue(analyse.episode);
+        ui->spinBoxSeason->setValue(analyse.mediaType.season);
+        ui->spinBoxEpisode->setValue(analyse.mediaType.episode);
     } else {
         ui->radioMovie->setChecked(true);
 
@@ -77,7 +77,7 @@ void SearchScraperDialog::searchScraper(){
         return;
     }
 
-    if (analyse.isValidForTV()){
+    if (analyse.mediaType.isValidForTV()){
         scraper->searchTV(m_manager,ui->labelAllo->text());
     } else {
         scraper->searchFilm(m_manager,ui->labelAllo->text());
@@ -108,7 +108,7 @@ void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
 
 void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, showPtr->code, analyse.season, analyse.episode);
+        result= FoundResult(scraper, showPtr->code, analyse.mediaType.season, analyse.mediaType.episode);
         done(QDialog::Accepted);
     }
 }

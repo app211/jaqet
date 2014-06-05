@@ -6,11 +6,19 @@ QMAKE_CXXFLAGS += -std=c++11
 
 QT       += core gui network xml widgets
 
+win32 {
+INCLUDEPATH += C:\bin\MediaInfo_DLL_0.7.69_Windows_i386_WithoutInstaller\Developers\Source
+LIBS += -LC:\bin\MediaInfo_DLL_0.7.69_Windows_i386_WithoutInstaller -lMediaInfo
+}
+
+linux-g++: {
+    LIBS += -lmediainfo
+    DEFINES += UNICODE
+}
 
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
     src/filedownloader.cpp \
-    src/av/avprobe.cpp \
     src/template/templateyadis.cpp \
     src/scrapers/allocinescraper.cpp \
     src/scrapers/scraper.cpp \
@@ -26,19 +34,18 @@ SOURCES += src/main.cpp\
     src/scanner/filenamescanner.cpp \
     src/scanner/scanner.cpp \
     src/chooseitemdialog.cpp \
-    src/inprogressdialog.cpp
+    src/inprogressdialog.cpp \
+    src/scanner/mediainfoscanner.cpp \
+    src/scanner/mediainfo.cpp \
+    src/panelview.cpp
 
 
 HEADERS  += src/mainwindow.h \
     src/scrapers/allocinescraper.h \
     src/scrapers/themoviedbscraper.h \
     src/scrapers/scraper.h \
-    src/av/avprobe.h \
-    src/av/av.h \
     src/template/templateyadis.h \
     src/fileparser.h \
-    src/av/av.h \
-    src/av/avprobe.h \
     src/scrapers/allocinescraper.h \
     src/scrapers/scraper.h \
     src/scrapers/themoviedbscraper.h \
@@ -55,13 +62,17 @@ HEADERS  += src/mainwindow.h \
     src/scanner/filenamescanner.h \
     src/scanner/scanner.h \
     src/chooseitemdialog.h \
-    src/inprogressdialog.h
+    src/inprogressdialog.h \
+    src/scanner/mediainfoscanner.h \
+    src/scanner/mediainfo.h \
+    src/panelview.h
 
 
 FORMS    += src/mainwindow.ui \
     src/searchscraperdialog.ui \
     src/chooseitemdialog.ui \
-    src/inprogressdialog.ui
+    src/inprogressdialog.ui \
+    src/panelview.ui
 
 RESOURCES += \
     resources/resources.qrc

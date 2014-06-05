@@ -16,14 +16,15 @@
 #include <QBitmap>
 #include <QPixmap>
 #include "../scrapers/scraper.h"
+#include <QNetworkReply>
 
 
 
-templateYadis::templateYadis()
+TemplateYadis::TemplateYadis()
 {
 }
 
-void templateYadis::parseMoviePoster(const QDomElement& e){
+void TemplateYadis::parseMoviePoster(const QDomElement& e){
     QDomElement standard=e.firstChildElement("standard");
     if (!standard.isNull()){
         QDomElement size=standard.firstChildElement("size");
@@ -48,7 +49,7 @@ void templateYadis::parseMoviePoster(const QDomElement& e){
 }
 
 
-void templateYadis::parseMovie(const QDomElement& e){
+void TemplateYadis::parseMovie(const QDomElement& e){
     
     if (e.hasAttribute("background")){
         movieBackground = e.attribute("background");
@@ -70,7 +71,7 @@ void templateYadis::parseMovie(const QDomElement& e){
     }
 }
 
-QString templateYadis::getAbsoluteFilePath(const QString& fileName){
+QString TemplateYadis::getAbsoluteFilePath(const QString& fileName){
 #ifndef Q_OS_WIN
     static bool isCaseSensitive=true;
 #else
@@ -93,7 +94,7 @@ QString templateYadis::getAbsoluteFilePath(const QString& fileName){
     return absoluteFilename;
 }
 
-bool templateYadis::parseImage(const QDomElement& imageElement, templateYadis_image& image){
+bool TemplateYadis::parseImage(const QDomElement& imageElement, templateYadis_image& image){
     if (!imageElement.hasAttribute("type")){
         return false;
     }
@@ -129,7 +130,7 @@ bool templateYadis::parseImage(const QDomElement& imageElement, templateYadis_im
     return true;
 }
 
-bool templateYadis::parseText(const QDomElement& textElement, templateYadis_text& text){
+bool TemplateYadis::parseText(const QDomElement& textElement, templateYadis_text& text){
     if (!textElement.hasAttribute("type")){
         return false;
     }
@@ -176,7 +177,8 @@ bool templateYadis::parseText(const QDomElement& textElement, templateYadis_text
     
     return true;
 }
-void templateYadis::parseSynopsis(const QDomElement& synopsisNode){
+
+void TemplateYadis::parseSynopsis(const QDomElement& synopsisNode){
     QDomNode n = synopsisNode.firstChild();
     while(!n.isNull()) {
         QDomElement e = n.toElement();
@@ -196,9 +198,21 @@ void templateYadis::parseSynopsis(const QDomElement& synopsisNode){
         n = n.nextSibling();
     }
 }
-extern bool loadPixmap(const QString& url, QPixmap& pixmap);
 
-bool templateYadis::buildPoster(const ScraperResource& poster, QPixmap& pixmap){
+QSize TemplateYadis::getSize(){
+    int w=0;
+    int h=0;
+
+    foreach (const templateYadis_image& image, movie_synopsis_images){
+        w=qMax<int>(w,image.w);
+        h=qMax<int>(h,image.h);
+
+    }
+
+    return QSize(w,h);
+}
+
+bool TemplateYadis::buildPoster(const ScraperResource& poster, QPixmap& pixmap){
     
     bool bOk;
     int w=poster_standard_width.toInt(&bOk);
@@ -246,69 +260,7 @@ bool templateYadis::buildPoster(const ScraperResource& poster, QPixmap& pixmap){
     return true;
 }
 
-
-#include <QNetworkReply>
-
-
-
-void templateYadis::createTivx(QNetworkAccessManager & manager, const ScraperResource& poster, const ScraperResource& fanArt, QMap<QString, QString> texts){
-    int w=0;
-    int h=0;
-
-    foreach (const templateYadis_image& image, movie_synopsis_images){
-        w=qMax<int>(w,image.w);
-        h=qMax<int>(h,image.h);
-
-    }
-
-    this->texts=texts;
-    m_fanArtPixmap = QPixmap();
-
-    fa=FAN_ART::UNKNOWN;
-    po=POSTER::NONE;
-
-    if (!fanArt.resources.isEmpty()){
-        QString url=fanArt.scraper->getBestImageUrl(fanArt.resources,QSize(w,h));
-
-        qDebug() << url;
-
-        Promise* promise=Promise::loadAsync(manager,url);
-
-        QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
-
-        QObject::connect(promise, &Promise::completed, [=]()
-        {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
-                QPixmap fanArtPixmap;
-                if (fanArtPixmap.loadFromData(qb)){
-                    m_fanArtPixmap=fanArtPixmap;
-                    setFanArt(FAN_ART::OK);
-                }else {
-                    setFanArt(FAN_ART::ERROR);
-                }
-            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
-                setFanArt(FAN_ART::CANCELED);
-            } else {
-                setFanArt(FAN_ART::ERROR);
-            }
-        });
-
-    } else {
-        setFanArt(FAN_ART::NONE);
-    }
-
-
-    //   return result.scaled(QSize(result.width()/2,result.height()/2),  Qt::KeepAspectRatio,Qt::SmoothTransformation);
-}
-
-void templateYadis::update(){
-    if (this->fa==FAN_ART::CANCELED){
-        return;
-    } else {
-        if (this->fa==FAN_ART::UNKNOWN || this->po==POSTER::UNKNOWN){
-            return;
-        }
+void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<QString, QString> texts, const MediaInfo& mediaInfo){
 
         int w=0;
         int h=0;
@@ -326,8 +278,16 @@ void templateYadis::update(){
         //pixPaint.setBackgroundMode(Qt::OpaqueMode);
         foreach (const templateYadis_image& image, movie_synopsis_images){
             qDebug() << image.type << image.value;
-            if (image.type=="fanart" && this->fa==FAN_ART::OK && !m_fanArtPixmap.isNull()){
-                QPixmap scaled=m_fanArtPixmap.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+            if (image.type=="fanart" && !backdrop.isNull()){
+                QPixmap scaled=backdrop.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                int x= image.x+ (image.w-scaled.width())/2;
+                int y= image.y+ (image.h-scaled.height())/2;
+                int w= scaled.width();
+                int h=scaled.height();
+                pixPaint.drawPixmap(x,y,w,h,scaled);
+
+            }else if (image.type=="poster" && !poster.isNull()){
+                QPixmap scaled=poster.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
                 int x= image.x+ (image.w-scaled.width())/2;
                 int y= image.y+ (image.h-scaled.height())/2;
                 int w= scaled.width();
@@ -340,14 +300,6 @@ void templateYadis::update(){
                 if (pstatic.load(getAbsoluteFilePath(image.value)) ){
                     pixPaint.drawPixmap(image.x,image.y,image.w,image.h,pstatic);
                 }
-
-                /*   } else if (image.type=="poster" && !poster.resources.isEmpty()){
-            QPixmap pposter;
-            if (!buildPoster(poster, pposter)){
-       //         loadPixmap(poster.scraper->getBestImageUrl(poster.resources,QSize(w,h)),pposter);
-            }
-            pixPaint.drawPixmap(image.x,image.y,image.w,image.h,pposter);
-*/
             }
 
         }
@@ -402,16 +354,26 @@ void templateYadis::update(){
                 pixPaint.setPen(QPen(QColor(text.color)));
                 pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["title"]);
 
-            }
+            } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
+            QFont font(text.font);
+            font.setPixelSize(text.size);
+            pixPaint.setFont(font);
+            pixPaint.setPen(QPen(QColor(text.color)));
+            QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
+            QString s=QString("%1 %2").arg(v.width()).arg(v.height());
+            qDebug() << s;
+            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,s);
+
+        }
 
 
         }
 
         emit tivxOk(result);
-    }
+
 }
 
-bool templateYadis::loadTemplate(const QString& fileName){
+bool TemplateYadis::loadTemplate(const QString& fileName){
     
     
     QDomDocument doc("mydocument");
