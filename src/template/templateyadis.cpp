@@ -153,11 +153,16 @@ bool TemplateYadis::parseText(const QDomElement& textElement, templateYadis_text
         }
         
     }
+
+    if (textElement.hasAttribute("align")){
+        text.align=textElement.attribute("align");
+    }
     
     text.x=textElement.attribute("x").toInt(&bOk);
     if (!bOk){
         return false;
     }
+
     text.y=textElement.attribute("y").toInt(&bOk);
     if (!bOk){
         return false;
@@ -260,117 +265,105 @@ bool TemplateYadis::buildPoster(const ScraperResource& poster, QPixmap& pixmap){
     return true;
 }
 
+void TemplateYadis::drawText( QPainter& pixPaint, const templateYadis_text& text, const QString& textToDraw){
+    QFont font(text.font);
+    font.setPointSize(text.size);
+    pixPaint.setFont(font);
+    pixPaint.setPen(QPen(QColor(text.color)));
+
+    int align= Qt::AlignLeft;
+    if (!text.align.isEmpty()){
+       if (text.align.compare("center",Qt::CaseInsensitive)==0){
+           align = Qt::AlignCenter;
+       }
+    }
+
+    pixPaint.drawText(text.x,text.y,text.w,text.h,align|Qt::TextWordWrap|Qt::AlignTop	,textToDraw);
+
+    const QPointF points[4] = {
+        QPointF(text.x, text.y),
+        QPointF(text.x+text.w, text.y),
+        QPointF(text.x+text.w, text.y+text.h),
+        QPointF(text.x, text.y+text.h)
+    };
+
+    pixPaint.setPen(QPen(Qt::red));
+    pixPaint.drawPolygon(points,4);
+}
+
 void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<QString, QString> texts, const MediaInfo& mediaInfo){
 
-        int w=0;
-        int h=0;
+    int w=0;
+    int h=0;
 
-        foreach (const templateYadis_image& image, movie_synopsis_images){
-            w=qMax<int>(w,image.w);
-            h=qMax<int>(h,image.h);
+    foreach (const templateYadis_image& image, movie_synopsis_images){
+        w=qMax<int>(w,image.w);
+        h=qMax<int>(h,image.h);
 
-        }
+    }
 
-        QPixmap result(w,h);
-        result.fill(Qt::transparent);
-        QPainter pixPaint(&result);
+    QPixmap result(w,h);
+    result.fill(Qt::transparent);
+    QPainter pixPaint(&result);
 
-        //pixPaint.setBackgroundMode(Qt::OpaqueMode);
-        foreach (const templateYadis_image& image, movie_synopsis_images){
-            qDebug() << image.type << image.value;
-            if (image.type=="fanart" && !backdrop.isNull()){
-                QPixmap scaled=backdrop.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-                int x= image.x+ (image.w-scaled.width())/2;
-                int y= image.y+ (image.h-scaled.height())/2;
-                int w= scaled.width();
-                int h=scaled.height();
-                pixPaint.drawPixmap(x,y,w,h,scaled);
+    //pixPaint.setBackgroundMode(Qt::OpaqueMode);
+    foreach (const templateYadis_image& image, movie_synopsis_images){
+        qDebug() << image.type << image.value;
+        if (image.type=="fanart" && !backdrop.isNull()){
+            QPixmap scaled=backdrop.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+            int x= image.x+ (image.w-scaled.width())/2;
+            int y= image.y+ (image.h-scaled.height())/2;
+            int w= scaled.width();
+            int h=scaled.height();
+            pixPaint.drawPixmap(x,y,w,h,scaled);
 
-            }else if (image.type=="poster" && !poster.isNull()){
-                QPixmap scaled=poster.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-                int x= image.x+ (image.w-scaled.width())/2;
-                int y= image.y+ (image.h-scaled.height())/2;
-                int w= scaled.width();
-                int h=scaled.height();
-                pixPaint.drawPixmap(x,y,w,h,scaled);
+        }else if (image.type=="poster" && !poster.isNull()){
+            QPixmap scaled=poster.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+            int x= image.x+ (image.w-scaled.width())/2;
+            int y= image.y+ (image.h-scaled.height())/2;
+            int w= scaled.width();
+            int h=scaled.height();
+            pixPaint.drawPixmap(x,y,w,h,scaled);
 
-            } else if (image.type=="static" && !image.value.isEmpty()){
-                QPixmap pstatic;
+        } else if (image.type=="static" && !image.value.isEmpty()){
+            QPixmap pstatic;
 
-                if (pstatic.load(getAbsoluteFilePath(image.value)) ){
-                    pixPaint.drawPixmap(image.x,image.y,image.w,image.h,pstatic);
-                }
+            if (pstatic.load(getAbsoluteFilePath(image.value)) ){
+                pixPaint.drawPixmap(image.x,image.y,image.w,image.h,pstatic);
             }
-
         }
 
-        foreach (const templateYadis_text& text, movie_synopsis_texts){
-            if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,0,text.value);
+    }
 
-            } else if (text.type=="plot" && texts.contains("synopsis")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["synopsis"]);
+    foreach (const templateYadis_text& text, movie_synopsis_texts){
+        if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
+            drawText(pixPaint,text,text.value);
 
-            } else if (text.type=="cast" && texts.contains("actors")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["actors"]);
+        } else if (text.type=="plot" && texts.contains("synopsis")){
+            drawText(pixPaint,text,texts["synopsis"]);
 
-            } else if (text.type=="director" && texts.contains("directors")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["directors"]);
+        } else if (text.type=="cast" && texts.contains("actors")){
+            drawText(pixPaint,text,texts["actors"]);
 
-            } else if (text.type=="year" && texts.contains("year")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["year"]);
+        } else if (text.type=="director" && texts.contains("directors")){
+            drawText(pixPaint,text,texts["directors"]);
+        } else if (text.type=="year" && texts.contains("year")){
+            drawText(pixPaint,text,texts["year"]);
 
-            } else if (text.type=="runtime" && texts.contains("runtime")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["runtime"]);
+        } else if (text.type=="runtime" && texts.contains("runtime")){
+            drawText(pixPaint,text, texts["runtime"]);
 
-            }else if (text.type=="title" && texts.contains("title")){
-                QFont font(text.font);
-                font.setPixelSize(text.size);
-                pixPaint.setFont(font);
-                pixPaint.setPen(QPen(QColor(text.color)));
-                pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,texts["title"]);
+        }else if (text.type=="title" && texts.contains("title")){
+            drawText(pixPaint,text,texts["title"]);
 
-            } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
-            QFont font(text.font);
-            font.setPixelSize(text.size);
-            pixPaint.setFont(font);
-            pixPaint.setPen(QPen(QColor(text.color)));
+        } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
             QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
-            QString s=QString("%1 %2").arg(v.width()).arg(v.height());
-            qDebug() << s;
-            pixPaint.drawText(text.x,text.y,text.w,text.h,Qt::AlignLeft|Qt::TextWordWrap,s);
-
+            QString s=QString("%1").arg(v.width());
+            drawText(pixPaint,text,s);
         }
+    }
 
-
-        }
-
-        emit tivxOk(result);
-
+    emit tivxOk(result.scaled(QSize(result.width()/2,result.height()/2),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation));
 }
 
 bool TemplateYadis::loadTemplate(const QString& fileName){

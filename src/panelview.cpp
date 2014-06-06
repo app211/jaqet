@@ -322,7 +322,7 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 }
 
 void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPixmap& backDrop){
-    if (currentSearch.backdropState != backdropState){
+    if (currentSearch.backdropState != backdropState || !(backDrop.toImage()==currentSearch.backdrop.toImage())){
         currentSearch.backdropState=backdropState;
         currentSearch.backdrop=backDrop;
         rebuildTemplate();
@@ -330,7 +330,7 @@ void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPi
 }
 
 void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap& poster){
-    if (currentSearch.posterState != posterState){
+    if (currentSearch.posterState != posterState || !(poster.toImage()==currentSearch.poster.toImage())){
         currentSearch.posterState=posterState;
         currentSearch.poster=poster;
         rebuildTemplate();

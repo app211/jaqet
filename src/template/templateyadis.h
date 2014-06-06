@@ -19,6 +19,7 @@ class  templateYadis_text {
     QString language;
     QString font;
     QString value;
+    QString align;
     int x;
     int y;
     int w;
@@ -64,6 +65,7 @@ private:
     QString getAbsoluteFilePath(const QString& fileName);
     void parseSynopsis(const QDomElement& synopsisNode);
     bool buildPoster(const ScraperResource& poster, QPixmap &pixmap);
+    void drawText(QPainter &pixPaint, const templateYadis_text& text, const QString& textToDraw);
 
 public:
     QString movieBackground;
