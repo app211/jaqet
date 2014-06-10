@@ -6,10 +6,14 @@
 #include <QStringList>
 #include <QUrl>
 #include <QNetworkReply>
+#include <QApplication>
+
 #include "../promise.h"
+
 
 TheMovieDBScraper::TheMovieDBScraper()
 {
+
 }
 
 QString TheMovieDBScraper::createURL(const QString& type, const QMap<QString, QString> &params) const
@@ -83,8 +87,7 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
 }
 
 
-void TheMovieDBScraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch) {
-
+void TheMovieDBScraper::internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch) const {
     QMap<QString,QString> params;
 
     QString url=createURL("configuration",params);
@@ -95,16 +98,13 @@ void TheMovieDBScraper::searchFilm( QNetworkAccessManager* manager, const QStrin
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
             if (e.error== QJsonParseError::NoError){
-                if (!parseConfiguration(doc)){
-                    // return false;
-                } else {
-                    searchFilmConfigurationOk(manager,toSearch);
+                if (parseConfiguration(doc)){
+                   searchFilmConfigurationOk(manager,toSearch);
+                   return;
                 }
-            } else {
-                // return false;
-
-
             }
+        } else {
+                 emit scraperError(promise->reply->errorString());
         }
     });
 }
@@ -343,6 +343,7 @@ void TheMovieDBScraper::findMovieInfo( QNetworkAccessManager* manager, const QSt
     });
 }
 
+
 void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode,  SearchMovieInfo& result) const{
     QMap<QString,QString> params;
     QString url=createURL(QString("movie/%1/images").arg(movieCode),params);
@@ -565,3 +566,7 @@ QIcon TheMovieDBScraper::getIcon() const {
 
     return m_icon;
 }
+
+QString TheMovieDBScraper::getName() const { return "TMBD";
+                                           }
+

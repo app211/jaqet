@@ -83,16 +83,15 @@ public:
 class Scraper : public QObject
 {
     Q_OBJECT
-protected:
-    static int randInt(int low, int high) ;
-    static QString getRandomUserAgent() ;
 
 public:
     Scraper();
-    virtual QIcon getIcon() const { return QIcon();}
+    virtual QIcon getIcon() const =0;
+    virtual QString getName() const = 0;
+
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
-    virtual void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) =0;
+    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) const;
     virtual void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
 
     virtual void searchTV(QNetworkAccessManager* manager, const QString& toSearch) =0;
@@ -100,7 +99,15 @@ public:
 
     virtual QString getBestImageUrl(const QString& filePath, const QSize& size) const=0;
 
+protected:
+   virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch) const=0;
+
+public slots:
+    void error();
+
 Q_SIGNALS:
+    void scraperError();
+    void scraperError(const QString& error);
     void found(FilmPrtList films);
     void found(ShowPtrList shows);
     void found(const Scraper* scraper,SearchMovieInfo films);

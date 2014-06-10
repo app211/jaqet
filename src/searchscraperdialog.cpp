@@ -2,11 +2,13 @@
 #include "ui_searchscraperdialog.h"
 #include <QMenu>
 #include <QDebug>
+#include <QPushButton>
+#include <QMessageBox>
 
 #include "fileparser.h"
 #include "scanner/filenamescanner.h"
 #include "chooseitemdialog.h"
-#include <QPushButton>
+
 
 SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileInfo, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
     QDialog(parent),
@@ -36,7 +38,7 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
 
     }
     foreach (Scraper* scraper,scrapers){
-        QAction* scraperAction = new QAction(scraper->getIcon(),"&TMDB", this);
+        QAction* scraperAction = new QAction(scraper->getIcon(),scraper->getName(), this);
         scraperAction->setData(qVariantFromValue((void*)scraper));
         menuFichier->addAction(scraperAction);
 
@@ -95,7 +97,11 @@ void SearchScraperDialog::found(FilmPrtList result){
             accept(scraper, ch.getSelectedFilm());
         }
     } else if (result.size()==1){
+        qDebug() << result.at(0)->title;
         accept(scraper, result.at(0));
+    } else {
+        QMessageBox::information(this, tr("My Application"),
+                                        tr("Nothing found"));
     }
 }
 

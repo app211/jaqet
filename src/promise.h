@@ -13,7 +13,10 @@ class Promise : public QObject
 public:
     Promise();
     QNetworkReply * reply=nullptr;
-    static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url);
+    static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url, bool ramdomIp=true);
+
+public slots:
+    void complete();
 
 Q_SIGNALS:
     void completed();

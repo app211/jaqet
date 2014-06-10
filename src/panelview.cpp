@@ -6,6 +6,7 @@
 #include <QGraphicsProxyWidget>
 
 #include "scrapers/themoviedbscraper.h"
+#include "scrapers/allocinescraper.h"
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
@@ -27,6 +28,18 @@ PanelView::PanelView(QWidget *parent) :
             SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
 
     this->scrapes.append(s);
+
+    Scraper* allocine=new AlloCineScraper;
+    QAction* tmdbActionAllocine = new QAction(s->getIcon(),"&Allociné", this);
+    tmdbActionAllocine->setData(qVariantFromValue((void*)s));
+
+    connect(allocine, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
+            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+
+    connect(allocine, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
+            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+
+    this->scrapes.append(allocine);
 
     scene = new QGraphicsScene(this);
 
@@ -84,7 +97,6 @@ void PanelView::search(QFileInfo f){
     currentSearch.mediaInfo=r.mediaInfo;
 
 
-
     SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
         if (!fd.getResult().isNull()){
@@ -126,6 +138,17 @@ static QPixmap createDefaultPoster(int w, int h){
     return result;
 }
 
+#include <QTime>
+
+void delay( int millisecondsToWait )
+{
+    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+    while( QTime::currentTime() < dieTime )
+    {
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+    }
+}
+
 void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
@@ -150,13 +173,37 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     }
 
     ui->synopsis->setText(b.synopsis);
-    /*
+
+    ui->castListWidget->clear();
+
+    for (const QString& actor : b.actors){
+        ui->castListWidget->addItem(actor);
+    }
+
+    //  ui->directorLineEdit->setText(b.directors);
+
+
     ui->toolButtonSysnopsis->disconnect();
     QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
-        setMovieInfo(b);
+        setSynopsis(b.synopsis);
+        rebuildTemplate();
     });
-*/
+
+
+    ui->castToolButton->disconnect();
+    QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
+    {
+        setCast(b.actors);
+        rebuildTemplate();
+    });
+
+    ui->directorToolButton->disconnect();
+    QObject::connect(ui->directorToolButton, &QPushButton::released, [=]()
+    {
+        setDirectors(b.directors);
+        rebuildTemplate();
+    });
     scene->clear();
 
     ui->graphicsViewPosters->setScene(nullptr);
@@ -178,6 +225,8 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
             urls.insert(realUrl);
 
+            qDebug() << realUrl;
+
             scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
 
             QPixmap scaled = createDefaultPoster(w,h);
@@ -185,12 +234,14 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            Promise* promise=Promise::loadAsync(manager,realUrl);
+            Promise* promise=Promise::loadAsync(manager,realUrl,false);
             QObject::connect(promise, &Promise::completed, [=]()
             {
                 if (promise->reply->error() ==QNetworkReply::NoError){
                     QByteArray qb=promise->reply->readAll();
                     setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                } else {
+                    qDebug() << promise->reply->errorString();
                 }
             });
 
@@ -226,7 +277,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            Promise* promise=Promise::loadAsync(manager,realUrl);
+            Promise* promise=Promise::loadAsync(manager,realUrl,false);
             QObject::connect(promise, &Promise::completed, [=]()
             {
                 if (promise->reply->error() ==QNetworkReply::NoError){
@@ -287,14 +338,22 @@ void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemT
     itemToUpdate->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 }
 
+
+#include "./inprogressdialog.h"
+
 void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 
     currentSearch._poster=ScraperResource(url,_currentScrape);
 
     if (!currentSearch._poster.resources.isEmpty()){
+
+        InProgressDialog* p=new InProgressDialog(QApplication::activeWindow());
+        p->show();
+        QApplication::processEvents();
+
         QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,b.getSize());
 
-        Promise* promise=Promise::loadAsync(manager,url);
+        Promise* promise=Promise::loadAsync(manager,url,false);
 
         //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
@@ -304,7 +363,7 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
                 QByteArray qb=promise->reply->readAll();
                 QPixmap fanArtPixmap;
                 if (fanArtPixmap.loadFromData(qb)){
-                     setPosterState(NETRESOURCE::OK, fanArtPixmap);
+                    setPosterState(NETRESOURCE::OK, fanArtPixmap);
                 }else {
                     setPosterState(NETRESOURCE::ERROR);
                 }
@@ -313,6 +372,9 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
             } else {
                 setPosterState(NETRESOURCE::ERROR);
             }
+
+            p->close();
+            p->deleteLater();
         });
 
     } else {
@@ -344,7 +406,11 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
     if (!currentSearch._backdrop.resources.isEmpty()){
         QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,b.getSize());
 
-        Promise* promise=Promise::loadAsync(manager,url);
+        InProgressDialog* p=new InProgressDialog(QApplication::activeWindow());
+        p->show();
+        QApplication::processEvents();
+
+        Promise* promise=Promise::loadAsync(manager,url,false);
 
         //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
@@ -354,7 +420,7 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
                 QByteArray qb=promise->reply->readAll();
                 QPixmap fanArtPixmap;
                 if (fanArtPixmap.loadFromData(qb)){
-                     setBackdropState(NETRESOURCE::OK, fanArtPixmap);
+                    setBackdropState(NETRESOURCE::OK, fanArtPixmap);
                 }else {
                     setBackdropState(NETRESOURCE::ERROR);
                 }
@@ -363,6 +429,9 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
             } else {
                 setBackdropState(NETRESOURCE::ERROR);
             }
+
+            p->close();
+            p->deleteLater();
         });
 
     } else {
@@ -372,9 +441,22 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
 }
 
 void PanelView::rebuildTemplate() {
-   b.create(currentSearch.poster, currentSearch.backdrop,currentSearch.texts, currentSearch.mediaInfo);
+    b.create(currentSearch.poster, currentSearch.backdrop,currentSearch.texts, currentSearch.mediaInfo);
 }
 
 void PanelView::resultOk(QPixmap result){
     ui->labelPoster->setPixmap(result);
+}
+
+void PanelView::setSynopsis(const QString& synopsis){
+    currentSearch.texts["synopsis"]=synopsis;
+
+}
+
+void PanelView::setCast(const QStringList& actors){
+    currentSearch.texts["actors"]=actors.join(',');
+}
+
+void PanelView::setDirectors(const QStringList& directors){
+    currentSearch.texts["directors"]=directors.join(',');
 }

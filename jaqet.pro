@@ -25,7 +25,6 @@ SOURCES += src/main.cpp\
     src/scrapers/themoviedbscraper.cpp \
      src/fileparser.cpp \
     src/scrapers/thetvdbscraper.cpp \
-    src/scrapers/httpaccess.cpp \
     src/scrapers/cncclassificationwrapper.cpp \
     src/promise.cpp \
     src/searchscraperdialog.cpp \

@@ -6,6 +6,7 @@ InProgressDialog::InProgressDialog(QWidget *parent) :
     ui(new Ui::InProgressDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
 }
 
 InProgressDialog::~InProgressDialog()

@@ -61,6 +61,9 @@ private:
     void setBackdropState(NETRESOURCE fa, const QPixmap &backDrop=QPixmap());
     void setPosterState(NETRESOURCE posterState, const QPixmap& poster=QPixmap());
     void rebuildTemplate();
+    void setSynopsis(const QString& synopsis);
+    void setCast(const QStringList& actors);
+    void setDirectors(const QStringList& directors);
 
 private slots:
 

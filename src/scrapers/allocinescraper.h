@@ -10,8 +10,6 @@ class AlloCineScraper : public Scraper
     static const QString ALLO_DEFAULT_URL_IMAGES;
     static const QString ALLO_PARTNER;
     static const uchar icon_png[];
-    QIcon m_icon;
-
     FilmPrtList parseResultset(const QJsonDocument& ) const;
     QList<Show> parseTVResultset(const QJsonDocument& resultset) const;
     bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
@@ -20,17 +18,27 @@ class AlloCineScraper : public Scraper
     bool findSaisonInfo(const QString& seasonCode, const QString& episode, QString &episodeCode) const;
     bool findEpisodeInfo(const QString& epidodeCode, SearchEpisodeInfo &result) const;
 
+protected :
+    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch) const;
+
 public:
     AlloCineScraper();
 
-    QIcon getIcon();
+    QIcon getIcon() const;
 
-    bool findMovieInfo(const QString& movieCode, SearchMovieInfo &result) const;
+    QString getName() const;
+
+    void  findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
+
     bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const;
 
+    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const{}
+
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-  //  bool searchFilm(const QString& toSearch, SearchResult &result) ;
- //   bool searchTV(const QString& toSearch, SearchTVResult &result);
+
+    void searchTV(QNetworkAccessManager* manager, const QString& toSearch);
+
+    //   bool searchTV(const QString& toSearch, SearchTVResult &result);
 
     QString getBestImageUrl(const QString& filePath, const QSize& ) const;
 
