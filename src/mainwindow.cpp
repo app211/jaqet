@@ -117,7 +117,7 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
     Engine::TypeItem typeItem=modelB->getTypeItem(current);
 
     if (typeItem==Engine::TypeItem::PROCEEDABLE){
-        ui->widget_3->setProceedable(modelB->fileInfo(current));
+        ui->widget_3->setProceedable(modelB, modelB->fileInfo(current));
      } else if (typeItem==Engine::TypeItem::DIR){
         ui->widget_3->setDir();
     } else if (typeItem==Engine::TypeItem::PROCEEDED){

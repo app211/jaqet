@@ -273,9 +273,9 @@ void TemplateYadis::drawText( QPainter& pixPaint, const templateYadis_text& text
 
     int align= Qt::AlignLeft;
     if (!text.align.isEmpty()){
-       if (text.align.compare("center",Qt::CaseInsensitive)==0){
-           align = Qt::AlignCenter;
-       }
+        if (text.align.compare("center",Qt::CaseInsensitive)==0){
+            align = Qt::AlignCenter;
+        }
     }
 
     pixPaint.drawText(text.x,text.y,text.w,text.h,align|Qt::TextWordWrap|Qt::AlignTop	,textToDraw);
@@ -291,7 +291,64 @@ void TemplateYadis::drawText( QPainter& pixPaint, const templateYadis_text& text
     pixPaint.drawPolygon(points,4);
 }
 
-void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<QString, QString> texts, const MediaInfo& mediaInfo){
+template <class T> T getProperty(const QMap<Template::Properties, QVariant>& properties, Template::Properties property, const T& defaultValue=T() ){
+
+    if (properties.contains(property) && properties[property].canConvert<T>()){
+        return properties[property].value<T>();
+    }
+
+    return defaultValue;
+}
+
+void  TemplateYadis::proceed(const QFileInfo& f){
+    QString title=getProperty<QString>(properties,Properties::title,"jaqet");
+    QString suffixe="";
+    int counter=0;
+    while (QFileInfo(f.absoluteDir(),title+suffixe).exists()){
+        suffixe=QString::number(counter++);
+    }
+
+    QDir d;
+
+    if (!d.mkpath( QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath())){
+        return;
+    }
+
+    d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
+
+    QFile file(f.absoluteFilePath());
+    if (!file.rename(QFileInfo(d,title+"."+f.completeSuffix()).absoluteFilePath())){
+        return;
+    }
+
+
+    QPixmap back=createBackdrop();
+    back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
+
+    QPixmap poster=getProperty<QPixmap>(properties,Properties::poster);
+    if (!poster.isNull()){
+        poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
+    }
+}
+
+void TemplateYadis::proceed(){
+    if (properties.contains(Template::Properties::fileinfo) && properties[Template::Properties::fileinfo].canConvert<QFileInfo>()){
+        QFileInfo f= properties[Template::Properties::fileinfo].value<QFileInfo>();
+        if (f.exists()){
+            return proceed(f);
+        }
+    }
+}
+void TemplateYadis::internalCreate(){
+
+    QPixmap result=createBackdrop();
+    emit tivxOk(result.scaled(QSize(result.width()/2,result.height()/2),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation));
+
+}
+
+QPixmap TemplateYadis::createBackdrop(){
+    MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
+
 
     int w=0;
     int h=0;
@@ -308,23 +365,30 @@ void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<
 
     //pixPaint.setBackgroundMode(Qt::OpaqueMode);
     foreach (const templateYadis_image& image, movie_synopsis_images){
-        qDebug() << image.type << image.value;
-        if (image.type=="fanart" && !backdrop.isNull()){
-            QPixmap scaled=backdrop.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-            int x= image.x+ (image.w-scaled.width())/2;
-            int y= image.y+ (image.h-scaled.height())/2;
-            int w= scaled.width();
-            int h=scaled.height();
-            pixPaint.drawPixmap(x,y,w,h,scaled);
-
-        }else if (image.type=="poster" && !poster.isNull()){
-            QPixmap scaled=poster.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-            int x= image.x+ (image.w-scaled.width())/2;
-            int y= image.y+ (image.h-scaled.height())/2;
-            int w= scaled.width();
-            int h=scaled.height();
-            pixPaint.drawPixmap(x,y,w,h,scaled);
-
+        if (image.type=="fanart" ){
+            if(properties.contains(Template::Properties::backdrop)){
+                QPixmap backdrop=properties[Template::Properties::backdrop].value<QPixmap>();
+                if (!backdrop.isNull()){
+                    QPixmap scaled=backdrop.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                    int x= image.x+ (image.w-scaled.width())/2;
+                    int y= image.y+ (image.h-scaled.height())/2;
+                    int w= scaled.width();
+                    int h=scaled.height();
+                    pixPaint.drawPixmap(x,y,w,h,scaled);
+                }
+            }
+        } else if (image.type=="poster"){
+            if(properties.contains(Template::Properties::poster)){
+                QPixmap poster=properties[Template::Properties::poster].value<QPixmap>();
+                if (!poster.isNull()){
+                    QPixmap scaled=poster.scaled(QSize(image.w,image.h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                    int x= image.x+ (image.w-scaled.width())/2;
+                    int y= image.y+ (image.h-scaled.height())/2;
+                    int w= scaled.width();
+                    int h=scaled.height();
+                    pixPaint.drawPixmap(x,y,w,h,scaled);
+                }
+            }
         } else if (image.type=="static" && !image.value.isEmpty()){
             QPixmap pstatic;
 
@@ -339,22 +403,23 @@ void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<
         if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
             drawText(pixPaint,text,text.value);
 
-        } else if (text.type=="plot" && texts.contains("synopsis")){
-            drawText(pixPaint,text,texts["synopsis"]);
+        } else if (text.type=="plot" && properties.contains(Template::Properties::synopsis)){
+            drawText(pixPaint,text,properties[Template::Properties::synopsis].toString());
 
-        } else if (text.type=="cast" && texts.contains("actors")){
-            drawText(pixPaint,text,texts["actors"]);
+        } else if (text.type=="cast" && properties.contains(Template::Properties::actors)){
+            drawText(pixPaint,text,properties[Template::Properties::actors].toStringList().join(", "));
 
-        } else if (text.type=="director" && texts.contains("directors")){
-            drawText(pixPaint,text,texts["directors"]);
-        } else if (text.type=="year" && texts.contains("year")){
-            drawText(pixPaint,text,texts["year"]);
+        } else if (text.type=="director" && properties.contains(Template::Properties::director)){
+            drawText(pixPaint,text,properties[Template::Properties::director].toStringList().join(", "));
 
-        } else if (text.type=="runtime" && texts.contains("runtime")){
-            drawText(pixPaint,text, texts["runtime"]);
+        } else if (text.type=="year" && properties.contains(Template::Properties::year)){
+            drawText(pixPaint,text,properties[Template::Properties::year].toString());
 
-        }else if (text.type=="title" && texts.contains("title")){
-            drawText(pixPaint,text,texts["title"]);
+        } else if (text.type=="runtime" && properties.contains(Template::Properties::runtime)){
+            drawText(pixPaint,text, properties[Template::Properties::runtime].toString());
+
+        }else if (text.type=="title" && properties.contains(Template::Properties::title)){
+            drawText(pixPaint,text,properties[Template::Properties::title].toString());
 
         } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
             QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
@@ -363,30 +428,30 @@ void TemplateYadis::create(const QPixmap &poster, const QPixmap &backdrop, QMap<
         }
     }
 
-    emit tivxOk(result.scaled(QSize(result.width()/2,result.height()/2),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation));
+    return result;
 }
 
 bool TemplateYadis::loadTemplate(const QString& fileName){
-    
-    
+
+
     QDomDocument doc("mydocument");
-    
+
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)){
         return false;
     }
-    
+
     absoluteTemplateFilePath=QFileInfo(file).absolutePath();
-    
+
     if (!doc.setContent(&file)) {
         file.close();
         return false;
     }
-    
+
     file.close();
-    
+
     QDomElement docElem = doc.documentElement();
-    
+
     QDomNode n = docElem.firstChild();
     while(!n.isNull()) {
         QDomElement e = n.toElement(); // try to convert the node to an element.
@@ -394,7 +459,7 @@ bool TemplateYadis::loadTemplate(const QString& fileName){
             if (e.tagName()=="movie"){
                 parseMovie(e);
             }
-            
+
             qDebug() << e.tagName();
             if (e.tagName()=="title" && e.hasAttribute("text")){
                 //    scrapFileFile.title = e.attribute("text");
@@ -408,23 +473,29 @@ bool TemplateYadis::loadTemplate(const QString& fileName){
         }
         n = n.nextSibling();
     }
-    
+
     QDir dir(absoluteTemplateFilePath);
     QStringList filters;
     filters << "*.ttf";
-    
+
     foreach ( QString fontName, dir.entryList(filters, QDir::Files) ){
         QString fontPath =getAbsoluteFilePath(fontName);
-        qDebug() << fontPath << QFontDatabase::addApplicationFont(fontPath);
+        QFontDatabase::addApplicationFont(fontPath);
     }
-    
-    
-    qDebug() << movieBackground;
-    qDebug() <<  poster_standard_width;
-    qDebug() <<  poster_standard_height;
-    qDebug() <<  poster_standard_border;
-    qDebug() <<  poster_standard_mask;
-    qDebug() << this->poster_standard_frame;
-    
+
+
+    backdropSize = QSize(0,0);
+    posterSize = QSize(0,0);
+
+    foreach (const templateYadis_image& image, movie_synopsis_images){
+        if (image.type=="poster"){
+            posterSize.setWidth(qMax<int>(posterSize.width(),image.w));
+            posterSize.setHeight(qMax<int>(posterSize.height(),image.h));
+        } else if (image.type=="fanart" ){
+            backdropSize.setWidth(qMax<int>(backdropSize.width(),image.w));
+            backdropSize.setHeight(qMax<int>(backdropSize.height(),image.h));
+        }
+    }
+
     return true;
 }

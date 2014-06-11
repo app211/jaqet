@@ -5,8 +5,11 @@
 #include <QDir>
 #include <QFileIconProvider>
 #include <QGraphicsScene>
+#include "template/templateyadis.h"
 
 class Engine : public QAbstractListModel {
+    Q_OBJECT
+
 public :
 
 
@@ -20,11 +23,7 @@ public :
 
     QDir currentDir;
 
-    explicit Engine(QObject *parent = 0, const QString& path=""):
-        QAbstractListModel(parent){
-        bingo.addFile(":/resources/images/bingo16x16.png",QSize(16,16));
-        bingo.addFile(":/resources/images/bingo32x32.png",QSize(32,32));
-    }
+    explicit Engine(QObject *parent = 0, const QString& path="");
 
     void cdUp();
     void cd(const QString& path);
@@ -34,6 +33,16 @@ public :
     virtual QStringList getVisibleFileExtensions() const = 0;
     virtual QGraphicsScene* preview(const QFileInfo &f)=0;
 
+    void create(const QMap<Template::Properties, QVariant> &newproperties);
+    void proceed();
+
+    QSize getBackdropSize() const{
+        return b.getBackdropSize();
+    }
+
+    QSize getPosterSize() const {
+        return b.getPosterSize();
+    }
 protected:
     QIcon bingo;
     virtual TypeItem getTypeItem(const QFileInfo &f) const=0;
@@ -44,8 +53,13 @@ private :
     bool allowUp=false;
     QFileIconProvider iconProvider;
     static bool lessThan(const QFileInfo &s1, const QFileInfo &s2);
+    TemplateYadis b;
 
+private slots:
+    void resultOk(QPixmap result);
 
+signals :
+    void tivxOk(QPixmap result);
 };
 
 #endif // MYQSTRINGLISTMODEL_H

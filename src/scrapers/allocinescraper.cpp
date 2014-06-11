@@ -353,7 +353,9 @@ bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovie
 
     if(movieObject["castingShort"].isObject()){
         info.directors=movieObject["castingShort"].toObject()["directors"].toString().split(",", QString::SkipEmptyParts);
+        info.directors.replaceInStrings(QRegExp("^\\s+"),"");
         info.actors=movieObject["castingShort"].toObject()["actors"].toString().split(",", QString::SkipEmptyParts);
+        info.actors.replaceInStrings(QRegExp("^\\s+"),"");
     }
 
     info.productionYear = movieObject["productionYear"].toInt();

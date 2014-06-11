@@ -42,8 +42,6 @@ typedef QList<ShowPtr> ShowPtrList;
 
 class SearchMovieInfo {
 public:
-    bool searchOk;
-    QString error;
     QString originalTitle;
     QString title;
     QString synopsis;
@@ -128,5 +126,7 @@ public:
 
     }
 };
+
+Q_DECLARE_METATYPE(ScraperResource);
 
 #endif // SCRAPER_H

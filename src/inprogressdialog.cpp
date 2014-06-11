@@ -13,3 +13,12 @@ InProgressDialog::~InProgressDialog()
 {
     delete ui;
 }
+
+
+ InProgressDialog* InProgressDialog::create(){
+     InProgressDialog* p=new InProgressDialog(QApplication::activeWindow());
+     p->show();
+     QApplication::processEvents();
+
+     return p;
+ }

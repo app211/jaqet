@@ -6,6 +6,8 @@
 #include <QList>
 #include <QMap>
 #include <QPixmap>
+
+#include "template.h"
 #include "../scanner/scanner.h"
 
 class QDomElement;
@@ -40,21 +42,18 @@ class  templateYadis_image  {
     friend TemplateYadis;
 };
 
-class TemplateYadis :public QObject
+class TemplateYadis :public Template
 {
-    Q_OBJECT
-
+  Q_OBJECT
 public:
     TemplateYadis();
     bool loadTemplate(const QString& fileName);
     QSize getSize();
-
-public slots:
-
-    void create(const QPixmap &poster, const QPixmap &backdrop, QMap<QString, QString> texts, const MediaInfo &mediaInfo);
+    void internalCreate();
+    void proceed();
 
 private:
-     QMap<QString, QString> texts;
+    QMap<QString, QString> texts;
 
     void parseMovie(const QDomElement& e);
     void parseMoviePoster(const QDomElement& e);
@@ -66,6 +65,8 @@ private:
     void parseSynopsis(const QDomElement& synopsisNode);
     bool buildPoster(const ScraperResource& poster, QPixmap &pixmap);
     void drawText(QPainter &pixPaint, const templateYadis_text& text, const QString& textToDraw);
+    void  proceed(const QFileInfo& f);
+    QPixmap createBackdrop();
 
 public:
     QString movieBackground;
@@ -77,7 +78,7 @@ public:
     QList<templateYadis_image> movie_synopsis_images;
     QList<templateYadis_text> movie_synopsis_texts;
 
-Q_SIGNALS:
+signals :
     void tivxOk(QPixmap result);
     void canceled();
 };

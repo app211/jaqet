@@ -1,6 +1,41 @@
 #include "engine.h"
 #include <QDebug>
 
+ Engine::Engine(QObject *parent, const QString& path
+                ):
+    QAbstractListModel(parent){
+    bingo.addFile(":/resources/images/bingo16x16.png",QSize(16,16));
+    bingo.addFile(":/resources/images/bingo32x32.png",QSize(32,32));
+
+
+#ifdef Q_OS_WIN32
+    b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+#else
+    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
+    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+
+    // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
+#endif
+
+    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(resultOk(QPixmap )));
+
+}
+
+void Engine::resultOk(QPixmap result){
+    emit tivxOk(result);
+}
+
+void Engine::create(const QMap<Template::Properties, QVariant> &newproperties){
+    b.create(newproperties);
+}
+
+void Engine::proceed(){
+    b.proceed();
+    populate();
+}
+
 int Engine::rowCount(const QModelIndex &parent) const {
     return entryInfoList.size()+(allowUp?1:0);
 }

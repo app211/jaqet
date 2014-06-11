@@ -10,6 +10,7 @@
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
+#include "engine.h"
 
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
@@ -45,19 +46,6 @@ PanelView::PanelView(QWidget *parent) :
 
     setDir();
 
-#ifdef Q_OS_WIN32
-    b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
-#else
-    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
-
-    // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
-#endif
-
-    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(resultOk(QPixmap )));
-
 }
 
 PanelView::~PanelView()
@@ -74,28 +62,35 @@ void PanelView::setDir(){
     ui->stackedWidget->setCurrentIndex(2);
 }
 
-void PanelView::setProceedable(const QFileInfo& fileInfo){
+void PanelView::setProceedable(Engine* engine, const QFileInfo& fileInfo){
+
     ui->stackedWidget->setCurrentIndex(0);
 
     ui->Proceed->disconnect();
 
     QObject::connect(ui->Proceed, &QPushButton::released, [=]()
     {
-        search(fileInfo);
+        search(engine, fileInfo);
     });
 }
 
-void PanelView::search(QFileInfo f){
+void PanelView::search(Engine* engine, QFileInfo f){
 
     currentSearch = MediaSearch();
 
+    currentSearch.engine=engine;
+
     currentSearch.fileInfo=f;
+    QVariant fileInfo;
+    fileInfo.setValue(f);
+    currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
 
     MediaInfoScanner ff;
     Scanner::AnalysisResult r=ff.analyze(f);
 
-    currentSearch.mediaInfo=r.mediaInfo;
-
+    QVariant mediaInfo;
+    mediaInfo.setValue(r.mediaInfo);
+    currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
 
     SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
@@ -109,7 +104,7 @@ void PanelView::search(QFileInfo f){
     }
 
 }
-void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
+void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo c){
 
     /*  ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
@@ -150,6 +145,10 @@ void delay( int millisecondsToWait )
 }
 
 void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
+
+    currentSearch.texts[Template::Properties::title]=b.title;
+    currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
+
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
     ui->labelEpisodeTitle->setVisible(false);
@@ -347,11 +346,9 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 
     if (!currentSearch._poster.resources.isEmpty()){
 
-        InProgressDialog* p=new InProgressDialog(QApplication::activeWindow());
-        p->show();
-        QApplication::processEvents();
+        InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,b.getSize());
+        QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,currentSearch.engine->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -373,8 +370,9 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
                 setPosterState(NETRESOURCE::ERROR);
             }
 
-            p->close();
-            p->deleteLater();
+
+            p->closeAndDeleteLater();
+
         });
 
     } else {
@@ -384,17 +382,26 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 }
 
 void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPixmap& backDrop){
-    if (currentSearch.backdropState != backdropState || !(backDrop.toImage()==currentSearch.backdrop.toImage())){
-        currentSearch.backdropState=backdropState;
-        currentSearch.backdrop=backDrop;
+
+    bool same=currentSearch.backdropState == backdropState;
+    if (same){
+        QPixmap currentBackdrop=currentSearch.texts[Template::Properties::backdrop].value<QPixmap>();
+        same = backDrop.toImage()==currentBackdrop.toImage();
+    }
+    if (!same){
+        currentSearch.texts[Template::Properties::backdrop]=backDrop;
         rebuildTemplate();
     }
 }
 
 void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap& poster){
-    if (currentSearch.posterState != posterState || !(poster.toImage()==currentSearch.poster.toImage())){
-        currentSearch.posterState=posterState;
-        currentSearch.poster=poster;
+    bool same=currentSearch.posterState != posterState;
+    if (same){
+        QPixmap currentPoster=currentSearch.texts[Template::Properties::poster].value<QPixmap>();
+        same = poster.toImage()==currentPoster.toImage();
+    }
+    if (!same){
+        currentSearch.texts[Template::Properties::poster]=poster;
         rebuildTemplate();
     }
 }
@@ -404,11 +411,9 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
     currentSearch._backdrop=ScraperResource(url,_currentScrape);
 
     if (!currentSearch._backdrop.resources.isEmpty()){
-        QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,b.getSize());
+        QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,currentSearch.engine->getBackdropSize());
 
-        InProgressDialog* p=new InProgressDialog(QApplication::activeWindow());
-        p->show();
-        QApplication::processEvents();
+        InProgressDialog* p=InProgressDialog::create();
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -430,8 +435,7 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
                 setBackdropState(NETRESOURCE::ERROR);
             }
 
-            p->close();
-            p->deleteLater();
+            p->closeAndDeleteLater();
         });
 
     } else {
@@ -441,7 +445,9 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
 }
 
 void PanelView::rebuildTemplate() {
-    b.create(currentSearch.poster, currentSearch.backdrop,currentSearch.texts, currentSearch.mediaInfo);
+    disconnect(SIGNAL(tivxOk(QPixmap )));
+    connect(currentSearch.engine, SIGNAL(tivxOk(QPixmap )), this, SLOT(resultOk(QPixmap )));
+    currentSearch.engine->create(currentSearch.texts);
 }
 
 void PanelView::resultOk(QPixmap result){
@@ -449,14 +455,17 @@ void PanelView::resultOk(QPixmap result){
 }
 
 void PanelView::setSynopsis(const QString& synopsis){
-    currentSearch.texts["synopsis"]=synopsis;
-
+    currentSearch.texts[Template::Properties::synopsis]=synopsis;
 }
 
 void PanelView::setCast(const QStringList& actors){
-    currentSearch.texts["actors"]=actors.join(',');
+    currentSearch.texts[Template::Properties::actors]=actors;
 }
 
 void PanelView::setDirectors(const QStringList& directors){
-    currentSearch.texts["directors"]=directors.join(',');
+    currentSearch.texts[Template::Properties::director]=directors;
+}
+
+void PanelView::proceed(){
+    currentSearch.engine->proceed();
 }

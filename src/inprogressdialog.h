@@ -12,11 +12,19 @@ class InProgressDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit InProgressDialog(QWidget *parent = 0);
     ~InProgressDialog();
+
+    static InProgressDialog* create();
+
+    void closeAndDeleteLater(){
+        close();
+        deleteLater();
+    }
 
 private:
     Ui::InProgressDialog *ui;
+    explicit InProgressDialog(QWidget *parent = 0);
+
 };
 
 #endif // INPROGRESSDIALOG_H

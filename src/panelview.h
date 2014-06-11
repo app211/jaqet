@@ -8,6 +8,7 @@
 #include "template/templateyadis.h"
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
+#include "template/template.h"
 
 class MyProxyModel;
 class Engine;
@@ -25,7 +26,7 @@ public:
     explicit PanelView(QWidget *parent = 0);
     ~PanelView();
 
-    void setProceedable(const QFileInfo&);
+    void setProceedable(Engine *engine, const QFileInfo &fileInfo);
     void setProceeded(QGraphicsScene*);
     void setDir();
 private:
@@ -35,24 +36,22 @@ private:
     };
 
     struct MediaSearch {
+        Engine* engine;
         ScraperResource _poster;
         NETRESOURCE posterState=NETRESOURCE::UNKNOWN;
-        QPixmap poster;
 
         ScraperResource _backdrop;
         NETRESOURCE backdropState=NETRESOURCE::UNKNOWN;
-        QPixmap backdrop;
 
         QFileInfo fileInfo;
         MediaInfo mediaInfo;
-        QMap<QString, QString> texts;
+        QMap<Template::Properties, QVariant> texts;
     };
 
 
     Ui::PanelView *ui;
 
     QNetworkAccessManager manager;
-    TemplateYadis b;
     QList<Scraper*> scrapes;
     MediaSearch currentSearch;
 
@@ -67,7 +66,7 @@ private:
 
 private slots:
 
-    void search(QFileInfo f);
+    void search(Engine *engine, QFileInfo f);
 
     // From Scrapper
     void foundMovie(const Scraper *scraper, SearchMovieInfo b);
@@ -79,10 +78,11 @@ private slots:
     // From UI
     void setPoster (const QString& url, const Scraper *scrape );
     void setBackdrop(const QString& url, const Scraper *scrape);
+    void proceed();
 
-    // From TemplateEngine
+    // From Engine
     void resultOk(QPixmap result);
 
-};
+ };
 
 #endif // PANELVIEW_H

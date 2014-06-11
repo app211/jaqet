@@ -36,7 +36,8 @@ SOURCES += src/main.cpp\
     src/inprogressdialog.cpp \
     src/scanner/mediainfoscanner.cpp \
     src/scanner/mediainfo.cpp \
-    src/panelview.cpp
+    src/panelview.cpp \
+    src/template/template.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -52,7 +53,6 @@ HEADERS  += src/mainwindow.h \
     src/filedownloader.h \
     src/fileparser.h \
     src/scrapers/thetvdbscraper.h \
-    src/scrapers/httpaccess.h \
     src/scrapers/cncclassificationwrapper.h \
     src/promise.h \
     src/searchscraperdialog.h \
@@ -64,7 +64,8 @@ HEADERS  += src/mainwindow.h \
     src/inprogressdialog.h \
     src/scanner/mediainfoscanner.h \
     src/scanner/mediainfo.h \
-    src/panelview.h
+    src/panelview.h \
+    src/template/template.h
 
 
 FORMS    += src/mainwindow.ui \
