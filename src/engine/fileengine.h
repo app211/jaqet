@@ -5,13 +5,14 @@
 
 #include <QDir>
 #include <QFileIconProvider>
-
+#include "fileenginefilesystemwatcher.h"
 
 class FileEngine : public Engine
 {
     Q_OBJECT
 public:
-    explicit FileEngine(QObject *parent = 0);
+    explicit FileEngine(QObject *parent = 0, const QString &path="");
+    virtual void init(const QString& path);
     void cdUp();
     void cd(const QString& path);
     QFileInfo fileInfo(const QModelIndex & index)const;
@@ -34,10 +35,13 @@ private:
     bool allowUp=false;
     QFileIconProvider iconProvider;
     QDir currentDir;
-
+    FileEngineFileSystemWatcher m;
 signals:
 
 public slots:
+
+    void	directoryChanged(const QString & path);
+    void	fileChanged(const QString & path);
 
 };
 

@@ -2,8 +2,14 @@
 #include <QGraphicsPixmapItem>
 
 TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
-    FileEngine(parent){
+    FileEngine(parent, path){
 
+
+    init(path);
+
+}
+
+void TVIXEngine::init(const QString& path){
 #ifdef Q_OS_WIN32
     b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 #else
@@ -14,7 +20,6 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
 
     // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
 #endif
-
 
     visibleFileExtensions = { "*.asf"
                               ,"*.avi"
@@ -38,10 +43,11 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
                               ,"*.wav"*/
                               ,"*.wma"
                             };
-    cd(path);
 
+    FileEngine::init(path);
 
 }
+
 
 Engine::TypeItem TVIXEngine::getTypeItem( const QFileInfo & f) const {
     if (f.exists())
@@ -81,7 +87,9 @@ void TVIXEngine::previewOk(QPixmap pimap){
     emit previewOK(&result);
 }
 
-QGraphicsScene *TVIXEngine::preview(const QFileInfo &f) {
+void TVIXEngine::preview(const QModelIndex & index){
+    QFileInfo f=fileInfo(index);
+
     result.clear();
 
     if (getTypeItem(f)!=TypeItem::PROCEEDED){
@@ -107,7 +115,7 @@ QGraphicsScene *TVIXEngine::preview(const QFileInfo &f) {
         }
     }
 
-    return &result;
+   emit previewOK(&result);
 }
 
 void TVIXEngine::create(const QMap<Template::Properties, QVariant> &newproperties){

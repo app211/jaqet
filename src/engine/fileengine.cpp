@@ -1,26 +1,38 @@
 #include "fileengine.h"
 
+#include <QDebug>
+
 bool lessThan(const QFileInfo &s1, const QFileInfo &s2)
 {
     return (s1.isDir() && !s2.isDir()) || (s1.isDir()==s2.isDir() && s1.fileName().compare(s2.fileName(),Qt::CaseInsensitive) < 0);
 }
 
 void FileEngine::internalDoubleClicked ( const QModelIndex & index ){
-    if (index.isValid()){
-           QVariant v=data(index,Qt::DisplayRole);
-           if (v==".."){
-               cdUp();
-           } else {
-               cd(v.toString());
-
-           }
+    if (this->getTypeItem(index)==TypeItem::DIR){
+        if ((allowUp && index.row()==0)){
+            cdUp();
+        } else {
+            cd(fileInfo(index).absoluteFilePath());
+        }
     }
 }
 
-FileEngine::FileEngine(QObject *parent) :
+FileEngine::FileEngine(QObject *parent, const QString& path) :
     Engine(parent)
 {
 }
+
+void FileEngine::init(const QString& path)
+{
+    connect(&m, SIGNAL(directoryChanged(const QString & )), this,
+            SLOT(directoryChanged(const QString &)));
+
+    connect(&m, SIGNAL(fileChanged(const QString &)), this,
+            SLOT(fileChanged(const QString &)));
+
+    cd(path);
+}
+
 
 int FileEngine::rowCount(const QModelIndex &parent) const {
     return entryInfoList.size()+(allowUp?1:0);
@@ -69,16 +81,25 @@ QVariant FileEngine::data(const QModelIndex &index, int role) const {
 }
 
 void FileEngine::cdUp(){
+    m.disabled();
     if (currentDir.cdUp()){
+        m.setPath(currentDir.absolutePath());
         populate();
     }
+
+    m.enabled();
 }
 
 void FileEngine::cd(const QString& path){
+    m.disabled();
+
     if (QFileInfo(currentDir,path).isDir()){
         currentDir.cd(path);
+        m.setPath(currentDir.absolutePath());
         populate();
     }
+
+    m.enabled();
 }
 
 QFileInfo FileEngine::fileInfo(const QModelIndex & index) const {
@@ -115,4 +136,13 @@ void FileEngine::populate(){
     allowUp= (QDir(currentDir).cdUp());
 
     emit endResetModel();
+}
+
+void FileEngine::directoryChanged(const QString & path){
+    populate();
+    qDebug() << path;
+}
+
+void FileEngine::fileChanged(const QString & path){
+    qDebug() << path;
 }

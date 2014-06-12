@@ -118,7 +118,7 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
      } else if (typeItem==Engine::TypeItem::DIR){
         ui->widget_3->setDir();
     } else if (typeItem==Engine::TypeItem::PROCEEDED){
-      //  ui->widget_3->setProceeded(modelB->preview(current)));
+        ui->widget_3->setProceeded(modelB,current);
      }
 }
 

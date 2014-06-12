@@ -26,7 +26,7 @@ public:
     ~PanelView();
 
     void setProceedable(Engine *engine, const QModelIndex &index);
-    void setProceeded(QGraphicsScene*);
+    void setProceeded(Engine *engine, const QModelIndex &index);
     void setDir();
 private:
     enum class NETRESOURCE {

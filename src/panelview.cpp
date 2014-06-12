@@ -53,9 +53,17 @@ PanelView::~PanelView()
     delete ui;
 }
 
-void PanelView::setProceeded(QGraphicsScene* s){
-    ui->graphicsViewBingo->setScene(s);
-    ui->stackedWidget->setCurrentIndex(3);
+void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
+
+     ui->stackedWidget->setCurrentIndex(3);
+
+    QObject::disconnect(engine,SIGNAL(previewOK(QGraphicsScene* )),this,0);
+    QObject::connect(engine, &Engine::previewOK, [=](QGraphicsScene* newScene){
+        ui->graphicsViewBingo->setScene(newScene);
+    });
+
+    engine->preview(index);
+
 }
 
 void PanelView::setDir(){
@@ -454,7 +462,6 @@ void PanelView::rebuildTemplate() {
 
 void PanelView::previewOK(QGraphicsScene* s){
     ui->graphicsView->setScene(s);
-    //ui->labelPoster->setPixmap(result);
 }
 
 void PanelView::setSynopsis(const QString& synopsis){

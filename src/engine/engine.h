@@ -31,7 +31,9 @@ public :
     virtual void internalDoubleClicked ( const QModelIndex & index )=0;
 
     virtual void create(const QMap<Template::Properties, QVariant> &newproperties)=0;
+
     virtual void preview(const QMap<Template::Properties, QVariant> &newproperties)=0;
+    virtual void preview(const QModelIndex & index)=0;
 
     virtual void proceed()=0;
 
@@ -53,7 +55,8 @@ private slots:
      void doubleClicked ( const QModelIndex & index );
 
 signals :
-    void tivxOk(QPixmap result);
+    void previewOK(QGraphicsScene*);
+
 };
 
 #endif // MYQSTRINGLISTMODEL_H
