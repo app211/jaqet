@@ -7,8 +7,6 @@
 #include <QGraphicsScene>
 #include <QStringListModel>
 #include <QPixmap>
-#include "template/templateyadis.h"
-
 
 
 class MyProxyModel;
@@ -63,7 +61,6 @@ private slots:
     QMap<QString,QString> _texts;
 
     QNetworkAccessManager manager;
-    TemplateYadis b;
 
     QList<Scraper*> scrapes;
 

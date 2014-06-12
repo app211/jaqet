@@ -10,7 +10,7 @@
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
-#include "engine.h"
+#include "engine/engine.h"
 
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
@@ -62,7 +62,7 @@ void PanelView::setDir(){
     ui->stackedWidget->setCurrentIndex(2);
 }
 
-void PanelView::setProceedable(Engine* engine, const QFileInfo& fileInfo){
+void PanelView::setProceedable(Engine* engine, const QModelIndex &index){
 
     ui->stackedWidget->setCurrentIndex(0);
 
@@ -70,27 +70,29 @@ void PanelView::setProceedable(Engine* engine, const QFileInfo& fileInfo){
 
     QObject::connect(ui->Proceed, &QPushButton::released, [=]()
     {
-        search(engine, fileInfo);
+        search(engine, index);
     });
 }
 
-void PanelView::search(Engine* engine, QFileInfo f){
+void PanelView::search(Engine* engine, const QModelIndex &index){
 
     currentSearch = MediaSearch();
 
     currentSearch.engine=engine;
 
-    currentSearch.fileInfo=f;
-    QVariant fileInfo;
-    fileInfo.setValue(f);
-    currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
+    if (engine->canGiveFileInfo()){
+        QFileInfo f=engine->getFileInfo(index);
+        currentSearch.fileInfo=f;
+        QVariant fileInfo;
+        fileInfo.setValue(f);
+        currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
+        MediaInfoScanner ff;
+        Scanner::AnalysisResult r=ff.analyze(f);
+        QVariant mediaInfo;
+        mediaInfo.setValue(r.mediaInfo);
+        currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
 
-    MediaInfoScanner ff;
-    Scanner::AnalysisResult r=ff.analyze(f);
 
-    QVariant mediaInfo;
-    mediaInfo.setValue(r.mediaInfo);
-    currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
 
     SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
@@ -102,7 +104,7 @@ void PanelView::search(Engine* engine, QFileInfo f){
             }
         }
     }
-
+}
 }
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo c){
 
@@ -445,13 +447,14 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
 }
 
 void PanelView::rebuildTemplate() {
-    disconnect(SIGNAL(tivxOk(QPixmap )));
-    connect(currentSearch.engine, SIGNAL(tivxOk(QPixmap )), this, SLOT(resultOk(QPixmap )));
-    currentSearch.engine->create(currentSearch.texts);
+    disconnect(SIGNAL(previewOK(QGraphicsScene* )));
+    connect(currentSearch.engine, SIGNAL(previewOK(QGraphicsScene* )), this, SLOT(previewOK(QGraphicsScene*  )));
+    currentSearch.engine->preview(currentSearch.texts);
 }
 
-void PanelView::resultOk(QPixmap result){
-    ui->labelPoster->setPixmap(result);
+void PanelView::previewOK(QGraphicsScene* s){
+    ui->graphicsView->setScene(s);
+    //ui->labelPoster->setPixmap(result);
 }
 
 void PanelView::setSynopsis(const QString& synopsis){

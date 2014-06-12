@@ -15,10 +15,9 @@
 #include <QFontDatabase>
 #include <QBitmap>
 #include <QPixmap>
-#include "../scrapers/scraper.h"
 #include <QNetworkReply>
 
-
+#include "../../scrapers/scraper.h"
 
 TemplateYadis::TemplateYadis()
 {

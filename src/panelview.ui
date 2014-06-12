@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
-    <height>436</height>
+    <width>937</width>
+    <height>677</height>
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageProceed">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -146,6 +146,13 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Director</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="3">
             <widget class="QToolButton" name="toolButtonSysnopsis">
              <property name="text">
@@ -153,12 +160,8 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Director</string>
-             </property>
-            </widget>
+           <item row="1" column="0" colspan="3">
+            <widget class="QTextEdit" name="synopsis"/>
            </item>
            <item row="0" column="0" colspan="3">
             <widget class="QLabel" name="labelUrl">
@@ -176,9 +179,6 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="3">
-            <widget class="QTextEdit" name="synopsis"/>
-           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="tab_3">
@@ -194,37 +194,8 @@
         </widget>
        </item>
        <item>
-        <widget class="QScrollArea" name="scrollArea_2">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents_2">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>855</width>
-            <height>76</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <widget class="QPushButton" name="pushButton">
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="labelPoster">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+        <widget class="QGraphicsView" name="graphicsView">
+       </widget>
        </item>
       </layout>
      </widget>

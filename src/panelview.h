@@ -5,10 +5,9 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include "template/templateyadis.h"
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
-#include "template/template.h"
+#include "engine/template/template.h"
 
 class MyProxyModel;
 class Engine;
@@ -26,7 +25,7 @@ public:
     explicit PanelView(QWidget *parent = 0);
     ~PanelView();
 
-    void setProceedable(Engine *engine, const QFileInfo &fileInfo);
+    void setProceedable(Engine *engine, const QModelIndex &index);
     void setProceeded(QGraphicsScene*);
     void setDir();
 private:
@@ -66,7 +65,7 @@ private:
 
 private slots:
 
-    void search(Engine *engine, QFileInfo f);
+    void search(Engine *engine, const QModelIndex &index);
 
     // From Scrapper
     void foundMovie(const Scraper *scraper, SearchMovieInfo b);
@@ -81,7 +80,7 @@ private slots:
     void proceed();
 
     // From Engine
-    void resultOk(QPixmap result);
+    void previewOK(QGraphicsScene*);
 
  };
 

@@ -33,9 +33,8 @@
 #include <QBrush>
 #include "fileparser.h"
 
-#include "template/templateyadis.h"
 
-#include "tvixengine.h"
+#include "engine/tvixengine.h"
 #include "promise.h"
 #include "searchscraperdialog.h"
 
@@ -45,7 +44,7 @@
 
 void MainWindow::doubleClicked ( const QModelIndex & index){
 
-    if (index.isValid()){
+ /*  if (index.isValid()){
         QVariant v=modelB->data(index,Qt::DisplayRole);
         if (v==".."){
             modelB->cdUp();
@@ -53,7 +52,7 @@ void MainWindow::doubleClicked ( const QModelIndex & index){
             modelB->cd(v.toString());
 
         }
-    }
+    }*/
 }
 
 
@@ -86,14 +85,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->listView->setModel(f);
     connect(ui->listView, SIGNAL(doubleClicked ( const QModelIndex & )),
-            this, SLOT(doubleClicked ( const QModelIndex & )));
+            modelB, SLOT(doubleClicked ( const QModelIndex & )));
 
     //   ui->listView->setRootIndex(f->mapFromSource(ffdf->setRootPath(QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation).at(0))));
 
     connect(ui->listView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
             this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&)));
-
-    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(s_clicked_texte(QPixmap )));
 
 
     scene = new QGraphicsScene(this);
@@ -117,11 +114,11 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
     Engine::TypeItem typeItem=modelB->getTypeItem(current);
 
     if (typeItem==Engine::TypeItem::PROCEEDABLE){
-        ui->widget_3->setProceedable(modelB, modelB->fileInfo(current));
+        ui->widget_3->setProceedable(modelB,current);
      } else if (typeItem==Engine::TypeItem::DIR){
         ui->widget_3->setDir();
     } else if (typeItem==Engine::TypeItem::PROCEEDED){
-        ui->widget_3->setProceeded(modelB->preview(modelB->fileInfo(current)));
+      //  ui->widget_3->setProceeded(modelB->preview(current)));
      }
 }
 
@@ -193,7 +190,7 @@ void MainWindow::chooseTizzBirdFolder() {
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     if (dialog.exec()){
-        modelB->cd(dialog.selectedFiles().at(0));
+        //modelB->cd(dialog.selectedFiles().at(0));
     }
 }
 

@@ -2,7 +2,19 @@
 #include <QGraphicsPixmapItem>
 
 TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
-    Engine(parent,path){
+    FileEngine(parent){
+
+#ifdef Q_OS_WIN32
+    b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+#else
+    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
+    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+
+    // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
+#endif
+
 
     visibleFileExtensions = { "*.asf"
                               ,"*.avi"
@@ -56,6 +68,19 @@ QStringList TVIXEngine::getVisibleFileExtensions() const {
     return visibleFileExtensions;
 }
 
+void TVIXEngine::preview(const QMap<Template::Properties, QVariant> &newproperties){
+    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(previewOk(QPixmap )));
+    create(newproperties);
+}
+
+
+void TVIXEngine::previewOk(QPixmap pimap){
+
+    result.clear();
+    result.addPixmap(pimap);
+    emit previewOK(&result);
+}
+
 QGraphicsScene *TVIXEngine::preview(const QFileInfo &f) {
     result.clear();
 
@@ -83,4 +108,21 @@ QGraphicsScene *TVIXEngine::preview(const QFileInfo &f) {
     }
 
     return &result;
+}
+
+void TVIXEngine::create(const QMap<Template::Properties, QVariant> &newproperties){
+     b.create(newproperties);
+}
+
+void TVIXEngine::proceed(){
+    b.proceed();
+    populate();
+}
+
+QSize TVIXEngine::getBackdropSize() const{
+    return b.getBackdropSize();
+}
+
+QSize TVIXEngine::getPosterSize() const {
+    return b.getPosterSize();
 }

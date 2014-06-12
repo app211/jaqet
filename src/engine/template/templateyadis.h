@@ -8,7 +8,7 @@
 #include <QPixmap>
 
 #include "template.h"
-#include "../scanner/scanner.h"
+#include "../../scanner/scanner.h"
 
 class QDomElement;
 class TemplateYadis;
