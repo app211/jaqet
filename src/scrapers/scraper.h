@@ -59,9 +59,7 @@ public:
 };
 class SearchEpisodeInfo {
 public:
-    bool searchOk;
     QString code;
-    QString error;
     QString title;
     QString originalTitle;
     QString synopsis;
@@ -90,22 +88,24 @@ public:
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
     void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) const;
+    virtual void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
+
     virtual void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
 
-    virtual void searchTV(QNetworkAccessManager* manager, const QString& toSearch) =0;
     virtual void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;
 
     virtual QString getBestImageUrl(const QString& filePath, const QSize& size) const=0;
 
 protected:
-   virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch) const=0;
+    virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
+    virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) =0;
 
 public slots:
-    void error();
+    void closeDialog();
 
 Q_SIGNALS:
-    void scraperError();
-    void scraperError(const QString& error);
+    void scraperError() const;
+    void scraperError(const QString& error) const;
     void found(FilmPrtList films);
     void found(ShowPtrList shows);
     void found(const Scraper* scraper,SearchMovieInfo films);

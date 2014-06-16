@@ -1,4 +1,3 @@
-#if 0
 #include "thetvdbscraper.h"
 #include <QUrl>
 #include <QDebug>
@@ -6,53 +5,53 @@
 #include <QXmlStreamReader>
 #include <QPixmap>
 #include <QByteArray>
+#include <QNetworkReply>
 
-const QString TheTVDBScraper::API_KEY="4D724EF8C0D6070D";
+#include "../utils.h"
+#include "../promise.h"
+
+const QString TheTVDBScraper::API_KEY="C526A71D6E158EF0";
 
 
-
-QStringList m_mirrors;
 
 TheTVDBScraper::TheTVDBScraper()
 {
 }
 
+QString TheTVDBScraper::getXMLURL() const {
+    if (m_xmlmirrors.size()>0){
+        return this->m_xmlmirrors[Utils::randInt(0,m_xmlmirrors.size()-1)];
+    }
 
-QString TheTVDBScraper::createMirrorUrl() const
-{
-    QString url;
-    if ( m_mirrors.isEmpty() ) {
-        // fallback
-        url = QString( "http://thetvdb.com" );
-    }
-    else {
-        // choose one at random as recommended in the thetvdb api docs
-        url = m_mirrors[Scraper::randInt(0, m_mirrors.size()-1)];
-    }
-    return url;
+    // fallback
+    return "http://thetvdb.com";
 }
 
-void TheTVDBScraper::updateMirrors()
-{
-    QString url = createMirrorUrl().append("/api/").append(API_KEY).append("/mirrors.xml");
-    /* url.addPath( QLatin1String( "/api/" ) );
-    url.addPath( apiKey() );
-    url.addPath( QLatin1String( "mirrors.xml" ) );
-    kDebug() << url;
-    KIO::StoredTransferJob* job = KIO::storedGet( url, KIO::Reload, KIO::HideProgressInfo );
-    job->addMetaData( "Charsets", "utf-8" );
-    connect( job, SIGNAL(result(KJob*)),
-             q, SLOT(_k_getMirrorListResult(KJob*)));*/
+QString TheTVDBScraper::getZIPURL() const {
+    if (m_zipmirrors.size()>0){
+        return this->m_zipmirrors[Utils::randInt(0,m_xmlmirrors.size()-1)];
+    }
+
+    // fallback
+    return "http://thetvdb.com";
 }
+
 
 QString TheTVDBScraper::createURL(const QString& command, const QMap<QString, QString>& params) const {
 
-    QString queryURL=createMirrorUrl().append("/api/").append(command);
+    QString queryURL=getXMLURL().append("/api/").append(command);
 
     QString mapParams;
+    bool firstParameter=true;
+
     foreach( QString key, params.keys() )
     {
-        mapParams.append(QUrl::toPercentEncoding(key)).append('=').append(params.value( QUrl::toPercentEncoding(key) )).append('&');
+        if (!firstParameter){
+            mapParams.append('&');
+        }
+
+        firstParameter=false;
+        mapParams.append(QUrl::toPercentEncoding(key)).append('=').append(params.value( QUrl::toPercentEncoding(key) ));
     }
 
     QString searchQuery = mapParams;
@@ -64,13 +63,12 @@ QString TheTVDBScraper::createURL(const QString& command, const QMap<QString, QS
     return fullQuery;
 }
 
-bool TheTVDBScraper::searchFilm(const QString& toSearch, SearchResult &result)  {
-    return false;
-}
 
-bool parseSeriesList( const QByteArray& data, QList<Show>& result )
+void TheTVDBScraper::parseSeriesList( QNetworkAccessManager* manager, const QString& toSearch, const QByteArray& data, const QString& langage)
 {
-    QMap<QString,QMap<QString,Show>> series;
+
+    QMap<QString,QList<QPair<QString,ShowPtr>>> series;
+
     QXmlStreamReader xml( data );
     if ( xml.readNextStartElement() ) {
         while ( xml.readNextStartElement() &&
@@ -97,57 +95,139 @@ bool parseSeriesList( const QByteArray& data, QList<Show>& result )
             }
             if ( id > 0 && !name.isEmpty() && !langage.isEmpty() ) {
                 qDebug() << "found series Item:" << langage << id << name;
-                Show r;
-                r.code=QString::number(id);
-                r.title=name;
-                if (series.contains(r.code)){
-                    series[r.code].insert(langage,r);
-                } else{
-                    QMap<QString,Show> shows;
-                    shows.insert(langage,r);
-                    series.insert(r.code,shows);
+                ShowPtr show(new Show());
+                show->code=QString::number(id);
+                show->title=name;
+
+                if (!series.contains(show->code)){
+                    series.insert(show->code,QList<QPair<QString,ShowPtr>>());
                 }
+
+                QPair<QString,ShowPtr> lang_show;
+                lang_show.first=langage;
+                lang_show.second=show;
+                series[show->code].append(lang_show);
             }
             else {
                 qDebug() << "invalid Item:" << id << name;
-                return false;
+                //   return false;
             }
         }
     }
 
-    result.clear();
-    foreach(const QString& serieid, series.keys()){
-        QMap<QString,Show> m=series[serieid];
-        if(m.contains("fr")){
-            result.append(m.take("fr"));
-        } else {
-            result.append(m.first());
+    ShowPtrList shows;
+    for(const QString& serieid: series.keys()){
+        bool found=false;
+        for (QPair<QString,ShowPtr> lang_show: series[serieid]) {
+            if (lang_show.first=="fr"){
+                shows.append(lang_show.second);
+                found=true;
+                break;
+            }
+        }
+
+        if (!found && series[serieid].size()>0){
+            shows.append(series[serieid].at(0).second);
         }
     }
 
-    return true;
+    emit found(shows);
 }
 
+void TheTVDBScraper::parseMirrorList( const QByteArray& data)
+{
+    QXmlStreamReader xml( data );
+    if ( xml.readNextStartElement() ) {
+        while ( xml.readNextStartElement() &&
+                xml.name() == QLatin1String( "Mirror" ) ) {
+            int id = 0;
+            int typemask = 0;
+            QString  mirrorpath;
+            while ( xml.readNextStartElement() ) {
+                if ( xml.name() == QLatin1String( "id" ) ) {
+                    id = xml.readElementText().toInt();
+                }
+                else if ( xml.name() == QLatin1String( "mirrorpath" ) ) {
+                    mirrorpath = xml.readElementText();
+                }
+                else if ( xml.name() == QLatin1String( "typemask" ) ) {
+                    typemask = xml.readElementText().toInt();
+                }
+                else {
+                    // skip over this tag
+                    xml.skipCurrentElement();
+                }
+            }
 
-bool TheTVDBScraper::searchTV(const QString& toSearch, SearchTVResult &result){
-    QMap<QString,QString> params;
-    params["language"]="fr";
-    params["seriesname"]=QUrl::toPercentEncoding(toSearch);
-
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand("GetSeries.php", params, headerData,data)){
-        qDebug() << data;
-        return parseSeriesList(data, result.shows);
+            if (id> 0 && typemask>0 && !mirrorpath.isEmpty()){
+                // Cf. http://thetvdb.com/wiki/index.php?title=API:mirrors.xml
+                if ((typemask&1)!=0){
+                    // 1 xml files
+                    this->m_xmlmirrors.append(mirrorpath);
+                }
+                if ((typemask&2)!=0){
+                    //2 banner files
+                    this->m_bannermirrors.append(mirrorpath);
+                }
+                if ((typemask&4)!=0){
+                    //4 zip files
+                    this->m_zipmirrors.append(mirrorpath);
+                }
+            }
+        }
     }
-
-    return false;
 }
 
-bool TheTVDBScraper::findMovieInfo( const QString& movieCode, SearchMovieInfo& result) const {
-    return false;
+
+void TheTVDBScraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const {
 }
+
+void TheTVDBScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+    QString queryURL=getZIPURL().append("/api/%1/series/%2/fr.xml").arg(API_KEY).arg( showCode );
+
+    qDebug() << queryURL;
+}
+
+
+void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
+    emit scraperError("Unsupported Operation");
+}
+
+void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) {
+    if  (retrieveMirror){
+        retrieveMirror= false;
+        QString url = QString("http://thetvdb.com/api/%1/mirrors.xml").arg(API_KEY);
+        Promise* promise=Promise::loadAsync(*manager,url,false);
+        QObject::connect(promise, &Promise::completed, [=]()
+        {
+            QByteArray data= promise->reply->readAll();
+            if (promise->reply->error() ==QNetworkReply::NoError){
+                parseMirrorList(data);
+                internalSearchTV(manager,toSearch,language);
+            } else {
+                emit scraperError(tr("Unable to retrieve 'mirrors.xml'"));
+            }
+        });
+    }
+    else {
+        QMap<QString,QString> params;
+        params["language"]=QUrl::toPercentEncoding(language);
+        params["seriesname"]=QUrl::toPercentEncoding(toSearch);
+        QString url=createURL("GetSeries.php",params);
+        Promise* promise=Promise::loadAsync(*manager,url,false);
+        QObject::connect(promise, &Promise::completed, [=]()
+        {
+            QByteArray data= promise->reply->readAll();
+            qDebug() << data;
+            if (promise->reply->error() ==QNetworkReply::NoError){
+                parseSeriesList(manager,toSearch, data,language);
+
+            }
+        });
+    }
+}
+
+#if 0
 
 bool TheTVDBScraper::findEpisodeInfo(const QString& showCode, const QString& season, const QString& episode, SearchEpisodeInfo &result) const {
 
@@ -161,11 +241,13 @@ bool TheTVDBScraper::findEpisodeInfo(const QString& showCode, const QString& sea
 
     if (execCommand(command, params, headerData,data)){
         qDebug() << data;
-       // return parseSeriesList(data, result.shows);
+        // return parseSeriesList(data, result.shows);
     }
 
     return false;
 }
+
+#endif
 
 QString TheTVDBScraper::getBestImageUrl(const QString& filePath, const QSize& size) const {
     return "";
@@ -209,7 +291,9 @@ const uchar TheTVDBScraper::icon_png[] = {
     0xe4, 0x73, 0xae, 0x36, 0x0e, 0xcb, 0x07, 0xf8, 0x0d, 0x41, 0xe5, 0xda, 0x32, 0x93, 0x20, 0x23,
     0x88, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82} ;
 
-QIcon TheTVDBScraper::getIcon() {
+static QIcon m_icon;
+
+QIcon TheTVDBScraper::getIcon() const {
     if (m_icon.isNull()){
         QPixmap pixmap;
         if (pixmap.loadFromData(TheTVDBScraper::icon_png, sizeof(TheTVDBScraper::icon_png)/sizeof(uchar))){
@@ -219,4 +303,8 @@ QIcon TheTVDBScraper::getIcon() {
 
     return m_icon;
 }
-#endif
+
+
+QString TheTVDBScraper::getName() const {
+    return "TVDB";
+}

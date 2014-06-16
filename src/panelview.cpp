@@ -7,6 +7,7 @@
 
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
+#include "scrapers/thetvdbscraper.h"
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
@@ -19,7 +20,7 @@ PanelView::PanelView(QWidget *parent) :
     ui->setupUi(this);
 
     Scraper* s=new TheMovieDBScraper;
-    QAction* tmdbAction = new QAction(s->getIcon(),"&TMDB", this);
+    QAction* tmdbAction = new QAction(s->getIcon(),s->getName(), this);
     tmdbAction->setData(qVariantFromValue((void*)s));
 
     connect(s, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
@@ -31,7 +32,7 @@ PanelView::PanelView(QWidget *parent) :
     this->scrapes.append(s);
 
     Scraper* allocine=new AlloCineScraper;
-    QAction* tmdbActionAllocine = new QAction(s->getIcon(),"&Allociné", this);
+    QAction* tmdbActionAllocine = new QAction(s->getIcon(),s->getName(), this);
     tmdbActionAllocine->setData(qVariantFromValue((void*)s));
 
     connect(allocine, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
@@ -41,6 +42,18 @@ PanelView::PanelView(QWidget *parent) :
             SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
 
     this->scrapes.append(allocine);
+
+    Scraper* tvdb=new TheTVDBScraper;
+    QAction* tvdbAction = new QAction(tvdb->getIcon(),tvdb->getName(), this);
+    tvdbAction->setData(qVariantFromValue((void*)s));
+
+    connect(tvdb, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
+            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+
+    connect(tvdb, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
+            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+
+    this->scrapes.append(tvdb);
 
     scene = new QGraphicsScene(this);
 

@@ -130,6 +130,9 @@ void SearchScraperDialog::found(ShowPtrList shows){
         }
     } else if (shows.size()==1){
         accept(scraper, shows.at(0));
+    } else {
+        QMessageBox::information(this, tr("My Application"),
+                                        tr("Nothing found"));
     }
 }
 

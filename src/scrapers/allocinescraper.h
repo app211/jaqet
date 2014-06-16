@@ -11,15 +11,17 @@ class AlloCineScraper : public Scraper
     static const QString ALLO_PARTNER;
     static const uchar icon_png[];
     FilmPrtList parseResultset(const QJsonDocument& ) const;
-    QList<Show> parseTVResultset(const QJsonDocument& resultset) const;
+    ShowPtrList parseTVResultset(const QJsonDocument& resultset) const;
     bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
-    bool parseLargeTVSerieInfo(const QJsonDocument& resultset, const QString &season, QString &seasonCode) const;
-    bool parseLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const QString&  episode, QString& episodeCode) const;
-    bool findSaisonInfo(const QString& seasonCode, const QString& episode, QString &episodeCode) const;
-    bool findEpisodeInfo(const QString& epidodeCode, SearchEpisodeInfo &result) const;
+    bool parseLargeTVSerieInfo(const QJsonDocument& resultset, const int seasonToFind, QString &seasonCode) const;
+    bool parseLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode) const;
+    void findSaisonInfo(QNetworkAccessManager *manager, const QString& seasonCode, const int episode) const;
+
+    bool findEpisodeInfo(QNetworkAccessManager *manager, const QString& epidodeCode) const;
 
 protected :
-    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch) const;
+    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) ;
 
 public:
     AlloCineScraper();
@@ -30,15 +32,10 @@ public:
 
     void  findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
 
-    bool findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const;
-
-    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const{}
+     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
 
-    void searchTV(QNetworkAccessManager* manager, const QString& toSearch);
-
-    //   bool searchTV(const QString& toSearch, SearchTVResult &result);
 
     QString getBestImageUrl(const QString& filePath, const QSize& ) const;
 

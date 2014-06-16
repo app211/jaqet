@@ -44,7 +44,7 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
     return fullQuery;
 }
 
-void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch) const
+void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) const
 {
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
@@ -70,32 +70,29 @@ void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const Q
 }
 
 
+void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  {
 
-void AlloCineScraper::searchTV(QNetworkAccessManager* manager, const QString& toSearch)  {
-#if 0
     QMap<QString,QString> params;
     params["filter"]="tvseries";
     params["q"]=QUrl::toPercentEncoding(toSearch);
 
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand("rest/v3/search", params, headerData,data)){
-        qDebug() << data;
-
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            result.shows=parseTVResultset(doc);
-            return true;
+    QString url=createURL("rest/v3/search",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            const QByteArray data=promise->reply->readAll();
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                emit found(parseTVResultset(doc));
+            } else {
+                emit scraperError(e.errorString());
+            }
+        } else {
+            emit scraperError(promise->reply->errorString());
         }
-
-        qDebug() << e.errorString();
-
-    }
-
-#endif
-
+    });
 }
 
 void  AlloCineScraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const{
@@ -129,13 +126,8 @@ void  AlloCineScraper::findMovieInfo(QNetworkAccessManager *manager, const QStri
 }
 
 
-bool AlloCineScraper::parseLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const QString&  episode, QString& episodeCode) const{
-#if 0
-    bool bOk;
-    int episodeToFind = episode.toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+bool AlloCineScraper::parseLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode) const{
+
 
     if (!resultset.isObject()){
         return false;
@@ -164,17 +156,11 @@ bool AlloCineScraper::parseLargeSeasonTVSerieInfo(const QJsonDocument& resultset
         }
     }
 
-#endif
     return false;
 }
 
-bool AlloCineScraper::parseLargeTVSerieInfo(const QJsonDocument& resultset, const QString&  season, QString& seasonCode) const{
-#if 0
-    bool bOk;
-    int seasonToFind = season.toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+bool AlloCineScraper::parseLargeTVSerieInfo(const QJsonDocument& resultset, const int seasonToFind, QString& seasonCode) const{
+
 
     if (!resultset.isObject()){
         return false;
@@ -203,39 +189,43 @@ bool AlloCineScraper::parseLargeTVSerieInfo(const QJsonDocument& resultset, cons
         }
     }
 
-#endif
+
     return false;
 }
 
-bool AlloCineScraper::findSaisonInfo(const QString& seasonCode, const QString& episode, QString& episodeCode) const{
-#if 0
+void AlloCineScraper::findSaisonInfo(QNetworkAccessManager *manager, const QString& seasonCode, const int episode) const{
+
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(seasonCode);
     params["profile"]=QUrl::toPercentEncoding("large");
     params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
 
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand("rest/v3/season", params, headerData,data)){
-        qDebug() << data;
-
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            if(parseLargeSeasonTVSerieInfo(doc,episode,episodeCode)){
-                return true;
+    QString url=createURL("rest/v3/season",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            const QByteArray data=promise->reply->readAll();
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                QString episodeCode;
+                if(parseLargeSeasonTVSerieInfo(doc,episode,episodeCode)){
+                   findEpisodeInfo(manager,episodeCode);
+                } else {
+                    emit scraperError();
+                }
+            } else {
+                emit scraperError(e.errorString());
             }
+        } else {
+            emit scraperError(promise->reply->errorString());
         }
-
-        qDebug() << e.errorString();
-    }
-#endif
-    return false;
+    });
 }
 
-bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo &result){
-#if 0
+bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset ){
+SearchEpisodeInfo result;
     if (!resultset.isObject()){
         return false;
     }
@@ -267,69 +257,65 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo &
             break;
         }
     }
-#endif
-    return true;
+
+    qDebug() << result.synopsis;
 }
 
-bool AlloCineScraper::findEpisodeInfo(const QString& episodeCode, SearchEpisodeInfo &result) const{
-#if 0
+bool AlloCineScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& episodeCode) const{
+
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(episodeCode);
     params["profile"]=QUrl::toPercentEncoding("large");
     params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
 
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand("rest/v3/episode", params, headerData,data)){
-        qDebug() << data;
-
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            if(parseEpisodeTVSerieInfo(doc,result)){
-                return true;
+    QString url=createURL("rest/v3/episode",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            const QByteArray data=promise->reply->readAll();
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                parseEpisodeTVSerieInfo(doc);
+             } else {
+                emit scraperError(e.errorString());
             }
+        } else {
+            emit scraperError(promise->reply->errorString());
         }
-
-        qDebug() << e.errorString();
-    }
-
-#endif
-    return false;
+    });
 }
 
-bool AlloCineScraper::findEpisodeInfo(const QString& showCode, const QString&  season, const QString& epidode, SearchEpisodeInfo &result) const{
-#if 0
+void AlloCineScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(showCode);
     params["profile"]=QUrl::toPercentEncoding("large");
     params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
 
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand("rest/v3/tvseries", params, headerData,data)){
-        qDebug() << data;
-
-        QJsonParseError e;
-        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-        if (e.error== QJsonParseError::NoError){
-            QString seasonCode;
-            if(parseLargeTVSerieInfo(doc,season,seasonCode)){
-                QString episodeCode;
-                if(findSaisonInfo(seasonCode, epidode,episodeCode)){
-                    if (findEpisodeInfo(episodeCode,result)){
-                        return true;
-                    }
+    QString url=createURL("rest/v3/tvseries",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            const QByteArray data=promise->reply->readAll();
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                QString seasonCode;
+                if(parseLargeTVSerieInfo(doc,season,seasonCode)){
+                    findSaisonInfo(manager, seasonCode, episode);
+                } else {
+                    emit scraperError();
                 }
+            } else {
+                emit scraperError(e.errorString());
             }
+        } else {
+            emit scraperError(promise->reply->errorString());
         }
-
-        qDebug() << e.errorString();
-    }
-#endif
-    return false;
+    });
 }
 
 bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const{
@@ -429,9 +415,9 @@ FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) cons
     return films;
 }
 
-QList<Show> AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) const{
+ShowPtrList AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) const{
 
-    QList<Show> shows;
+    ShowPtrList shows;
 
     if (!resultset.isObject()){
         return shows;
@@ -455,13 +441,13 @@ QList<Show> AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) co
     {
         QJsonObject obj = value.toObject();
 
-        Show show;
-        show.originalTitle= obj["originalTitle"].toString();
-        show.title= obj["originalTitle"].toString();
-        show.productionYear = QString::number(obj["yearStart"].toDouble());
-        show.code= QString::number(obj["code"].toDouble());
+        ShowPtr show(new Show());
+        show->originalTitle= obj["originalTitle"].toString();
+        show->title= obj["originalTitle"].toString();
+        show->productionYear = QString::number(obj["yearStart"].toDouble());
+        show->code= QString::number(obj["code"].toDouble());
         if(obj["poster"].isObject()){
-            show.posterHref = obj["poster"].toObject()["href"].toString();
+            show->posterHref = obj["poster"].toObject()["href"].toString();
         }
 
         shows.append(show);

@@ -39,7 +39,8 @@ SOURCES += src/main.cpp\
     src/engine/template/template.cpp \
     src/engine/tvixengine.cpp \
     src/engine/fileengine.cpp \
-    src/engine/fileenginefilesystemwatcher.cpp
+    src/engine/fileenginefilesystemwatcher.cpp \
+    src/utils.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -69,7 +70,8 @@ HEADERS  += src/mainwindow.h \
     src/engine/template/templateyadis.h \
     src/engine/tvixengine.h \
     src/engine/fileengine.h \
-    src/engine/fileenginefilesystemwatcher.h
+    src/engine/fileenginefilesystemwatcher.h \
+    src/utils.h
 
 
 FORMS    += src/mainwindow.ui \

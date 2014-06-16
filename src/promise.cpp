@@ -4,20 +4,15 @@
 #include <QUrl>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-
-int randInt(int low, int high)
-{
-    // Random number between low and high
-    return qrand() % ((high + 1) - low) + low;
-}
+#include "utils.h"
 
 QString getRandomUserAgent()
 {
 
-    QString v=QString("%1 %2").arg(randInt(1, 4)).arg(randInt(0, 9));
-    QString a=QString("%1").arg(randInt(0, 9));
-    QString b=QString("%1").arg(randInt(0, 99));
-    QString c=QString("%1").arg(randInt(0, 999));
+    QString v=QString("%1 %2").arg(Utils::randInt(1, 4)).arg(Utils::randInt(0, 9));
+    QString a=QString("%1").arg(Utils::randInt(0, 9));
+    QString b=QString("%1").arg(Utils::randInt(0, 99));
+    QString c=QString("%1").arg(Utils::randInt(0, 999));
 
     QStringList agents;
     agents.append(QString("Mozilla/5.0 (Linux; U; Android %1; fr-fr; Nexus One Build/FRF91) AppleWebKit/5%3.%4 (KHTML, like Gecko) Version/%2.%2 Mobile Safari/5%3.%4").arg(v).arg(a).arg(b).arg(c));
@@ -43,7 +38,7 @@ QString getRandomUserAgent()
     agents.append(QString("Mozilla/5.0 (Linux; U; Android %1.1; en-gb; HTC_DesireZ_A7272 Build/FRG83D) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/%4.1").arg(v).arg(c));
     agents.append(QString("Mozilla/5.0 (Linux; U; Android %1; fr-fr; LG-P5%3 Build/FRG83) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1").arg(v).arg(b));
 
-    return agents.at(randInt(0,agents.size()-1));
+    return agents.at(Utils::randInt(0,agents.size()-1));
 }
 
 Promise::Promise()
@@ -58,7 +53,7 @@ void Promise::complete(){
 Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url, bool randomIP){
 
     // Fetch a large file
-    QString ip = QString("%1.%1.%1.%1").arg(randInt(0, 255),randInt(0, 255),randInt(0, 255),randInt(0, 255));
+    QString ip = QString("%1.%1.%1.%1").arg(Utils::randInt(0, 255),Utils::randInt(0, 255),Utils::randInt(0, 255),Utils::randInt(0, 255));
 
     QNetworkRequest req;
     req.setUrl(QUrl(url));

@@ -14,9 +14,11 @@
 Scraper::Scraper()
 {  
     connect(this, SIGNAL(found(FilmPrtList)), this,
-            SLOT(error()));
+            SLOT(closeDialog()));
+    connect(this, SIGNAL(found(ShowPtrList)), this,
+            SLOT(closeDialog()));
     connect(this, SIGNAL(scraperError()), this,
-            SLOT(error()));
+            SLOT(closeDialog()));
 }
 
 
@@ -26,10 +28,17 @@ void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearc
 
     p=InProgressDialog::create();
 
-    internalSearchFilm( manager, toSearch);
+    internalSearchFilm( manager, toSearch,"fr");
 }
 
-void Scraper::error(){
+void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {
+
+    p=InProgressDialog::create();
+
+    internalSearchTV( manager, toSearch,"fr");
+}
+
+void Scraper::closeDialog(){
     if (p!=nullptr){
         p->closeAndDeleteLater();
         p = nullptr;

@@ -35,7 +35,8 @@ QString TheMovieDBScraper::createURL(const QString& type, const QMap<QString, QS
     return fullQuery;
 }
 
-void TheMovieDBScraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch){
+void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) {
+
     QMap<QString,QString> params;
     QString url=createURL("configuration",params);
     Promise* promise=Promise::loadAsync(*manager,url);
@@ -87,7 +88,7 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
 }
 
 
-void TheMovieDBScraper::internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch) const {
+void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) const {
     QMap<QString,QString> params;
 
     QString url=createURL("configuration",params);
@@ -497,7 +498,7 @@ QString TheMovieDBScraper::getBestImageUrl(const QString& filePath, const QSize&
     return QString().append(baseUrl).append(findBestSize(posterSizes,size.width())).append(filePath);
 }
 
-const QString TheMovieDBScraper::API_KEY="470fd2ec8853e25d2f8d86f685d2270e";
+const QString TheMovieDBScraper::API_KEY="446af083f4ed58d996410c131b2e95b3";
 
 static const uchar icon_png[] = {
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
