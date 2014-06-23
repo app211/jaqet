@@ -11,10 +11,6 @@
 
 #include "../promise.h"
 
-const QString AlloCineScraper::ALLOCINE_SECRET_KEY="29d185d98c984a359e6e6f26a0474269";
-const QString AlloCineScraper::ALLO_DEFAULT_URL_API="http://api.allocine.fr";
-const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES="images.allocine.fr";
-const QString AlloCineScraper::ALLO_PARTNER="100043982026";
 
 AlloCineScraper::AlloCineScraper()
 {
@@ -22,22 +18,18 @@ AlloCineScraper::AlloCineScraper()
 
 QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QString> &params) const
 {
-    QString queryURL=QString().append(ALLO_DEFAULT_URL_API).append('/').append(type);
 
     QString mapParams;
     foreach( QString key, params.keys() )
     {
-        mapParams.append(key).append('=').append(params.value( key )).append('&');
+         mapParams.append(QString("&%1=%2").arg(QUrl::toPercentEncoding(key),params.value( QUrl::toPercentEncoding(key))));
     }
 
-    QString searchQuery = QString("partner=").append(ALLO_PARTNER).append("&format=json&").append(mapParams).append("sed=").append( QDate::currentDate().toString("yyyyMMdd"));
-
-    qDebug() << searchQuery;
+    QString searchQuery = QString("partner=%1&format=json%2&sed=%3").arg(ALLO_PARTNER,mapParams,QDate::currentDate().toString("yyyyMMdd"));
 
     QString toEncrypt = ALLOCINE_SECRET_KEY+searchQuery;
 
-
-    QString fullQuery= queryURL.append('?').append(searchQuery).append("&sig=").append(QUrl::toPercentEncoding(QCryptographicHash::hash(toEncrypt.toUtf8(), QCryptographicHash::Sha1).toBase64()));
+    QString fullQuery= QString("%1/%2?%3&sig=%4").arg(ALLO_DEFAULT_URL_API,type, searchQuery,QUrl::toPercentEncoding(QCryptographicHash::hash(toEncrypt.toUtf8(), QCryptographicHash::Sha1).toBase64()));
 
     qDebug() << fullQuery;
 
@@ -224,8 +216,8 @@ void AlloCineScraper::findSaisonInfo(QNetworkAccessManager *manager, const QStri
     });
 }
 
-bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset ){
-SearchEpisodeInfo result;
+bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& result ){
+
     if (!resultset.isObject()){
         return false;
     }
@@ -258,7 +250,7 @@ SearchEpisodeInfo result;
         }
     }
 
-    qDebug() << result.synopsis;
+    return true;
 }
 
 bool AlloCineScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& episodeCode) const{
@@ -277,7 +269,12 @@ bool AlloCineScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QStr
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
-                parseEpisodeTVSerieInfo(doc);
+                SearchEpisodeInfo result;
+                if (parseEpisodeTVSerieInfo(doc, result)){
+                    emit found(this,result);
+                }else {
+                     emit scraperError();
+                }
              } else {
                 emit scraperError(e.errorString());
             }
@@ -582,6 +579,11 @@ const uchar AlloCineScraper::icon_png[] = {
     0xe3, 0x04, 0x1a, 0x9b, 0x8b, 0x4e, 0xb7, 0x20, 0x10, 0x27, 0xd2, 0x44, 0x4a, 0x35, 0x7f, 0x8f,
     0x4f, 0x91, 0xc6, 0xdd, 0x36, 0x5c, 0x58, 0x5b, 0xb7, 0xff, 0x01, 0xf7, 0xb6, 0x2b, 0x6b, 0x6c,
     0xbf, 0xa4, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82} ;
+
+const QString AlloCineScraper::ALLOCINE_SECRET_KEY="29d185d98c984a359e6e6f26a0474269";
+const QString AlloCineScraper::ALLO_DEFAULT_URL_API="http://api.allocine.fr";
+const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES="images.allocine.fr";
+const QString AlloCineScraper::ALLO_PARTNER="100043982026";
 
 
 QString AlloCineScraper::getName() const{
