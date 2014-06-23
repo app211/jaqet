@@ -18,6 +18,7 @@ private:
     void parseMirrorList( const QByteArray& data);
     QString getXMLURL() const ;
     QString getZIPURL() const ;
+       QString getBannerURL() const ;
 public:
     TheTVDBScraper();
     QIcon getIcon()const;
@@ -28,7 +29,7 @@ public:
 
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
-    QString getBestImageUrl(const QString& filePath, const QSize& size) const;
+    QString getBestImageUrl(const QString& url, const QSize& size) const;
 
 protected:
    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;

@@ -61,7 +61,7 @@ void TemplateYadis::parseMovie(const QDomElement& e){
             if (e.tagName()=="poster"){
                 parseMoviePoster(e);
             }else if (e.tagName()=="synopsis"){
-                parseSynopsis(e);
+                parseSynopsis(e, movie_synopsis_texts, movie_synopsis_images);
             }
         }
         
@@ -70,6 +70,43 @@ void TemplateYadis::parseMovie(const QDomElement& e){
     }
 }
 
+
+void TemplateYadis::parseTV(const QDomElement& e){
+
+    if (e.hasAttribute("background")){
+        tvBackground = e.attribute("background");
+    }
+
+    QDomNode n = e.firstChild();
+    while(!n.isNull()) {
+        QDomElement e = n.toElement();
+        if(!e.isNull()) {
+            if (e.tagName()=="poster"){
+                parseMoviePoster(e);
+            }else if (e.tagName()=="synopsis"){
+                QDomNode n2 = e.firstChild();
+                while(!n2.isNull()) {
+                    QDomElement e2 = n2.toElement();
+                    if(!e2.isNull()) {
+                        if (e2.tagName()=="common"){
+                            parseSynopsis(e2, commontv_synopsis_texts, commontv_synopsis_images);
+
+                        } else if (e2.tagName()=="season"){
+                            parseSynopsis(e2, seasontv_synopsis_texts, seasontv_synopsis_images);
+
+                        }else if (e2.tagName()=="episode"){
+                            parseSynopsis(e2, episodetv_synopsis_texts, episodetv_synopsis_images);
+                        }
+                    }
+        n2 = n2.nextSibling();
+                }
+            }
+        }
+
+
+        n = n.nextSibling();
+    }
+}
 QString TemplateYadis::getAbsoluteFilePath(const QString& fileName){
 #ifndef Q_OS_WIN
     static bool isCaseSensitive=true;
@@ -182,7 +219,7 @@ bool TemplateYadis::parseText(const QDomElement& textElement, templateYadis_text
     return true;
 }
 
-void TemplateYadis::parseSynopsis(const QDomElement& synopsisNode){
+void TemplateYadis::parseSynopsis(const QDomElement& synopsisNode, QList<templateYadis_text>&synopsis_texts,  QList<templateYadis_image>& synopsis_images ){
     QDomNode n = synopsisNode.firstChild();
     while(!n.isNull()) {
         QDomElement e = n.toElement();
@@ -190,15 +227,15 @@ void TemplateYadis::parseSynopsis(const QDomElement& synopsisNode){
             if (e.tagName()=="image"){
                 templateYadis_image image;
                 parseImage(e,image);
-                movie_synopsis_images.append(image);
+                synopsis_images.append(image);
             }else if (e.tagName()=="text"){
                 templateYadis_text text;
                 parseText(e,text);
-                movie_synopsis_texts.append(text);
+                synopsis_texts.append(text);
             }
         }
-        
-        
+
+
         n = n.nextSibling();
     }
 }
@@ -345,25 +382,39 @@ void TemplateYadis::internalCreate(){
 
 }
 
-QPixmap TemplateYadis::createBackdrop(){
-    MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
+void  TemplateYadis::drawTextes(QPainter& pixPaint, QList<templateYadis_text>& texts,  MediaInfo& mediaInfo){
+    foreach (const templateYadis_text& text, texts){
+        if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
+            drawText(pixPaint,text,text.value);
 
+        } else if (text.type=="plot" && properties.contains(Template::Properties::synopsis)){
+            drawText(pixPaint,text,properties[Template::Properties::synopsis].toString());
 
-    int w=0;
-    int h=0;
+        } else if (text.type=="cast" && properties.contains(Template::Properties::actors)){
+            drawText(pixPaint,text,properties[Template::Properties::actors].toStringList().join(", "));
 
-    foreach (const templateYadis_image& image, movie_synopsis_images){
-        w=qMax<int>(w,image.w);
-        h=qMax<int>(h,image.h);
+        } else if (text.type=="director" && properties.contains(Template::Properties::director)){
+            drawText(pixPaint,text,properties[Template::Properties::director].toStringList().join(", "));
 
+        } else if (text.type=="year" && properties.contains(Template::Properties::year)){
+            drawText(pixPaint,text,properties[Template::Properties::year].toString());
+
+        } else if (text.type=="runtime" && properties.contains(Template::Properties::runtime)){
+            drawText(pixPaint,text, properties[Template::Properties::runtime].toString());
+
+        }else if (text.type=="title" && properties.contains(Template::Properties::title)){
+            drawText(pixPaint,text,properties[Template::Properties::title].toString());
+
+        } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
+            QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
+            QString s=QString("%1").arg(v.width());
+            drawText(pixPaint,text,s);
+        }
     }
+}
 
-    QPixmap result(w,h);
-    result.fill(Qt::transparent);
-    QPainter pixPaint(&result);
-
-    //pixPaint.setBackgroundMode(Qt::OpaqueMode);
-    foreach (const templateYadis_image& image, movie_synopsis_images){
+void TemplateYadis::drawImages(QPainter& pixPaint, QList<templateYadis_image>& images){
+    foreach (const templateYadis_image& image, images){
         if (image.type=="fanart" ){
             if(properties.contains(Template::Properties::backdrop)){
                 QPixmap backdrop=properties[Template::Properties::backdrop].value<QPixmap>();
@@ -398,34 +449,44 @@ QPixmap TemplateYadis::createBackdrop(){
 
     }
 
-    foreach (const templateYadis_text& text, movie_synopsis_texts){
-        if (text.type=="static" && !text.value.isEmpty() && (text.language.isEmpty() ||text.language=="fr")){
-            drawText(pixPaint,text,text.value);
+}
+QPixmap TemplateYadis::createBackdrop(){
+    MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
 
-        } else if (text.type=="plot" && properties.contains(Template::Properties::synopsis)){
-            drawText(pixPaint,text,properties[Template::Properties::synopsis].toString());
 
-        } else if (text.type=="cast" && properties.contains(Template::Properties::actors)){
-            drawText(pixPaint,text,properties[Template::Properties::actors].toStringList().join(", "));
+    int w=0;
+    int h=0;
 
-        } else if (text.type=="director" && properties.contains(Template::Properties::director)){
-            drawText(pixPaint,text,properties[Template::Properties::director].toStringList().join(", "));
+    foreach (const templateYadis_image& image, movie_synopsis_images){
+        w=qMax<int>(w,image.w);
+        h=qMax<int>(h,image.h);
 
-        } else if (text.type=="year" && properties.contains(Template::Properties::year)){
-            drawText(pixPaint,text,properties[Template::Properties::year].toString());
-
-        } else if (text.type=="runtime" && properties.contains(Template::Properties::runtime)){
-            drawText(pixPaint,text, properties[Template::Properties::runtime].toString());
-
-        }else if (text.type=="title" && properties.contains(Template::Properties::title)){
-            drawText(pixPaint,text,properties[Template::Properties::title].toString());
-
-        } else if (text.type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
-            QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
-            QString s=QString("%1").arg(v.width());
-            drawText(pixPaint,text,s);
-        }
     }
+
+    QPixmap result(w,h);
+    result.fill(Qt::transparent);
+    QPainter pixPaint(&result);
+    //pixPaint.setBackgroundMode(Qt::OpaqueMode);
+
+    bool tv=properties[Template::Properties::tv].toBool();
+
+    if (tv){
+        drawImages(pixPaint, commontv_synopsis_images);
+        drawImages(pixPaint, seasontv_synopsis_images);
+        drawImages(pixPaint, episodetv_synopsis_images);
+    } else {
+        drawImages(pixPaint, movie_synopsis_images);
+    }
+
+    if (tv){
+        drawTextes(pixPaint, commontv_synopsis_texts,mediaInfo);
+        drawTextes(pixPaint, seasontv_synopsis_texts,mediaInfo);
+        drawTextes(pixPaint, episodetv_synopsis_texts,mediaInfo);
+    } else {
+        drawTextes(pixPaint, movie_synopsis_texts,mediaInfo);
+    }
+
+
 
     return result;
 }
@@ -457,18 +518,12 @@ bool TemplateYadis::loadTemplate(const QString& fileName){
         if(!e.isNull()) {
             if (e.tagName()=="movie"){
                 parseMovie(e);
+            } else if (e.tagName()=="tv"){
+                parseTV(e);
+
             }
 
             qDebug() << e.tagName();
-            if (e.tagName()=="title" && e.hasAttribute("text")){
-                //    scrapFileFile.title = e.attribute("text");
-            }
-            else if (e.tagName()=="synopsis" && e.hasAttribute("text")){
-                //    scrapFileFile.synopsis = e.attribute("text");
-            }
-            else if (e.tagName()=="release_date" && e.hasAttribute("text")){
-                //     scrapFileFile.releaseDate = e.attribute("text");
-            }
         }
         n = n.nextSibling();
     }

@@ -13,6 +13,19 @@
 #include "scanner/mediainfoscanner.h"
 #include "engine/engine.h"
 
+static QPixmap createDefaultPoster(int w, int h){
+    QPixmap result(w,h);
+    result.fill(Qt::white);
+
+    QPainter pixPaint(&result);
+
+    QPixmap icon;
+    icon.load(":/DownloadIcon.png");
+    pixPaint.drawPixmap((w-icon.width())/2,(h-icon.height())/2,icon.width(),icon.height(),icon);
+
+    return result;
+}
+
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelView)
@@ -107,8 +120,10 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
         QVariant fileInfo;
         fileInfo.setValue(f);
         currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
+
         MediaInfoScanner ff;
-        Scanner::AnalysisResult r=ff.analyze(f);
+        Scanner::AnalysisResult r=ff.analyze(f); 
+
         QVariant mediaInfo;
         mediaInfo.setValue(r.mediaInfo);
         currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
@@ -127,34 +142,90 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
     }
 }
 }
-void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo c){
+void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
+    currentSearch.texts[Template::Properties::tv]=QVariant(true);
 
-    /*  ui->toolButtonRescrap->setIcon(scraper->getIcon());
+    ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
     ui->labelEpisodeTitle->setVisible(true);
     ui->labelSeasonEpisode->setVisible(true);
 
     ui->stackedWidget->setCurrentIndex(1);
     ui->synopsis->setText(b.synopsis);
-
+    ui->toolButtonSysnopsis->disconnect();
+    QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
+    {
+        setSynopsis(b.synopsis);
+        rebuildTemplate();
+    });
 
     ui->labelEpisodeTitle->setText(b.title);
 
-    ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));*/
+   // ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));*/
+
+    scene->clear();
+
+    ui->graphicsViewPosters->setScene(nullptr);
+
+    int x=0;
+    int y=20;
+    int w=200;
+    int h=200;
+
+    QSet<QString> urls;
+
+    if (!b.bannersHref.isEmpty()){
+        foreach (const QString& url , b.bannersHref){
+
+            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
+            if (urls.contains(realUrl)){
+                continue;
+            }
+
+            urls.insert(realUrl);
+
+            qDebug() << realUrl;
+
+            scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
+
+            QPixmap scaled = createDefaultPoster(w,h);
+
+            QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
+            pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+            Promise* promise=Promise::loadAsync(manager,realUrl,false);
+            QObject::connect(promise, &Promise::completed, [=]()
+            {
+                if (promise->reply->error() ==QNetworkReply::NoError){
+                    QByteArray qb=promise->reply->readAll();
+                    setImageFromInternet( qb, pi,  x,  y,  w,  h);
+                } else {
+                    qDebug() << promise->reply->errorString();
+                }
+            });
+
+            QPushButton* b = new QPushButton("Plus");
+
+            QObject::connect(b, &QPushButton::released, [=]()
+            {
+                setPoster(url,scraper);
+            });
+
+            QGraphicsProxyWidget* button = scene->addWidget(b);
+            button->setPos(x,h);
+
+            x+=w+10;
+
+        }
+    }
+
+
+
+    ui->graphicsViewPosters->setScene(scene);
+
+
 }
 
-static QPixmap createDefaultPoster(int w, int h){
-    QPixmap result(w,h);
-    result.fill(Qt::white);
-
-    QPainter pixPaint(&result);
-
-    QPixmap icon;
-    icon.load(":/DownloadIcon.png");
-    pixPaint.drawPixmap((w-icon.width())/2,(h-icon.height())/2,icon.width(),icon.height(),icon);
-
-    return result;
-}
 
 #include <QTime>
 
@@ -171,6 +242,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
+    currentSearch.texts[Template::Properties::tv]=QVariant(false);
 
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 

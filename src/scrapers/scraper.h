@@ -67,6 +67,7 @@ public:
     QString backdropHref;
     QStringList backdropsHref;
     QStringList postersHref;
+    QStringList bannersHref;
     QString linkName;
     QString linkHref;
     int season;

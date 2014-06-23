@@ -6,6 +6,10 @@
 #include <QPixmap>
 #include <QByteArray>
 #include <QNetworkReply>
+#include <QBuffer>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 #include "../utils.h"
 #include "../promise.h"
@@ -23,23 +27,34 @@ QString TheTVDBScraper::getXMLURL() const {
         return this->m_xmlmirrors[Utils::randInt(0,m_xmlmirrors.size()-1)];
     }
 
-    // fallback
     return "http://thetvdb.com";
 }
 
 QString TheTVDBScraper::getZIPURL() const {
     if (m_zipmirrors.size()>0){
-        return this->m_zipmirrors[Utils::randInt(0,m_xmlmirrors.size()-1)];
+        return this->m_zipmirrors[Utils::randInt(0,m_zipmirrors.size()-1)];
     }
 
-    // fallback
     return "http://thetvdb.com";
 }
 
+QString TheTVDBScraper::getBannerURL() const {
+    if (m_bannermirrors.size()>0){
+        return this->m_bannermirrors[Utils::randInt(0,m_bannermirrors.size()-1)];
+    }
+
+    return "http://thetvdb.com";
+}
 
 QString TheTVDBScraper::createURL(const QString& command, const QMap<QString, QString>& params) const {
 
     QString queryURL=getXMLURL().append("/api/").append(command);
+
+    if (params.size()==0){
+        qDebug() << queryURL;
+
+        return queryURL;
+    }
 
     QString mapParams;
     bool firstParameter=true;
@@ -54,9 +69,7 @@ QString TheTVDBScraper::createURL(const QString& command, const QMap<QString, QS
         mapParams.append(QUrl::toPercentEncoding(key)).append('=').append(params.value( QUrl::toPercentEncoding(key) ));
     }
 
-    QString searchQuery = mapParams;
-
-    QString fullQuery= queryURL.append('?').append(searchQuery);
+    QString fullQuery= queryURL.append('?').append(mapParams);
 
     qDebug() << fullQuery;
 
@@ -180,12 +193,138 @@ void TheTVDBScraper::parseMirrorList( const QByteArray& data)
 
 
 void TheTVDBScraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const {
+    emit scraperError("Unsupported Operation");
+}
+
+bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int season, const int episode){
+    QXmlStreamReader xml( data );
+    if ( xml.readNextStartElement() && xml.name()==QLatin1String("Data")){
+        while ( xml.readNextStartElement()) {
+            if (xml.name() == QLatin1String( "Episode" ) ) {
+                int episodeNumber=-1;
+                int seasonNumber=-1;
+                QString overview;
+                while ( xml.readNextStartElement()) {
+                    if ( xml.name() == QLatin1String( "EpisodeNumber" ) ) {
+                        episodeNumber=xml.readElementText().toInt();
+                    } else if ( xml.name() == QLatin1String( "SeasonNumber" ) ) {
+                        seasonNumber=xml.readElementText().toInt();
+                    }else if ( xml.name() == QLatin1String( "Overview" ) ) {
+                        overview=xml.readElementText();
+                    }
+                    else {
+                        xml.skipCurrentElement();
+                    }
+                }
+
+                if (episodeNumber==episode&&season==seasonNumber){
+                    result.synopsis=overview;
+                    qDebug() << "BINGO!!!" << overview;
+                    return true;
+                }
+            } else  {
+                xml.skipCurrentElement();
+            }
+        }
+    }
+
+    return false;
+}
+
+bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
+    QXmlStreamReader xml( data );
+    if ( xml.readNextStartElement() && xml.name()==QLatin1String("Banners")){
+        while ( xml.readNextStartElement()) {
+            if (xml.name() == QLatin1String( "Banner" ) ) {
+                QString bannerPath;
+                QString bannerType;
+                 while ( xml.readNextStartElement() ) {
+                    if ( xml.name() == QLatin1String( "id" ) ) {
+                        xml.skipCurrentElement();
+                        //       qDebug() << "id " << xml.readElementText().toInt();
+                    } else if ( xml.name() == QLatin1String( "BannerPath" ) ) {
+                        bannerPath=  xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "BannerType" ) ) {
+                        bannerType= xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "BannerType2" ) ) {
+                        xml.skipCurrentElement();
+                        //      qDebug() << "BannerType2 " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "Colors" ) ) {
+                        xml.skipCurrentElement();
+                        //       qDebug() << "Colors " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "Language" ) ) {
+                        xml.skipCurrentElement();
+                        //      qDebug() << "Language " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "RatingCount" ) ) {
+                        xml.skipCurrentElement();
+                        //     qDebug() << "RatingCount " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "SeriesName" ) ) {
+                        xml.skipCurrentElement();
+                        //    qDebug() << "SeriesName " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "ThumbnailPath" ) ) {
+                        xml.skipCurrentElement();
+                        //    qDebug() << "ThumbnailPath " << xml.readElementText();
+                    } else if ( xml.name() == QLatin1String( "VignettePath" ) ) {
+                        xml.skipCurrentElement();
+                        //    qDebug() << "VignettePath " << xml.readElementText();
+                    } else {
+                        xml.skipCurrentElement();
+                    }
+                }
+
+                if (!bannerPath.isEmpty() && bannerType==QLatin1String( "series" )){
+                    result.bannersHref.append(bannerPath);
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void TheTVDBScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
-    QString queryURL=getZIPURL().append("/api/%1/series/%2/fr.xml").arg(API_KEY).arg( showCode );
 
-    qDebug() << queryURL;
+    QString lang="fr";
+    QString command=QString::fromLatin1( "%1/series/%2/all/%3.zip" ).arg(API_KEY).arg( showCode ).arg( lang ) ;
+
+    QMap<QString,QString> params;
+    QString url=createURL(command,params);
+    Promise* promise=Promise::loadAsync(*manager,url,false);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            QByteArray data= promise->reply->readAll();
+            SearchEpisodeInfo result;
+            QBuffer buffer(&data);
+            QuaZip replyZip(&buffer);
+            replyZip.open(QuaZip::mdUnzip);
+
+            for(bool f=replyZip.goToFirstFile(); f; f=replyZip.goToNextFile()) {
+                QuaZipFile zFile( &replyZip);
+
+                zFile.open( QIODevice::ReadOnly );
+
+                QString currentFileName=replyZip.getCurrentFileName();
+                if (currentFileName.endsWith("banners.xml",Qt::CaseInsensitive)){
+                    qDebug() << parseBanner( zFile.readAll(), result);
+                } else if (currentFileName.endsWith(QString("%1.xml").arg(lang),Qt::CaseInsensitive)){
+                    qDebug() << parseInfo( zFile.readAll(), result,season, episode);
+                }
+
+                zFile.close();
+
+            }
+
+            replyZip.close();
+
+            emit found(this,result);
+        } else {
+            emit scraperError(promise->reply->errorString());
+        }
+    });
 }
 
 
@@ -227,30 +366,10 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
     }
 }
 
-#if 0
 
-bool TheTVDBScraper::findEpisodeInfo(const QString& showCode, const QString& season, const QString& episode, SearchEpisodeInfo &result) const {
 
-    QString lang="fr";
-
-    QString command=QString::fromLatin1( "%1/series/%2/all/%3.zip" ).arg(API_KEY).arg( showCode ).arg( lang ) ;
-
-    QMap<QString,QString> params;
-    QByteArray headerData;
-    QByteArray data;
-
-    if (execCommand(command, params, headerData,data)){
-        qDebug() << data;
-        // return parseSeriesList(data, result.shows);
-    }
-
-    return false;
-}
-
-#endif
-
-QString TheTVDBScraper::getBestImageUrl(const QString& filePath, const QSize& size) const {
-    return "";
+QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& size) const {
+    return getBannerURL().append("/banners/").append(url);
 }
 
 

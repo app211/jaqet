@@ -4,6 +4,9 @@ TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++11
 
+include(src/third/quazip/quazip/quazip.pri)
+INCLUDEPATH += src/third/quazip/
+
 QT       += core gui network xml widgets
 
 win32 {
@@ -12,7 +15,7 @@ LIBS += -LC:\bin\MediaInfo_DLL_0.7.69_Windows_i386_WithoutInstaller -lMediaInfo
 }
 
 linux-g++: {
-    LIBS += -lmediainfo
+    LIBS += -lmediainfo -lz
     DEFINES += UNICODE
 }
 
