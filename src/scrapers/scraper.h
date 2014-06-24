@@ -62,6 +62,8 @@ public:
     QString code;
     QString title;
     QString originalTitle;
+    QString episodeTitle;
+    QString originalEpisodeTitle;
     QString synopsis;
     QString posterHref;
     QString backdropHref;
@@ -74,6 +76,7 @@ public:
     int episode;
     QString showTitle;
     QString originalShowTitle;
+    int productionYear;
 
 };
 

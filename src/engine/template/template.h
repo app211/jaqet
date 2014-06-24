@@ -14,7 +14,7 @@ public:
     explicit Template(QObject *parent = 0);
 
     enum class Properties {
-        tv,actors,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle
+        tv,actors,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
     };
 
     QSize getBackdropSize() const{

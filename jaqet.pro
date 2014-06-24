@@ -85,3 +85,6 @@ FORMS    += src/mainwindow.ui \
 
 RESOURCES += \
     resources/resources.qrc
+
+OTHER_FILES += \
+    attribution.txt

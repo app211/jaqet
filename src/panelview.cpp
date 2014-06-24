@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QNetworkReply>
 #include <QGraphicsProxyWidget>
+#include <QPushButton>
 
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
@@ -102,7 +103,7 @@ void PanelView::setProceedable(Engine* engine, const QModelIndex &index){
 
     ui->Proceed->disconnect();
 
-    QObject::connect(ui->Proceed, &QPushButton::released, [=]()
+    QObject::connect(ui->Proceed, &QToolButton::released, [=]()
     {
         search(engine, index);
     });
@@ -143,7 +144,13 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
 }
 }
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
+    currentSearch.texts[Template::Properties::title]=b.title;
+    currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
+    currentSearch.texts[Template::Properties::year]=b.productionYear;
     currentSearch.texts[Template::Properties::tv]=QVariant(true);
+    currentSearch.texts[Template::Properties::season]=QVariant(b.season);
+    currentSearch.texts[Template::Properties::episode]=QVariant(b.episode);
+    currentSearch.texts[Template::Properties::episodetitle]=b.episodeTitle;
 
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
@@ -223,6 +230,8 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     ui->graphicsViewPosters->setScene(scene);
 
+
+    rebuildTemplate();
 
 }
 

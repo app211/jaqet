@@ -9,8 +9,6 @@ Engine::Engine(QObject *parent, const QString& path)
 
 }
 
-
-
 void Engine::doubleClicked ( const QModelIndex & index ){
     internalDoubleClicked(  index );
 }

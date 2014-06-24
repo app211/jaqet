@@ -3,10 +3,7 @@
 
 TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
     FileEngine(parent, path){
-
-
-    init(path);
-
+   init(path);
 }
 
 void TVIXEngine::init(const QString& path){
@@ -78,7 +75,6 @@ void TVIXEngine::preview(const QMap<Template::Properties, QVariant> &newproperti
     connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(previewOk(QPixmap )));
     create(newproperties);
 }
-
 
 void TVIXEngine::previewOk(QPixmap pimap){
 
