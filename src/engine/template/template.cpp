@@ -5,7 +5,11 @@ Template::Template(QObject *parent) :
 {
 }
 
-void Template::create(const QMap<Properties, QVariant> &newproperties){
+void Template::create(const QMap<Properties, QVariant> &newproperties, bool reset){
+    if (reset){
+        properties.clear();
+    }
+
     if (!updateProperties(newproperties)){
         return;
     }
@@ -20,7 +24,7 @@ bool Template::updateProperties(const QMap<Template::Properties, QVariant>& newP
         i.next();
         this->properties[i.key()]=i.value();
         somethingChanged=true;
-     }
+    }
 
     return somethingChanged;
 }

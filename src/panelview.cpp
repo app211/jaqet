@@ -231,7 +231,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     ui->graphicsViewPosters->setScene(scene);
 
 
-    rebuildTemplate();
+    rebuildTemplate(true);
 
 }
 
@@ -408,7 +408,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     ui->graphicsViewPosters->setScene(scene);
 
 
-    rebuildTemplate();
+    rebuildTemplate(true);
 
 }
 
@@ -548,10 +548,10 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
 
 }
 
-void PanelView::rebuildTemplate() {
+void PanelView::rebuildTemplate(bool reset) {
     disconnect(SIGNAL(previewOK(QGraphicsScene* )));
     connect(currentSearch.engine, SIGNAL(previewOK(QGraphicsScene* )), this, SLOT(previewOK(QGraphicsScene*  )));
-    currentSearch.engine->preview(currentSearch.texts);
+    currentSearch.engine->preview(currentSearch.texts,reset);
 }
 
 void PanelView::previewOK(QGraphicsScene* s){

@@ -17,20 +17,13 @@ public:
         tv,actors,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
     };
 
-    QSize getBackdropSize() const{
-        return backdropSize;
-    }
 
-    QSize getPosterSize() const{
-        return posterSize;
-    }
-
-    void create(const QMap<Properties, QVariant> &newproperties);
+    void create(const QMap<Properties, QVariant> &newproperties, bool reset);
     virtual void proceed()=0;
+    virtual QSize getBackdropSize() const=0;
+    virtual QSize getPosterSize() const=0;
 
 protected:
-    QSize backdropSize;
-    QSize posterSize;
 
     QMap<Properties, QVariant> properties;
 

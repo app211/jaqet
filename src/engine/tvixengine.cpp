@@ -11,9 +11,9 @@ void TVIXEngine::init(const QString& path){
     b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 #else
     b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+   //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
+   //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
+  //   b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
 
     // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
 #endif
@@ -71,9 +71,9 @@ QStringList TVIXEngine::getVisibleFileExtensions() const {
     return visibleFileExtensions;
 }
 
-void TVIXEngine::preview(const QMap<Template::Properties, QVariant> &newproperties){
+void TVIXEngine::preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset){
     connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(previewOk(QPixmap )));
-    create(newproperties);
+    create(newproperties,reset);
 }
 
 void TVIXEngine::previewOk(QPixmap pimap){
@@ -114,8 +114,8 @@ void TVIXEngine::preview(const QModelIndex & index){
    emit previewOK(&result);
 }
 
-void TVIXEngine::create(const QMap<Template::Properties, QVariant> &newproperties){
-     b.create(newproperties);
+void TVIXEngine::create(const QMap<Template::Properties, QVariant> &newproperties, bool reset){
+     b.create(newproperties,reset);
 }
 
 void TVIXEngine::proceed(){
