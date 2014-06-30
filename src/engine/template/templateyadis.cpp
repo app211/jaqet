@@ -42,12 +42,8 @@ void TemplateYadis::parseMoviePoster(const QDomElement& e){
         if (!frame.isNull()){
             poster_standard_frame=frame.text();
         }
-        
     }
-    
 }
-
-
 
 QString TemplateYadis::getAbsoluteFilePath(const QString& fileName){
 #ifndef Q_OS_WIN
@@ -176,6 +172,7 @@ void TemplateYadis::proceed(){
         }
     }
 }
+
 void TemplateYadis::internalCreate(){
 
     QPixmap result=createBackdrop();
@@ -347,10 +344,15 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         }
     } else if (type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
         QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
-        textToDraw=QString("%1").arg(v.width());
+        textToDraw=QString("%1").arg(v.height());
     } else if (type=="season" && properties.contains(Template::Properties::season)){
         textToDraw=properties[Template::Properties::season].toString();
+    } else if (type=="channels" && !mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).isNull()){
+        textToDraw=QString("%1").arg(mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).toInt());
+    } else if (type=="aspect" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
+        textToDraw=QString("%1").arg(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString());
     }
+
 
     if (!textToDraw.isEmpty()){
         QFont _font(font);
@@ -388,6 +390,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
 
 
 bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPaint){
+
+    MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
 
     if (!imageElement.hasAttribute("type")){
         return false;
@@ -452,7 +456,54 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if (pstatic.load(getAbsoluteFilePath(value)) ){
             pixPaint.drawPixmap(x,y,w,h,pstatic);
         }
+    } else if (type=="vcodec"){
+        if (mediaInfo.videoStreamCount()>0){
+            QPixmap pstatic;
+            QString f=QString("%1.png").arg(mediaInfo.videoStreamValue(0, MediaInfo::VideoCodec).toString());
+            if (pstatic.load(getAbsoluteFilePath(f)) ){
+                pixPaint.drawPixmap(x,y,w,h,pstatic);
+            }
+        }
+    }else if (type=="acodec"){
+        if (mediaInfo.audioStreamCount()>0){
+            QPixmap pstatic;
+            QString acodec=mediaInfo.audioStreamValue(0, MediaInfo::AudioCodec).toString().trimmed();
+
+            QString f=QString("%1.png").arg(acodec.split(" ").at(0));
+            if (pstatic.load(getAbsoluteFilePath(f)) ){
+                pixPaint.drawPixmap(x,y,w,h,pstatic);
+            }
+        }
+    }  else if (type=="format"){
+        if (mediaInfo.audioStreamCount()>0){
+            QPixmap pstatic;
+            QString f=QString("%1.png").arg(mediaInfo.metaDataValue( MediaInfo::Format).toString());
+            qDebug() << f;
+            if (pstatic.load(getAbsoluteFilePath(f)) ){
+                pixPaint.drawPixmap(x,y,w,h,pstatic);
+            }
+        }
+    }else if (type=="aspect"){
+        if (mediaInfo.audioStreamCount()>0 && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
+            QString aspectRatioString=mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString();
+            QStringList ratio=aspectRatioString.split(QRegExp("(/|:)"));
+            QString f;
+            QPixmap pstatic;
+            if (ratio.size()==2){
+                if (ratio.at(1)=="1"){
+                    f=QString("%1.png").arg(ratio.at(0));
+                } else {
+                    f=QString("%1_%2.png").arg(ratio.at(0),ratio.at(1));
+                }
+
+                qDebug() << f;
+                if (pstatic.load(getAbsoluteFilePath(f)) ){
+                    pixPaint.drawPixmap(x,y,w,h,pstatic);
+                }
+            }
+        }
     }
+
 
     return true;
 }

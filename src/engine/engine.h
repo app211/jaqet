@@ -20,13 +20,13 @@ public :
 
     explicit Engine(QObject *parent = 0, const QString& path="");
 
+    virtual bool canGiveFileInfo(){return false;}
     int rowCount(const QModelIndex &parent = QModelIndex()) const=0;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const=0;
     Qt::ItemFlags flags(const QModelIndex &index) const=0;
 
     virtual TypeItem getTypeItem(const QModelIndex & index) const=0;
     virtual QStringList getVisibleFileExtensions() const = 0;
-    virtual bool canGiveFileInfo(){return false;}
     virtual QFileInfo getFileInfo(const QModelIndex &index){return QFileInfo();}
     virtual void internalDoubleClicked ( const QModelIndex & index )=0;
 
@@ -36,7 +36,6 @@ public :
     virtual void proceed()=0;
 
     virtual QSize getBackdropSize() const=0;
-
     virtual QSize getPosterSize() const =0;
 
 

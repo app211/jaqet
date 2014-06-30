@@ -10,12 +10,13 @@ void TVIXEngine::init(const QString& path){
 #ifdef Q_OS_WIN32
     b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 #else
-    b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+    //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
   //   b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
 
     // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
+    b.loadTemplate("/home/teddy/Developpement/Tribute Full/template.xml");
 #endif
 
     visibleFileExtensions = { "*.asf"
@@ -34,11 +35,9 @@ void TVIXEngine::init(const QString& path){
                               ,"*.vob"
                               ,"*.wmv"
                               ,"*.wvx"
-                              ,"*.xvid"
-                             /* ,"*.mp3"
-                              ,"*.ogg"
-                              ,"*.wav"*/
-                              ,"*.wma"
+                              ,"*.xvid",
+                              "*.mp4"
+                            ,"*.wma"
                             };
 
     FileEngine::init(path);

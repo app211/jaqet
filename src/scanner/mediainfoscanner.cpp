@@ -42,6 +42,11 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
     _mediaInfo.setBitrate(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("OverallBitRate"))).toInt() / 1000);
     _mediaInfo.setEncodedApplication(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("Encoded_Application"))));
 
+     _mediaInfo.setMetaData(MediaInfo::Format, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format"))));
+    qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format/Family")));
+    qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format/Extensions")));
+
+
 
     //Metadata
     _mediaInfo.setMetaData(MediaInfo::Title, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("Title"))).trimmed());
@@ -77,12 +82,25 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
         _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioCodecProfile, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Codec_Profile"))).trimmed());
         _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioLanguage, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Language/String"))).trimmed());
         _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioEncodedLibrary, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Encoded_Library/String"))).trimmed());
+
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Codec/String")));
+
     }
 
     //Video
     int videoStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Video);
     for (int videoStreamId = 0; videoStreamId < videoStreamCount; videoStreamId++) {
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoBitrate, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("BitRate"))).trimmed().toUInt() / 1000);
+
+         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoAspectRatioString,QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio/String"))).trimmed());
+
+         qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio")));
+                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio/String")));
+
+    //    QString aspectRatio=
+
+                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("PixelAspectRatio_Original")));
+                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("PixelAspectRatio_Original/String")));
 
         int width = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Width"))).trimmed().toInt();
         int height = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Height"))).trimmed().toInt();
@@ -92,7 +110,13 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoFormat, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Format"))).trimmed());
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoCodec, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Codec/String"))).trimmed());
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoEncodedLibrary, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Encoded_Library/String"))).trimmed());
+
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Codec/String")));
+
     }
+
+
+
 
     //Text
     int textStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Text);

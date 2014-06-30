@@ -29,7 +29,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="pageProceed">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -258,8 +258,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>toolButtonRescrap</sender>
+   <signal>pressed()</signal>
+   <receiver>PanelView</receiver>
+   <slot>rescrap()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>21</x>
+     <y>37</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>proceed()</slot>
+  <slot>rescrap()</slot>
  </slots>
 </ui>

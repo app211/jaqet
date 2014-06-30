@@ -60,23 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-#ifdef Q_OS_WIN32
- //    b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
-#else
-  //  b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-    // b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-    //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
-
-   // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
-#endif
-    // Create seed for the random
-    // That is needed only once on application startup
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
 
     ui->setupUi(this);
-
 
     modelB=new TVIXEngine(this, QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation).at(0));
 
@@ -190,7 +177,10 @@ void MainWindow::chooseTizzBirdFolder() {
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     if (dialog.exec()){
-        //modelB->cd(dialog.selectedFiles().at(0));
+        FileEngine* fileEngine=qobject_cast<FileEngine*>(modelB);
+        if (fileEngine != nullptr){
+            fileEngine->cd(dialog.selectedFiles().at(0));
+        }
     }
 }
 

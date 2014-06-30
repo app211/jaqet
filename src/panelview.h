@@ -78,6 +78,7 @@ private slots:
     void setPoster (const QString& url, const Scraper *scrape );
     void setBackdrop(const QString& url, const Scraper *scrape);
     void proceed();
+    void rescrap();
 
     // From Engine
     void previewOK(QGraphicsScene*);

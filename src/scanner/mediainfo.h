@@ -180,6 +180,8 @@ public:
          */
         DiscNumber,
 
+        Format,
+
         /** QString */
         Title,
 
@@ -354,7 +356,9 @@ public:
         VideoCodec,
 
         /** QString */
-        VideoEncodedLibrary
+        VideoEncodedLibrary,
+
+        VideoAspectRatioString
     };
 
     int videoStreamCount() const;
