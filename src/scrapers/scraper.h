@@ -57,6 +57,7 @@ public:
     int runtime;
 
 };
+
 class SearchEpisodeInfo {
 public:
     QString code;
@@ -77,32 +78,38 @@ public:
     QString showTitle;
     QString originalShowTitle;
     int productionYear;
+    QStringList actors;
 
 };
+
 
 class Scraper : public QObject
 {
     Q_OBJECT
 
 public:
-    Scraper();
+    Scraper(QObject *parent=0);
     virtual QIcon getIcon() const =0;
     virtual QString getName() const = 0;
 
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
     void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) const;
-    virtual void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
+    void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
+    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
+    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
-    virtual void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
+    enum class ImageType {
+        UNKNOWN, BANNER, POSTER
+    };
 
-    virtual void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;
-
-    virtual QString getBestImageUrl(const QString& filePath, const QSize& size) const=0;
+    virtual QString getBestImageUrl(const QString& filePath, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const=0;
 
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
-    virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) =0;
+    virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
+    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
+    virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;
 
 public slots:
     void closeDialog();
@@ -110,10 +117,11 @@ public slots:
 Q_SIGNALS:
     void scraperError() const;
     void scraperError(const QString& error) const;
-    void found(FilmPrtList films);
-    void found(ShowPtrList shows);
-    void found(const Scraper* scraper,SearchMovieInfo films);
-    void found(const Scraper* scraper,SearchEpisodeInfo films);
+    void found(FilmPrtList films) const;
+    void found(ShowPtrList shows) const;
+    void found(const Scraper* scraper,SearchMovieInfo films) const;
+    void found(const Scraper* scraper,SearchEpisodeInfo films) const;
+    void progress(const QString& progressInfo) const;
  };
 
 

@@ -19,18 +19,18 @@ class AlloCineScraper : public Scraper
 
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) ;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
 public:
-    AlloCineScraper();
+    AlloCineScraper(QObject *parent=0);
 
     QIcon getIcon() const;
     QString getName() const;
 
-    void  findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
-    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    QString getBestImageUrl(const QString& filePath, const QSize& ) const;
+    QString getBestImageUrl(const QString& filePath, const QSize&, ImageType imageType=ImageType::UNKNOWN ) const;
 
 };
 #endif // ALLOCINESCRAPER_H

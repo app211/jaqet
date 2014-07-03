@@ -15,6 +15,7 @@ public:
     void proceed();
     QSize getBackdropSize() const;
     QSize getPosterSize() const;
+    QSize getBannerSize() const;
 
     void preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset=false);
     void preview(const QModelIndex & index);

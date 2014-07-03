@@ -27,16 +27,16 @@ class TheMovieDBScraper: public Scraper
 
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language);
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const ;
 
 public:
-    TheMovieDBScraper();
+    TheMovieDBScraper(QObject *parent=0);
     QIcon getIcon() const;
    QString getName() const;
    QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
-    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const ;
-    QString getBestImageUrl(const QString& filePath, const QSize& size) const;
+    QString getBestImageUrl(const QString& filePath, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const;
 
 
 

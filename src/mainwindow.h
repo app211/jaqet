@@ -35,14 +35,12 @@ private slots:
 
     void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
     void chooseTizzBirdFolder();
-    void loadImage();
-    void ctxMenu(const QPoint &pos) ;
+     void ctxMenu(const QPoint &pos) ;
 
     void doubleClicked ( const QModelIndex & index );
     void setMovieInfo( const SearchMovieInfo&);
      void buildTvix();
 
-    void savePix();
     void s_clicked_texte(QPixmap result);
 
  private:

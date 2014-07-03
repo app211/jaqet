@@ -10,7 +10,7 @@ void TVIXEngine::init(const QString& path){
 #ifdef Q_OS_WIN32
     b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 #else
-    //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
+   //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
   //   b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
@@ -128,4 +128,8 @@ QSize TVIXEngine::getBackdropSize() const{
 
 QSize TVIXEngine::getPosterSize() const {
     return b.getPosterSize();
+}
+
+QSize TVIXEngine::getBannerSize() const {
+    return b.getBannerSize();
 }

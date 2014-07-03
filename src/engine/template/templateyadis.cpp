@@ -261,14 +261,18 @@ void TemplateYadis::searchSizeForTag(QDomElement docElem, const QString& tagName
 QSize TemplateYadis::getPosterSize() const{
     QSize result(0,0);
     searchSizeForTag(doc.documentElement(),"poster",result);
-    qDebug() << result;
     return result;
 }
 
 QSize TemplateYadis::getBackdropSize() const{
     QSize result(0,0);
     searchSizeForTag(doc.documentElement(),"fanart",result);
-    qDebug() << result;
+     return result;
+}
+
+QSize TemplateYadis::getBannerSize() const{
+    QSize result(0,0);
+    searchSizeForTag(doc.documentElement(),"banner",result);
     return result;
 }
 
@@ -365,11 +369,11 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         int _align= Qt::AlignLeft;
         if (!align.isEmpty()){
             if (align.compare("center",Qt::CaseInsensitive)==0){
-                _align = Qt::AlignCenter;
+                _align = Qt::AlignHCenter;
             }
         }
 
-        pixPaint.drawText(getX(x),getY(y),w,h,_align|Qt::TextWordWrap|Qt::AlignTop	,textToDraw);
+        pixPaint.drawText(getX(x),getY(y),w,h,_align|Qt::TextWordWrap|Qt::AlignTop,textToDraw);
 
 #ifdef QT_DEBUG
         const QPointF points[4] = {
@@ -424,6 +428,9 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         return false;
     }
 
+    x=getX(x);
+    y=getY(y);
+
     QString value=imageElement.text();
 
     if (type=="fanart" ){
@@ -443,6 +450,18 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
             QPixmap poster=properties[Template::Properties::poster].value<QPixmap>();
             if (!poster.isNull()){
                 QPixmap scaled=poster.scaled(QSize(w,h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                int _x= x+ (w-scaled.width())/2;
+                int _y= y+ (h-scaled.height())/2;
+                int _w= scaled.width();
+                int _h=scaled.height();
+                pixPaint.drawPixmap(_x,_y,_w,_h,scaled);
+            }
+        }
+    }else if (type=="banner"){
+        if(properties.contains(Template::Properties::banner)){
+            QPixmap banner=properties[Template::Properties::banner].value<QPixmap>();
+            if (!banner.isNull()){
+                QPixmap scaled=banner.scaled(QSize(w,h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
                 int _w= scaled.width();
@@ -519,6 +538,7 @@ bool TemplateYadis::execNode(QDomElement synopsisNode, QPainter &result, Context
     while(!n.isNull()) {
         QDomElement e = n.toElement();
         if(!e.isNull()) {
+            qDebug() << e.tagName() << e.text();
             if (e.tagName()=="image"){
                 execImage(e,result);
             }else if (e.tagName()=="text"){
@@ -603,6 +623,7 @@ bool TemplateYadis::execTV(QDomElement e, QPainter &result){
                         } else if (e2.tagName()=="season"){
                             // Season is ignored
                         }else if (e2.tagName()=="episode"){
+                            execNode(e2,result,Context::tv_synopsis_episode);
                             QDomNodeList episodeIcons=e2.elementsByTagName("episodeicon");
                             if (episodeIcons.length()==1){
                                 execNode(episodeIcons.at(0).toElement(),result,Context::tv_synopsis_episode_episodeicon);

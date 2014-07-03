@@ -39,6 +39,7 @@ public:
 
     QSize getBackdropSize() const;
     QSize getPosterSize() const;
+    QSize getBannerSize() const;
 
     enum class Context {movie_synopsis,tv_synopsis_common,tv_synopsis_episode,tv_synopsis_episode_episodeicon};
 

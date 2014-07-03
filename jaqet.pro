@@ -24,7 +24,6 @@ linux-g++: {
 
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
-    src/filedownloader.cpp \
     src/scrapers/allocinescraper.cpp \
     src/scrapers/scraper.cpp \
     src/scrapers/themoviedbscraper.cpp \
@@ -58,7 +57,6 @@ HEADERS  += src/mainwindow.h \
     src/scrapers/scraper.h \
     src/scrapers/themoviedbscraper.h \
     src/template/templateyadis.h \
-    src/filedownloader.h \
     src/fileparser.h \
     src/scrapers/thetvdbscraper.h \
     src/scrapers/cncclassificationwrapper.h \

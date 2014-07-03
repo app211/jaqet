@@ -14,7 +14,7 @@ public:
     explicit Template(QObject *parent = 0);
 
     enum class Properties {
-        tv,actors,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
+        tv,actors,banner,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
     };
 
 
@@ -22,6 +22,7 @@ public:
     virtual void proceed()=0;
     virtual QSize getBackdropSize() const=0;
     virtual QSize getPosterSize() const=0;
+    virtual QSize getBannerSize() const=0;
 
 protected:
 

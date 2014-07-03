@@ -13,6 +13,7 @@
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
 #include "engine/engine.h"
+#include "./inprogressdialog.h"
 
 static QPixmap createDefaultPoster(int w, int h){
     QPixmap result(w,h);
@@ -33,7 +34,7 @@ PanelView::PanelView(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    Scraper* s=new TheMovieDBScraper;
+    Scraper* s=new TheMovieDBScraper(this);
     QAction* tmdbAction = new QAction(s->getIcon(),s->getName(), this);
     tmdbAction->setData(qVariantFromValue((void*)s));
 
@@ -45,7 +46,7 @@ PanelView::PanelView(QWidget *parent) :
 
     this->scrapes.append(s);
 
-    Scraper* allocine=new AlloCineScraper;
+    Scraper* allocine=new AlloCineScraper(this);
     QAction* tmdbActionAllocine = new QAction(s->getIcon(),s->getName(), this);
     tmdbActionAllocine->setData(qVariantFromValue((void*)s));
 
@@ -57,7 +58,7 @@ PanelView::PanelView(QWidget *parent) :
 
     this->scrapes.append(allocine);
 
-    Scraper* tvdb=new TheTVDBScraper;
+    Scraper* tvdb=new TheTVDBScraper(this);
     QAction* tvdbAction = new QAction(tvdb->getIcon(),tvdb->getName(), this);
     tvdbAction->setData(qVariantFromValue((void*)s));
 
@@ -160,6 +161,19 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     ui->stackedWidget->setCurrentIndex(1);
     ui->synopsis->setText(b.synopsis);
     ui->toolButtonSysnopsis->disconnect();
+
+    ui->castListWidget->clear();
+    for (const QString& actor : b.actors){
+        ui->castListWidget->addItem(actor);
+    }
+
+    ui->castToolButton->disconnect();
+    QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
+    {
+        setCast(b.actors);
+        rebuildTemplate();
+    });
+
     QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
         setSynopsis(b.synopsis);
@@ -184,14 +198,15 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     if (!b.bannersHref.isEmpty()){
         foreach (const QString& url , b.bannersHref){
 
-            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
+            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h), Scraper::ImageType::BANNER);
+
+            qDebug()<< realUrl;
+
             if (urls.contains(realUrl)){
                 continue;
             }
 
             urls.insert(realUrl);
-
-            qDebug() << realUrl;
 
             scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
 
@@ -215,7 +230,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
             QObject::connect(b, &QPushButton::released, [=]()
             {
-                setPoster(url,scraper);
+                setBanner(url,scraper);
             });
 
             QGraphicsProxyWidget* button = scene->addWidget(b);
@@ -278,10 +293,16 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     ui->synopsis->setText(b.synopsis);
 
     ui->castListWidget->clear();
-
     for (const QString& actor : b.actors){
         ui->castListWidget->addItem(actor);
     }
+
+    ui->castToolButton->disconnect();
+    QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
+    {
+        setCast(b.actors);
+        rebuildTemplate();
+    });
 
     //  ui->directorLineEdit->setText(b.directors);
 
@@ -294,12 +315,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     });
 
 
-    ui->castToolButton->disconnect();
-    QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
-    {
-        setCast(b.actors);
-        rebuildTemplate();
-    });
+
 
     ui->directorToolButton->disconnect();
     QObject::connect(ui->directorToolButton, &QPushButton::released, [=]()
@@ -442,8 +458,44 @@ void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemT
 }
 
 
-#include "./inprogressdialog.h"
+void PanelView::setBanner(const QString& url, const Scraper *_currentScrape){
+    currentSearch._banner=ScraperResource(url,_currentScrape);
 
+    if (!currentSearch._banner.resources.isEmpty()){
+
+        InProgressDialog* p=InProgressDialog::create();
+
+        QString url=currentSearch._banner.scraper->getBestImageUrl(currentSearch._banner.resources,currentSearch.engine->getPosterSize(), Scraper::ImageType::BANNER);
+
+        Promise* promise=Promise::loadAsync(manager,url,false);
+
+        //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
+
+        QObject::connect(promise, &Promise::completed, [=]()
+        {
+            if (promise->reply->error() ==QNetworkReply::NoError){
+                QByteArray qb=promise->reply->readAll();
+                QPixmap bannerPixmap;
+                if (bannerPixmap.loadFromData(qb)){
+                    setBannerState(NETRESOURCE::OK, bannerPixmap);
+                }else {
+                    setBannerState(NETRESOURCE::ERROR);
+                }
+            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+                setBannerState(NETRESOURCE::CANCELED);
+            } else {
+                setBannerState(NETRESOURCE::ERROR);
+            }
+
+            p->closeAndDeleteLater();
+
+        });
+
+    } else {
+        setPosterState(NETRESOURCE::NONE);
+    }
+
+}
 void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 
     currentSearch._poster=ScraperResource(url,_currentScrape);
@@ -510,6 +562,17 @@ void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap
     }
 }
 
+void PanelView::setBannerState(PanelView::NETRESOURCE bannerState, const QPixmap& banner){
+    bool same=currentSearch.bannerState != bannerState;
+    if (same){
+        QPixmap currentBanner=currentSearch.texts[Template::Properties::banner].value<QPixmap>();
+        same = banner.toImage()==currentBanner.toImage();
+    }
+    if (!same){
+        currentSearch.texts[Template::Properties::banner]=banner;
+        rebuildTemplate();
+    }
+}
 void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
 
     currentSearch._backdrop=ScraperResource(url,_currentScrape);

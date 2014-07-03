@@ -12,7 +12,8 @@
 #include "../promise.h"
 
 
-AlloCineScraper::AlloCineScraper()
+AlloCineScraper::AlloCineScraper(QObject *parent)
+    :Scraper(parent)
 {
 }
 
@@ -62,7 +63,7 @@ void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const Q
 }
 
 
-void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  {
+void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
 
     QMap<QString,QString> params;
     params["filter"]="tvseries";
@@ -87,7 +88,7 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     });
 }
 
-void  AlloCineScraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const{
+void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const{
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
     params["code"]=QUrl::toPercentEncoding(movieCode);
@@ -117,6 +118,41 @@ void  AlloCineScraper::findMovieInfo(QNetworkAccessManager *manager, const QStri
     });
 }
 
+
+void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+
+    QMap<QString,QString> params;
+    params["code"]=QUrl::toPercentEncoding(showCode);
+    params["profile"]=QUrl::toPercentEncoding("large");
+    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+
+    QString url=createURL("rest/v3/tvseries",params);
+    Promise* promise=Promise::loadAsync(*manager,url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            const QByteArray data=promise->reply->readAll();
+            qDebug() << data;
+            QJsonParseError e;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                QString seasonCode;
+                SearchEpisodeInfo result;
+                result.episode=episode;
+                result.season=season;
+                if(extractSeasonCodeFromLargeTVSerieInfo(doc,season,seasonCode,result)){
+                    findSeasonInfoByCode(manager, seasonCode, episode,result);
+                } else {
+                    emit scraperError();
+                }
+            } else {
+                emit scraperError(e.errorString());
+            }
+        } else {
+            emit scraperError(promise->reply->errorString());
+        }
+    });
+}
 
 bool AlloCineScraper::extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode, SearchEpisodeInfo& result) const{
 
@@ -292,40 +328,6 @@ void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, cons
     });
 }
 
-void AlloCineScraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
-
-    QMap<QString,QString> params;
-    params["code"]=QUrl::toPercentEncoding(showCode);
-    params["profile"]=QUrl::toPercentEncoding("large");
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
-
-    QString url=createURL("rest/v3/tvseries",params);
-    Promise* promise=Promise::loadAsync(*manager,url);
-    QObject::connect(promise, &Promise::completed, [=]()
-    {
-        if (promise->reply->error() ==QNetworkReply::NoError){
-            const QByteArray data=promise->reply->readAll();
-            qDebug() << data;
-            QJsonParseError e;
-            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-            if (e.error== QJsonParseError::NoError){
-                QString seasonCode;
-                SearchEpisodeInfo result;
-                result.episode=episode;
-                result.season=season;
-                if(extractSeasonCodeFromLargeTVSerieInfo(doc,season,seasonCode,result)){
-                    findSeasonInfoByCode(manager, seasonCode, episode,result);
-                } else {
-                    emit scraperError();
-                }
-            } else {
-                emit scraperError(e.errorString());
-            }
-        } else {
-            emit scraperError(promise->reply->errorString());
-        }
-    });
-}
 
 bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const{
 
@@ -373,7 +375,7 @@ bool AlloCineScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMovie
     return true;
 }
 
-QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& ) const{
+QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& , ImageType imageType) const{
     return filePath;
 }
 

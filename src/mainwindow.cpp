@@ -22,7 +22,6 @@
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/thetvdbscraper.h"
 
-#include "filedownloader.h"
 
 #include <QSortFilterProxyModel>
 #include <QStringListModel>
@@ -184,24 +183,11 @@ void MainWindow::chooseTizzBirdFolder() {
     }
 }
 
-void MainWindow::loadImage()
-{
-    QPixmap buttonImage;
-    buttonImage.loadFromData(m_pImgCtrl->downloadedData());
 
-    QGraphicsPixmapItem* pi=scene->addPixmap(buttonImage.scaled(100,100,Qt::KeepAspectRatio));
-    pi->setOffset(QPoint(10,20));
-    scene->addWidget(new QPushButton("Plus"));
-    //ui->label->setPixmap(buttonImage);
-    m_pImgCtrl->deleteLater();
-}
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::savePix(){
 
- //   ui->labelPoster->pixmap()->save(QFileInfo(QDir(QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).at(0)),"test.png").absoluteFilePath());
-}
