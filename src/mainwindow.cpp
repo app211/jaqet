@@ -30,7 +30,6 @@
 #include <QPixmap>
 #include <QPen>
 #include <QBrush>
-#include "fileparser.h"
 
 
 #include "engine/tvixengine.h"

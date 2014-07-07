@@ -27,7 +27,6 @@ SOURCES += src/main.cpp\
     src/scrapers/allocinescraper.cpp \
     src/scrapers/scraper.cpp \
     src/scrapers/themoviedbscraper.cpp \
-    src/fileparser.cpp \
     src/scrapers/thetvdbscraper.cpp \
     src/scrapers/cncclassificationwrapper.cpp \
     src/promise.cpp \
@@ -52,12 +51,10 @@ HEADERS  += src/mainwindow.h \
     src/scrapers/allocinescraper.h \
     src/scrapers/themoviedbscraper.h \
     src/scrapers/scraper.h \
-    src/fileparser.h \
     src/scrapers/allocinescraper.h \
     src/scrapers/scraper.h \
     src/scrapers/themoviedbscraper.h \
     src/template/templateyadis.h \
-    src/fileparser.h \
     src/scrapers/thetvdbscraper.h \
     src/scrapers/cncclassificationwrapper.h \
     src/promise.h \

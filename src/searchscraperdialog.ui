@@ -25,30 +25,25 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="1">
-          <widget class="QToolButton" name="toolButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonFollowStyle</enum>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLineEdit" name="lineEditTitle">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="labelAllo">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+         <item>
+          <widget class="QToolButton" name="toolButton">
            <property name="text">
-            <string>TextLabel</string>
+            <string/>
            </property>
-           <property name="scaledContents">
-            <bool>false</bool>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -63,7 +58,7 @@
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
           <layout class="QFormLayout" name="formLayout">
-           <item row="1" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="testLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -76,7 +71,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="3" column="1">
             <widget class="QTextEdit" name="labelFilename">
              <property name="enabled">
               <bool>true</bool>
@@ -312,6 +307,20 @@ QRadioButton#radioMovie::indicator::pressed {
              </layout>
             </widget>
            </item>
+           <item row="1" column="1">
+            <widget class="QDateEdit" name="dateEdit">
+             <property name="displayFormat">
+              <string>yyyy</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>year</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -332,7 +341,9 @@ QRadioButton#radioMovie::indicator::pressed {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>radioTV</sender>
@@ -341,8 +352,8 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>137</y>
+     <x>170</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
      <x>283</x>
@@ -357,12 +368,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>143</y>
+     <x>141</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
-     <x>282</x>
-     <y>144</y>
+     <x>408</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
@@ -373,12 +384,44 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>731</x>
-     <y>112</y>
+     <x>632</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
      <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditTitle</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>509</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>454</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>buttonBox</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>583</x>
+     <y>121</y>
     </hint>
    </hints>
   </connection>

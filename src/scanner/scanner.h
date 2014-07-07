@@ -28,11 +28,19 @@ public:
         QString name;
         int season;
         int episode;
+        int year;
     };
 
-    struct AnalysisResult {   
+    struct AnalysisResult {
         MediaType mediaType;
         MediaInfo mediaInfo;
+
+        AnalysisResult(int year){
+            mediaType.year=year;
+        }
+
+        AnalysisResult(){
+         }
     };
 
     virtual AnalysisResult analyze( const QFileInfo& fi ) const=0 ;

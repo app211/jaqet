@@ -124,7 +124,7 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
         currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
 
         MediaInfoScanner ff;
-        Scanner::AnalysisResult r=ff.analyze(f); 
+        Scanner::AnalysisResult r=ff.analyze(f);
 
         QVariant mediaInfo;
         mediaInfo.setValue(r.mediaInfo);

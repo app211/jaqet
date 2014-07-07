@@ -6,7 +6,6 @@
     <qresource prefix="/resources">
         <file>images/movie.png</file>
         <file>images/tv.png</file>
-        <file>images/edit.png</file>
         <file>images/view-toggle-icon-grid-inactive.png</file>
         <file>images/view-toggle-icon-grid-active.png</file>
         <file>images/view-toggle-icon-list-inactive.png</file>
@@ -28,5 +27,6 @@
         <file>images/bingo16x16.png</file>
         <file alias="DownloadIcon.png">images/arrow416.png</file>
         <file alias="Proceed.png">images/auto32.png</file>
+        <file alias="Edit.png">images/edit_icon.png</file>
     </qresource>
 </RCC>

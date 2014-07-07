@@ -5,7 +5,6 @@
 #include <QPushButton>
 #include <QMessageBox>
 
-#include "fileparser.h"
 #include "scanner/filenamescanner.h"
 #include "chooseitemdialog.h"
 
@@ -18,14 +17,13 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
 {
     ui->setupUi(this);
 
-    QString baseName = FileParser::baseName(fileInfo);
-    QString name = FileParser::cleanName(baseName);
-    QString filteredName = FileParser::filterBlacklist(name);
-    ui->labelAllo->setText(filteredName);
-
     FileNameScanner fns;
     analyse=fns.analyze(fileInfo);
+    ui->lineEditTitle->setText(fns.getFilteredName(fileInfo));
 
+    if (analyse.mediaType.year>=1900){
+        ui->dateEdit->setDate(QDate(analyse.mediaType.year,1,1));
+    }
     QMenu *menuFichier = new QMenu(this);
 
     ui->labelFilename->setText(fileInfo.fileName());
@@ -80,9 +78,9 @@ void SearchScraperDialog::searchScraper(){
     }
 
     if (analyse.mediaType.isValidForTV()){
-        scraper->searchTV(m_manager,ui->labelAllo->text());
+        scraper->searchTV(m_manager,ui->lineEditTitle->text());
     } else {
-        scraper->searchFilm(m_manager,ui->labelAllo->text());
+        scraper->searchFilm(m_manager,ui->lineEditTitle->text());
     }
 }
 
@@ -91,13 +89,29 @@ void SearchScraperDialog::found(FilmPrtList result){
     Scraper *scraper = qobject_cast<Scraper *>(this->sender());
 
     if (result.size()>1){
-        ChooseItemDialog ch(this);
-        ch.setList(result);
-        if (ch.exec()==QDialog::Accepted){
-            accept(scraper, ch.getSelectedFilm());
+        FilmPrtList candidates;
+
+        // Filter result by year
+        if (analyse.mediaType.year>=1900){
+            for (FilmPtr film : result){
+                bool bOk;
+                int productionYear= film->productionYear.toInt(&bOk);
+                if (bOk && productionYear==analyse.mediaType.year){
+                    candidates.append(film);
+                }
+            }
+        }
+
+        if (candidates.size()==1){
+            accept(scraper, candidates.at(0));
+        } else {
+            ChooseItemDialog ch(this);
+            ch.setList(result);
+            if (ch.exec()==QDialog::Accepted){
+                accept(scraper, ch.getSelectedFilm());
+            }
         }
     } else if (result.size()==1){
-        qDebug() << result.at(0)->title;
         accept(scraper, result.at(0));
     } else {
         QMessageBox::information(this, tr("My Application"),
