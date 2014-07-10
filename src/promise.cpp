@@ -44,36 +44,41 @@ QString getRandomUserAgent()
 Promise::Promise()
 {
     connect(this, &Promise::completed, this, &Promise::complete);
+    connect(this, &Promise::canceled, this, &Promise::cancel);
 }
 
 void Promise::complete(){
     deleteLater();
 }
 
-Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url, bool randomIP){
+void Promise::cancel(){
+    if (reply!=nullptr){
+         reply->abort();
+    }
+}
 
-    // Fetch a large file
-    QString ip = QString("%1.%1.%1.%1").arg(Utils::randInt(0, 255),Utils::randInt(0, 255),Utils::randInt(0, 255),Utils::randInt(0, 255));
+Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
 
     QNetworkRequest req;
     req.setUrl(QUrl(url));
+
+    if (useRandomUserAgent){
     req.setRawHeader( "User-Agent" , getRandomUserAgent().toLatin1());
-    if (randomIP){
+    }
+
+    if (useRandomIP){
+        QString ip = QString("%1.%2.%3.%4").arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255));
         req.setRawHeader("X-Forwarded-For", ip.toLatin1());
         req.setRawHeader("Client-IP", ip.toLatin1());
         req.setRawHeader("VIA", ip.toLatin1());
     }
 
+    req.setPriority(priority)
+            ;
     QNetworkReply * reply = manager.get(req);
 
     Promise * promise = new Promise;
     promise->reply=reply;
-
-    // When the promise is canceled, abort the request
-    QObject::connect(promise, &Promise::canceled, [reply]()
-    {
-        reply->abort();
-    });
 
     // When the request finishes (or is aborted), indicate that the promise completed
     QObject::connect(reply, &QNetworkReply::finished, promise, &Promise::completed);

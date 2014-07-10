@@ -3,7 +3,8 @@
 
 #include <QObject>
 
-class QNetworkReply;
+#include<QNetworkReply>
+
 class QNetworkAccessManager;
 
 class Promise : public QObject
@@ -13,10 +14,11 @@ class Promise : public QObject
 public:
     Promise();
     QNetworkReply * reply=nullptr;
-    static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url, bool ramdomIp=true);
+    static Promise* loadAsync(QNetworkAccessManager & manager, const QString& url, bool useRandomIP=true, bool useRandomUserAgent=true, QNetworkRequest::Priority priority=QNetworkRequest::NormalPriority);
 
 public slots:
     void complete();
+    void cancel();
 
 Q_SIGNALS:
     void completed();
