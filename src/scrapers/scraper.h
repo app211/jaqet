@@ -66,9 +66,9 @@ public:
     QString episodeTitle;
     QString originalEpisodeTitle;
     QString synopsis;
-    QString posterHref;
-    QString backdropHref;
     QStringList backdropsHref;
+    QList<QSize> backdropsSize;
+    QList<QSize> postersSize;
     QStringList postersHref;
     QStringList bannersHref;
     QString linkName;
@@ -100,10 +100,10 @@ public:
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
     enum class ImageType {
-        UNKNOWN, BANNER, POSTER
+        UNKNOWN, BANNER, POSTER,BACKDROP
     };
 
-    virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const=0;
+    virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,ImageType imageType=ImageType::UNKNOWN) const=0;
 
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
@@ -129,10 +129,12 @@ Q_SIGNALS:
 class ScraperResource {
 public:
     QString resources;
+    QSize originalSize;
     const Scraper* scraper;
-    ScraperResource(const QString& resources, const Scraper* scraper){
+    ScraperResource(const QString& resources, const QSize& originalSize, const Scraper* scraper){
         this->resources=resources;
         this->scraper=scraper;
+        this->originalSize=originalSize;
     }
 
     ScraperResource(){

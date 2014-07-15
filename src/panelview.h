@@ -65,6 +65,7 @@ private:
     void setSynopsis(const QString& synopsis);
     void setCast(const QStringList& actors);
     void setDirectors(const QStringList& directors);
+    void addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
 
 private slots:
 
@@ -78,8 +79,8 @@ private slots:
     void setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
 
     // From UI
-    void setPoster (const QString& url, const Scraper *scrape );
-    void setBackdrop(const QString& url, const Scraper *scrape);
+    void setPoster (const QString& url, const QSize &originalSize, const Scraper *scrape );
+    void setBackdrop(const QString& url, const QSize& originalSize, const Scraper *scrape);
     void setBanner(const QString& url, const Scraper *scrape);
     void proceed();
     void rescrap();

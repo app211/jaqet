@@ -516,7 +516,7 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, SearchMov
 
 
 
-QString TheMovieDBScraper::getBestImageUrl(const QString& filePath,const QSize& originalSize, const QSize& size, ImageType imageType) const {
+QString TheMovieDBScraper::getBestImageUrl(const QString& filePath,const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, ImageType imageType) const {
     return QString().append(baseUrl).append(findBestSize(posterSizes,size.width())).append(filePath);
 }
 

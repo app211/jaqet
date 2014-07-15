@@ -1,4 +1,5 @@
 #include "template.h"
+#include <QDebug>
 
 Template::Template(QObject *parent) :
     QObject(parent)
@@ -22,8 +23,10 @@ bool Template::updateProperties(const QMap<Template::Properties, QVariant>& newP
     QMapIterator<Template::Properties, QVariant> i(newProperties);
     while (i.hasNext()) {
         i.next();
-        this->properties[i.key()]=i.value();
+        properties[i.key()]=i.value();
+        qDebug() << (int)i.key() << i.value().toString();
         somethingChanged=true;
+
     }
 
     return somethingChanged;

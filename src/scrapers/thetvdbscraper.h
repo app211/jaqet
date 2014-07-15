@@ -29,7 +29,7 @@ public:
     QString getName() const;
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    QString getBestImageUrl(const QString& url,const QSize& originalSize, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const;
+    QString getBestImageUrl(const QString& url,const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode=Qt::KeepAspectRatio, ImageType imageType=ImageType::UNKNOWN) const;
 
 };
 

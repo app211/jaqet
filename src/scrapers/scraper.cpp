@@ -78,9 +78,9 @@ void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& sh
 void Scraper::closeDialog(){
     if (p!=nullptr){
         p->close();
-        QCoreApplication::processEvents();
         p->deleteLater();
         p = nullptr;
+        QCoreApplication::processEvents();
     }
 }
 

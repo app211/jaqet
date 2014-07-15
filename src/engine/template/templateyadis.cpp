@@ -341,7 +341,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=properties[Template::Properties::runtime].toString();
     }else if (type=="title") {
         if ((context==Context::tv_synopsis_common || context==Context::movie_synopsis) && properties.contains(Template::Properties::title)){
-            textToDraw==properties[Template::Properties::title].toString();
+            textToDraw=properties[Template::Properties::title].toString();
         }
         else if (context==Context::tv_synopsis_episode_episodeicon && properties.contains(Template::Properties::episodetitle)){
             textToDraw=properties[Template::Properties::episodetitle].toString();
@@ -356,7 +356,6 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
     } else if (type=="aspect" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
         textToDraw=QString("%1").arg(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString());
     }
-
 
     if (!textToDraw.isEmpty()){
         QFont _font(font);
@@ -437,7 +436,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if(properties.contains(Template::Properties::backdrop)){
             QPixmap backdrop=properties[Template::Properties::backdrop].value<QPixmap>();
             if (!backdrop.isNull()){
-                QPixmap scaled=backdrop.scaled(QSize(w,h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                 QPixmap scaled=backdrop.scaled(QSize(w,h),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
                 int _w= scaled.width();

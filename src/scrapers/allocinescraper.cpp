@@ -256,6 +256,35 @@ void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager,const 
     });
 }
 
+bool parseMedia(const QJsonArray& mediaArray, QStringList& postersHref, QList<QSize>& postersSize, QStringList& backdropsHref, QList<QSize>& backdropsSize ){
+
+    foreach (const QJsonValue & value, mediaArray)
+    {
+        QJsonObject media = value.toObject();
+        if (media["class"]=="picture"){
+            if (media["type"].isObject()){
+                QJsonObject typeObject = media["type"].toObject();
+                if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
+                    QJsonObject thumbnailObject=media["thumbnail"].toObject();
+                    if (thumbnailObject["path"].isString()){
+                        qDebug() << QSize(media["width"].toInt(), media["height"].toInt());
+                        if (typeObject["$"].toString()=="Affiche"){
+                            postersHref.append(thumbnailObject["path"].toString());
+                            postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
+                        } else {
+                            backdropsHref.append(thumbnailObject["path"].toString());
+                            backdropsSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+
 bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& result ){
 
     if (!resultset.isObject()){
@@ -288,6 +317,10 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
             result.linkHref=link["href"].toString();
             break;
         }
+    }
+
+    if (episodeObject["media"].isArray()){
+        parseMedia(episodeObject["media"].toArray(), result.postersHref, result.postersSize,result.backdropsHref,result.backdropsSize );
     }
 
     return true;
@@ -355,6 +388,7 @@ void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, cons
     });
 }
 
+
 bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, SearchMovieInfo& info) const{
 
     if (!resultset.isObject()){
@@ -368,11 +402,16 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
 
     QJsonObject movieObject = jsonObject["movie"].toObject();
 
+    info.title=movieObject["title"].toString();
+    info.originalTitle=movieObject["originalTitle"].toString();
     info.synopsis=movieObject["synopsis"].toString();
-//    if(movieObject["poster"].isObject()){
-//        info.posterHref = movieObject["poster"].toObject()["href"].toString();
-//        info.postersHref.append(info.posterHref);
-//    }
+    info.productionYear = movieObject["productionYear"].toInt();
+    info.runtime = movieObject["runtime"].toInt();
+
+    //    if(movieObject["poster"].isObject()){
+    //        info.posterHref = movieObject["poster"].toObject()["href"].toString();
+    //        info.postersHref.append(info.posterHref);
+    //    }
 
     if(movieObject["castingShort"].isObject()){
         info.directors=movieObject["castingShort"].toObject()["directors"].toString().split(",", QString::SkipEmptyParts);
@@ -381,60 +420,24 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
         info.actors.replaceInStrings(QRegExp("^\\s+"),"");
     }
 
-    info.productionYear = movieObject["productionYear"].toInt();
-    info.runtime = movieObject["runtime"].toInt();
-
-    QJsonArray mediaArray = movieObject["media"].toArray();
-
-    foreach (const QJsonValue & value, mediaArray)
-    {
-        QJsonObject media = value.toObject();
-        if (media["class"]=="picture"){
-            if (media["type"].isObject()){
-                QJsonObject typeObject = media["type"].toObject();
-                if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
-                    QJsonObject thumbnailObject=media["thumbnail"].toObject();
-                    if (thumbnailObject["path"].isString()){
-                        qDebug() << QSize(media["width"].toInt(), media["height"].toInt());
-                          if (typeObject["$"].toString()=="Affiche"){
-                          info.postersHref.append(thumbnailObject["path"].toString());
-                          info.postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
-                          } else {
-                              info.backdropsHref.append(thumbnailObject["path"].toString());
-                              info.backdropsSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
-                           }
-
-                    }
-                }
-            }
-        }
+    if (movieObject["media"].isArray()){
+        parseMedia(movieObject["media"].toArray(), info.postersHref, info.postersSize,info.backdropsHref,info.backdropsSize );
     }
 
-    /*  QJsonArray jsonArray = movieObject["link"].toArray();
-
-    foreach (const QJsonValue & value, jsonArray)
-    {
-        QJsonObject link = value.toObject();
-
-        if (link["rel"].toString()=="aco:web"){
-            info.linkName=link["name"].toString();
-
-            info.linkHref=link["href"].toString();
-            break;
-        }
-    }
-*/
-    return true;
+     return true;
 }
 
-QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, ImageType imageType) const{
+QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
     if (filePath.startsWith("http:",Qt::CaseInsensitive)){
-       return filePath;
+        return filePath;
     }
     else {
-        const QSize trueSize=originalSize.scaled(size,Qt::KeepAspectRatio);
-        qDebug() << originalSize << trueSize;
-    return QString("http://images.allocine.fr/c_%1_%2/b_1_d6d6d6/%3").arg(trueSize.width()).arg(trueSize.height()).arg(filePath);
+        if (originalSize.expandedTo(size)==size){
+            return QString("http://%1%2").arg(ALLO_DEFAULT_URL_IMAGES).arg(filePath);
+        } else {
+            const QSize trueSize=originalSize.scaled(size,mode);
+            return QString("http://%1/c_%2_%3/b_1_d6d6d6%4").arg(ALLO_DEFAULT_URL_IMAGES).arg(trueSize.width()).arg(trueSize.height()).arg(filePath);
+        }
     }
 }
 
@@ -473,9 +476,9 @@ FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) cons
         }
         film->productionYear = QString::number(obj["productionYear"].toDouble());
         film->code= QString::number(obj["code"].toDouble());
-//        if(obj["poster"].isObject()){
-//            film->posterHref = obj["poster"].toObject()["href"].toString();
-//        }
+        //        if(obj["poster"].isObject()){
+        //            film->posterHref = obj["poster"].toObject()["href"].toString();
+        //        }
 
 
 
@@ -516,9 +519,9 @@ ShowPtrList AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) co
         show->title= obj["originalTitle"].toString();
         show->productionYear = QString::number(obj["yearStart"].toDouble());
         show->code= QString::number(obj["code"].toDouble());
-//        if(obj["poster"].isObject()){
-//            show->posterHref = obj["poster"].toObject()["href"].toString();
-//        }
+        //        if(obj["poster"].isObject()){
+        //            show->posterHref = obj["poster"].toObject()["href"].toString();
+        //        }
 
         shows.append(show);
     }
