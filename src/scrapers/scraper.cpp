@@ -8,6 +8,7 @@
 #include <QStringList>
 #include <QUrl>
 #include <QApplication>
+#include <QMessageBox>
 
 #include "../inprogressdialog.h"
 
@@ -21,10 +22,10 @@ Scraper::Scraper(QObject *parent)
             SLOT(closeDialog()));
 
     connect(this, SIGNAL(scraperError()), this,
-            SLOT(closeDialog()));
+            SLOT(showErrorDialog()));
 
     connect(this, SIGNAL(scraperError(const QString&)), this,
-            SLOT(closeDialog()));
+            SLOT(showErrorDialog(const QString&)));
 
     connect(this, SIGNAL(found(const Scraper* ,SearchMovieInfo )), this,
             SLOT(closeDialog()));
@@ -50,6 +51,14 @@ void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)
     internalSearchTV( manager, toSearch,"fr");
 }
 
+void Scraper::showErrorDialog(const QString& error){
+    closeDialog();
+
+    QMessageBox msgBox;
+    msgBox.setText("Unable to retrieve information.");
+    msgBox.setDetailedText(error);
+    msgBox.exec();
+}
 
 void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const {
 
@@ -68,7 +77,9 @@ void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& sh
 
 void Scraper::closeDialog(){
     if (p!=nullptr){
-        p->closeAndDeleteLater();
+        p->close();
+        QCoreApplication::processEvents();
+        p->deleteLater();
         p = nullptr;
     }
 }

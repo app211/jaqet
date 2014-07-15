@@ -417,7 +417,7 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
     }
 }
 
-QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& size, ImageType imageType) const {
+QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& originalSize, const QSize& size, ImageType imageType) const {
     if (imageType==ImageType::BANNER){
         return getBannerURL().append("/banners/").append(url);
     }

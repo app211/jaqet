@@ -45,10 +45,10 @@ public:
     QString originalTitle;
     QString title;
     QString synopsis;
-    QString posterHref;
-    QString backdropHref;
     QStringList backdropsHref;
+    QList<QSize> backdropsSize;
     QStringList postersHref;
+    QList<QSize> postersSize;
     QString linkName;
     QString linkHref;
     QStringList directors;
@@ -103,7 +103,7 @@ public:
         UNKNOWN, BANNER, POSTER
     };
 
-    virtual QString getBestImageUrl(const QString& filePath, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const=0;
+    virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const=0;
 
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
@@ -113,6 +113,7 @@ protected:
 
 public slots:
     void closeDialog();
+    void showErrorDialog(const QString& error=QString::null);
 
 Q_SIGNALS:
     void scraperError() const;

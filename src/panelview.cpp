@@ -83,7 +83,7 @@ PanelView::~PanelView()
 
 void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
 
-     ui->stackedWidget->setCurrentIndex(3);
+    ui->stackedWidget->setCurrentIndex(3);
 
     QObject::disconnect(engine,SIGNAL(previewOK(QGraphicsScene* )),this,0);
     QObject::connect(engine, &Engine::previewOK, [=](QGraphicsScene* newScene){
@@ -132,17 +132,17 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
 
 
 
-    SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
-    if (fd.exec()==QDialog::Accepted){
-        if (!fd.getResult().isNull()){
-            if (!fd.getResult().isTV()){
-                fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
-            } else {
-                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
+        SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
+        if (fd.exec()==QDialog::Accepted){
+            if (!fd.getResult().isNull()){
+                if (!fd.getResult().isTV()){
+                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
+                } else {
+                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
+                }
             }
         }
     }
-}
 }
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     currentSearch.texts[Template::Properties::title]=b.title;
@@ -182,7 +182,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     ui->labelEpisodeTitle->setText(b.title);
 
-   // ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));*/
+    // ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));*/
 
     scene->clear();
 
@@ -198,7 +198,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     if (!b.bannersHref.isEmpty()){
         foreach (const QString& url , b.bannersHref){
 
-            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h), Scraper::ImageType::BANNER);
+            QString realUrl=scraper->getBestImageUrl(url,QSize(),QSize(w,h), Scraper::ImageType::BANNER);
 
             qDebug()<< realUrl;
 
@@ -215,7 +215,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            Promise* promise=Promise::loadAsync(manager,realUrl,false);
+            Promise* promise=Promise::loadAsync(manager,realUrl,false,true,QNetworkRequest::LowPriority);
             QObject::connect(promise, &Promise::completed, [=]()
             {
                 if (promise->reply->error() ==QNetworkReply::NoError){
@@ -241,13 +241,9 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         }
     }
 
-
-
     ui->graphicsViewPosters->setScene(scene);
 
-
     rebuildTemplate(true);
-
 }
 
 
@@ -335,9 +331,16 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     QSet<QString> urls;
 
     if (!b.postersHref.isEmpty()){
-        foreach (const QString& url , b.postersHref){
+        for (int i=0; i<b.postersHref.size(); i++){
 
-            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
+            QString url= b.postersHref[i];
+
+            QSize posterSize;
+            if (b.postersSize.size()>i){
+                posterSize=b.postersSize[i];
+            }
+
+            QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h));
             if (urls.contains(realUrl)){
                 continue;
             }
@@ -353,7 +356,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            Promise* promise=Promise::loadAsync(manager,realUrl,false);
+            Promise* promise=Promise::loadAsync(manager,realUrl,false,true,QNetworkRequest::LowPriority);
             QObject::connect(promise, &Promise::completed, [=]()
             {
                 if (promise->reply->error() ==QNetworkReply::NoError){
@@ -380,9 +383,16 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     }
 
     if (!b.backdropsHref.isEmpty()){
-        foreach (const QString& url , b.backdropsHref){
+        for (int i=0; i<b.backdropsHref.size(); i++){
 
-            QString realUrl=scraper->getBestImageUrl(url,QSize(w,h));
+            QString url= b.backdropsHref[i];
+
+            QSize posterSize;
+            if (b.backdropsSize.size()>i){
+                posterSize=b.backdropsSize[i];
+            }
+
+            QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h));
             if (urls.contains(realUrl)){
                 continue;
             }
@@ -423,9 +433,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
     ui->graphicsViewPosters->setScene(scene);
 
-
     rebuildTemplate(true);
-
 }
 
 void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
@@ -465,7 +473,7 @@ void PanelView::setBanner(const QString& url, const Scraper *_currentScrape){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._banner.scraper->getBestImageUrl(currentSearch._banner.resources,currentSearch.engine->getPosterSize(), Scraper::ImageType::BANNER);
+        QString url=currentSearch._banner.scraper->getBestImageUrl(currentSearch._banner.resources,QSize(),currentSearch.engine->getPosterSize(), Scraper::ImageType::BANNER);
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -504,7 +512,7 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,currentSearch.engine->getPosterSize());
+        QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,QSize(),currentSearch.engine->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -526,9 +534,7 @@ void PanelView::setPoster (const QString& url, const Scraper *_currentScrape){
                 setPosterState(NETRESOURCE::ERROR);
             }
 
-
             p->closeAndDeleteLater();
-
         });
 
     } else {
@@ -578,7 +584,7 @@ void PanelView::setBackdrop(const QString& url, const Scraper *_currentScrape){
     currentSearch._backdrop=ScraperResource(url,_currentScrape);
 
     if (!currentSearch._backdrop.resources.isEmpty()){
-        QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,currentSearch.engine->getBackdropSize());
+        QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,QSize(),currentSearch.engine->getBackdropSize());
 
         InProgressDialog* p=InProgressDialog::create();
 
@@ -649,5 +655,4 @@ void PanelView::rescrap() {
             }
         }
     }
-
 }

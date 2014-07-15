@@ -8,7 +8,6 @@
 
 QString getRandomUserAgent()
 {
-
     QString v=QString("%1 %2").arg(Utils::randInt(1, 4)).arg(Utils::randInt(0, 9));
     QString a=QString("%1").arg(Utils::randInt(0, 9));
     QString b=QString("%1").arg(Utils::randInt(0, 99));
@@ -53,17 +52,16 @@ void Promise::complete(){
 
 void Promise::cancel(){
     if (reply!=nullptr){
-         reply->abort();
+        reply->abort();
     }
 }
 
 Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
-
     QNetworkRequest req;
     req.setUrl(QUrl(url));
 
     if (useRandomUserAgent){
-    req.setRawHeader( "User-Agent" , getRandomUserAgent().toLatin1());
+        req.setRawHeader( "User-Agent" , getRandomUserAgent().toLatin1());
     }
 
     if (useRandomIP){
@@ -73,14 +71,13 @@ Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url,
         req.setRawHeader("VIA", ip.toLatin1());
     }
 
-    req.setPriority(priority)
-            ;
+    req.setPriority(priority);
+
     QNetworkReply * reply = manager.get(req);
 
     Promise * promise = new Promise;
     promise->reply=reply;
 
-    // When the request finishes (or is aborted), indicate that the promise completed
     QObject::connect(reply, &QNetworkReply::finished, promise, &Promise::completed);
 
     return promise;

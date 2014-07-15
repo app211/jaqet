@@ -10,12 +10,13 @@ class AlloCineScraper : public Scraper
     FilmPrtList parseResultset(const QJsonDocument& ) const;
     ShowPtrList parseTVResultset(const QJsonDocument& resultset) const;
 
-    bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
+    bool parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, SearchMovieInfo& info) const;
 
     bool extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument& resultset, const int seasonToFind, QString &seasonCode, SearchEpisodeInfo& result) const;
     bool extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode, SearchEpisodeInfo& result) const;
     void findSeasonInfoByCode(QNetworkAccessManager *manager, const QString seasonCode, const int episode, SearchEpisodeInfo result) const;
     void findEpisodeInfoByCode(QNetworkAccessManager *manager, const QString epidodeCode, SearchEpisodeInfo result) const;
+    void findMediaInfo(QNetworkAccessManager *manager, const QString mediaCode) const;
 
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
@@ -30,7 +31,7 @@ public:
     QString getName() const;
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    QString getBestImageUrl(const QString& filePath, const QSize&, ImageType imageType=ImageType::UNKNOWN ) const;
+    QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, ImageType imageType=ImageType::UNKNOWN ) const;
 
 };
 #endif // ALLOCINESCRAPER_H

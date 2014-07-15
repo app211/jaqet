@@ -348,8 +348,6 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
 
     info.title = movieObject["title"].toString();
     info.synopsis=movieObject["overview"].toString();
-    info.posterHref =   QString().append(baseUrl).append("original").append(movieObject["poster_path"].toString());
-    info.backdropHref =   QString().append(baseUrl).append("original").append(movieObject["backdrop_path"].toString());
     info.postersHref.append(movieObject["poster_path"].toString());
     info.backdropsHref.append(movieObject["backdrop_path"].toString());
 
@@ -518,7 +516,7 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, SearchMov
 
 
 
-QString TheMovieDBScraper::getBestImageUrl(const QString& filePath, const QSize& size, ImageType imageType) const {
+QString TheMovieDBScraper::getBestImageUrl(const QString& filePath,const QSize& originalSize, const QSize& size, ImageType imageType) const {
     return QString().append(baseUrl).append(findBestSize(posterSizes,size.width())).append(filePath);
 }
 

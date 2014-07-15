@@ -36,7 +36,7 @@ public:
     QIcon getIcon() const;
    QString getName() const;
    QString createURL(const QString& , const QMap<QString, QString>& params) const;
-    QString getBestImageUrl(const QString& filePath, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const;
+    QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, ImageType imageType=ImageType::UNKNOWN) const;
 
 
 
