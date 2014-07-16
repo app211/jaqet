@@ -266,13 +266,13 @@ bool parseMedia(const QJsonArray& mediaArray, QStringList& postersHref, QList<QS
                 QJsonObject typeObject = media["type"].toObject();
                 if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
                     QJsonObject thumbnailObject=media["thumbnail"].toObject();
-                    if (thumbnailObject["path"].isString()){
+                    if (thumbnailObject["href"].isString()){
                         qDebug() << QSize(media["width"].toInt(), media["height"].toInt());
                         if (typeObject["$"].toString()=="Affiche"){
-                            postersHref.append(thumbnailObject["path"].toString());
+                            postersHref.append(thumbnailObject["href"].toString());
                             postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
                         } else {
-                            backdropsHref.append(thumbnailObject["path"].toString());
+                            backdropsHref.append(thumbnailObject["href"].toString());
                             backdropsSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
                         }
                     }
@@ -321,6 +321,20 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
 
     if (episodeObject["media"].isArray()){
         parseMedia(episodeObject["media"].toArray(), result.postersHref, result.postersSize,result.backdropsHref,result.backdropsSize );
+    }
+
+    if (episodeObject["castMember"].isArray()){
+        QJsonArray castArray = episodeObject["castMember"].toArray();
+        foreach (const QJsonValue & value, castArray)
+        {
+            QJsonObject cast = value.toObject();
+
+            if (cast["person"].isObject() && cast["activity"].isObject()){
+                if (cast["activity"].toObject()["$"]=="Acteur"){
+                    result.actors.append(cast["person"].toObject()["name"].toString());
+               }
+            }
+        }
     }
 
     return true;
@@ -428,17 +442,14 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
 }
 
 QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
-    if (filePath.startsWith("http:",Qt::CaseInsensitive)){
-        return filePath;
-    }
-    else {
-        if (originalSize.expandedTo(size)==size){
-            return QString("http://%1%2").arg(ALLO_DEFAULT_URL_IMAGES).arg(filePath);
+    QUrl url(filePath);
+     if (originalSize.expandedTo(size)==size){
+            return filePath;
         } else {
             const QSize trueSize=originalSize.scaled(size,mode);
-            return QString("http://%1/c_%2_%3/b_1_d6d6d6%4").arg(ALLO_DEFAULT_URL_IMAGES).arg(trueSize.width()).arg(trueSize.height()).arg(filePath);
+            return QString("http://%1/c_%2_%3/b_1_d6d6d6%4").arg(url.host()).arg(trueSize.width()).arg(trueSize.height()).arg(url.path());
         }
-    }
+
 }
 
 FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) const{

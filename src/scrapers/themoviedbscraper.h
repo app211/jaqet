@@ -17,11 +17,17 @@ class TheMovieDBScraper: public Scraper
     bool parseEpisodeInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info, const int season, const int episode) const;
 
     void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode,  SearchMovieInfo &result) const;
+    void findEpisodeInfoGetImage(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
+    void findEpisodeInfoGetCredit(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
+
+
     bool parseImageInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
+    bool parseImageInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const;
+    bool parseCreditInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const;
+
     QStringList posterSizes;
     QStringList backdropSizes;
-    bool findSaisonInfo(const QString& showCode, const QString& season, SearchEpisodeInfo &result) const;
-    bool findTVInfo(const QString& showCode, SearchEpisodeInfo &result) const;
+
     void searchFilmConfigurationOk( QNetworkAccessManager* manager, const QString& toSearch);
     void searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch);
 

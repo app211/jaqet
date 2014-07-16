@@ -202,6 +202,7 @@ void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const
 }
 
 bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int season, const int episode){
+    qDebug() << data;
     QXmlStreamReader xml( data );
     if ( xml.readNextStartElement() && xml.name()==QLatin1String("Data")){
         while ( xml.readNextStartElement()) {
@@ -209,6 +210,9 @@ bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int seas
                 int episodeNumber=-1;
                 int seasonNumber=-1;
                 QString overview;
+                QString filename;
+                QString thumb_height;
+                QString thumb_width;
                 while ( xml.readNextStartElement()) {
                     if ( xml.name() == QLatin1String( "EpisodeNumber" ) ) {
                         episodeNumber=xml.readElementText().toInt();
@@ -216,6 +220,12 @@ bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int seas
                         seasonNumber=xml.readElementText().toInt();
                     }else if ( xml.name() == QLatin1String( "Overview" ) ) {
                         overview=xml.readElementText();
+                    }else if ( xml.name() == QLatin1String( "filename" ) ) {
+                        filename=xml.readElementText();
+                    }else if ( xml.name() == QLatin1String( "thumb_height" ) ) {
+                        thumb_height=xml.readElementText();
+                    }else if ( xml.name() == QLatin1String( "thumb_width" ) ) {
+                        thumb_width=xml.readElementText();
                     }
                     else {
                         xml.skipCurrentElement();
@@ -224,7 +234,13 @@ bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int seas
 
                 if (episodeNumber==episode&&season==seasonNumber){
                     result.synopsis=overview;
-                    qDebug() << "BINGO!!!" << overview;
+                    if (!filename.isEmpty()){
+                        result.backdropsHref.append(filename);
+                        int w=thumb_width.toInt();
+                        int h=thumb_height.toInt();
+                        result.backdropsSize.append(QSize(w,h));
+                    }
+
                     return true;
                 }
             } else  {
@@ -243,7 +259,7 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
             if (xml.name() == QLatin1String( "Banner" ) ) {
                 QString bannerPath;
                 QString bannerType;
-                 while ( xml.readNextStartElement() ) {
+                while ( xml.readNextStartElement() ) {
                     if ( xml.name() == QLatin1String( "id" ) ) {
                         xml.skipCurrentElement();
                         //       qDebug() << "id " << xml.readElementText().toInt();
@@ -298,7 +314,7 @@ bool parseActors(const QByteArray &data, SearchEpisodeInfo& result){
             if (xml.name() == QLatin1String( "Actor" ) ) {
                 QString actorName;
                 QString actorSortOrder;
-                 while ( xml.readNextStartElement() ) {
+                while ( xml.readNextStartElement() ) {
                     if ( xml.name() == QLatin1String( "Name" ) ) {
                         actorName=  xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "SortOrder" ) ) {
@@ -308,13 +324,13 @@ bool parseActors(const QByteArray &data, SearchEpisodeInfo& result){
                     }
                 }
 
-                 if (!actorName.isEmpty() && !actorSortOrder.isEmpty()){
-                     bool bOk;
-                     int order = actorSortOrder.toInt(&bOk);
-                     if (bOk && order>=0 && order<=3){
-                         actors[order].append(actorName);
-                     }
-                 }
+                if (!actorName.isEmpty() && !actorSortOrder.isEmpty()){
+                    bool bOk;
+                    int order = actorSortOrder.toInt(&bOk);
+                    if (bOk && order>=0 && order<=3){
+                        actors[order].append(actorName);
+                    }
+                }
             } else {
                 return false;
             }
@@ -418,9 +434,9 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
 }
 
 QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, ImageType imageType) const {
-    if (imageType==ImageType::BANNER){
+    //if (imageType==ImageType::BANNER){
         return getBannerURL().append("/banners/").append(url);
-    }
+  //  }
 }
 
 const uchar TheTVDBScraper::icon_png[] = {

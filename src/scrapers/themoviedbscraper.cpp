@@ -131,10 +131,12 @@ void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, 
             SearchEpisodeInfo result;
             QJsonParseError e;
             QByteArray data=promise->reply->readAll();
+            qDebug() << data;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 if(parseEpisodeInfo(doc,result,season, episode)){
-                    emit found(this,result);
+                    findEpisodeInfoGetImage(manager,showCode, result.season, result.episode, result);
+
                 } else {
                     emit scraperError();
 
@@ -177,8 +179,6 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
         }
     });
 }
-
-
 
 void TheMovieDBScraper::searchFilmConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch) {
 
@@ -406,63 +406,55 @@ void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, co
                 if(parseImageInfo(doc,newResult)){
                     emit found(this,newResult);
                 } else {
-                    qDebug() <<data;
+                    emit scraperError();
                 }
             }
         }
     });
 }
 
-bool TheMovieDBScraper::findTVInfo(const QString& showCode, SearchEpisodeInfo &result) const{
-
-    //    QMap<QString,QString> params;
-    //    QByteArray headerData;
-    //    QByteArray data;
-
-    //    params["language"]="fr";
-
-    //    if (execCommand(QString("tv/").append(showCode), params, headerData,data)){
-    //        qDebug() << data;
-
-    //        QJsonParseError e;
-    //        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-    //        if (e.error== QJsonParseError::NoError){
-    //            /*if(parseMovieInfo(doc,result)){
-    //                        return getImage(movieCode, result);
-    //                    }*/
-    //        }
-
-    //        qDebug() << e.errorString();
-    //    }
-
-    return false;
+void TheMovieDBScraper::findEpisodeInfoGetImage(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const{
+    QMap<QString,QString> params;
+    QString url=createURL(QString("tv/%1/season/%2/episode/%3/images").arg(showCode).arg(season).arg(episode),params);
+    Promise* promise=Promise::loadAsync(*manager, url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            QJsonParseError e;
+            SearchEpisodeInfo newResult=result;
+            QByteArray data=promise->reply->readAll();
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                if(parseImageInfo(doc,newResult)){
+                    findEpisodeInfoGetCredit(manager,showCode, season, episode, newResult);
+                } else {
+                    emit scraperError();
+                }
+            }
+        }
+    });
 }
 
-bool TheMovieDBScraper::findSaisonInfo(const QString& showCode, const QString& season, SearchEpisodeInfo &result) const{
-
-    //    QMap<QString,QString> params;
-    //    QByteArray headerData;
-    //    QByteArray data;
-
-    //    params["language"]="fr";
-
-    //    if (execCommand(QString("tv/").append(showCode).append("/season/").append(season), params, headerData,data)){
-    //        qDebug() << data;
-
-    //        QJsonParseError e;
-    //        QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
-    //        if (e.error== QJsonParseError::NoError){
-    //            /*if(parseMovieInfo(doc,result)){
-    //                        return getImage(movieCode, result);
-    //                    }*/
-    //        }
-
-    //        qDebug() << e.errorString();
-    //    }
-
-    //    findTVInfo(showCode,result);
-
-    return false;
+void TheMovieDBScraper::findEpisodeInfoGetCredit(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const{
+    QMap<QString,QString> params;
+    QString url=createURL(QString("tv/%1/season/%2/episode/%3/credits").arg(showCode).arg(season).arg(episode),params);
+    Promise* promise=Promise::loadAsync(*manager, url);
+    QObject::connect(promise, &Promise::completed, [=]()
+    {
+        if (promise->reply->error() ==QNetworkReply::NoError){
+            QJsonParseError e;
+            SearchEpisodeInfo newResult=result;
+            QByteArray data=promise->reply->readAll();
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
+            if (e.error== QJsonParseError::NoError){
+                if(parseCreditInfo(doc,newResult)){
+                    emit found(this,newResult);
+                } else {
+                    emit scraperError();
+                }
+            }
+        }
+    });
 }
 
 
@@ -479,6 +471,66 @@ bool TheMovieDBScraper::parseEpisodeInfo(const QJsonDocument& resultset, SearchE
     info.title = episodeObject["name"].toString();
     info.code = episodeObject["id"].toString();
     info.synopsis = episodeObject["overview"].toString();
+    info.season = episodeObject["season_number"].toInt();
+    info.episode= episodeObject["episode_number"].toInt();
+    return true;
+}
+
+bool TheMovieDBScraper::parseCreditInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const{
+    if (!resultset.isObject()){
+        return false;
+    }
+    QJsonObject creditsObject = resultset.object();
+
+
+    if (creditsObject["cast"].isArray()){
+        QJsonArray jsonArray = creditsObject["cast"].toArray();
+        foreach (const QJsonValue & value, jsonArray)
+        {
+            if (value.isObject() &&  value.toObject()["name"].isString()){
+                info.actors.append(value.toObject()["name"].toString());
+            }
+        }
+    }
+
+    if (creditsObject["crew"].isArray()){
+        QJsonArray jsonArray = creditsObject["crew"].toArray();
+
+        foreach (const QJsonValue & value, jsonArray)
+        {
+            if (value.isObject() &&  value.toObject()["job"].isString() && value.toObject()["job"].toString().compare("Director",Qt::CaseInsensitive)==0 &&  value.toObject()["name"].isString()){
+              //  info.directors.append(value.toObject()["name"].toString());
+            }
+        }
+    }
+}
+
+bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const{
+
+    if (!resultset.isObject()){
+        return false;
+    }
+    QJsonObject movieObject = resultset.object();
+
+    if (!movieObject["stills"].isArray()){
+        return false;
+    }
+
+    QJsonArray backdropsArray = movieObject["stills"].toArray();
+
+    foreach (const QJsonValue & value, backdropsArray)
+    {
+        QJsonObject backdropObject = value.toObject();
+
+        info.backdropsHref.append( backdropObject["file_path"].toString());
+
+        int w= backdropObject["width"].toInt();
+        int h= backdropObject["height"].toInt();
+
+        info.backdropsSize.append(QSize(w,h));
+
+    }
+
 
     return true;
 }
