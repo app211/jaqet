@@ -82,13 +82,85 @@ public:
 
 };
 
+class Scraper;
+
+struct FoundResult {
+
+    FoundResult() : isnull(true){
+    }
+
+    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code)
+        :  isnull(false),
+          tv(false),
+          code(code),
+          scraper(scraper),
+          originalTitle(originalTitle)
+          {
+    }
+
+    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code, int season, int episode)
+        : isnull(false),
+          tv(true),
+          code(code),
+          scraper(scraper),
+          season(season),
+          episode(episode),
+          originalTitle(originalTitle)
+    {
+    }
+
+    bool isNull() const {
+        return isnull;
+    }
+
+    bool isTV() const {
+        return tv;
+    }
+
+    QString getCode() const {
+        return code;
+    }
+
+    Scraper *getScraper() const {
+        return scraper;
+    }
+
+    int getSeason(){
+        return season;
+    }
+
+    int getEpisode(){
+        return episode;
+    }
+
+    bool tv;
+    QString code;
+    Scraper *scraper;
+    /*const*/ bool isnull;
+    int season;
+    int episode;
+    QString originalTitle;
+
+};
+
 
 class Scraper : public QObject
 {
     Q_OBJECT
 
 public:
+
+    enum SearchCapabilities {
+        Movie = 0x0001,
+        TV = 0x0002
+    };
+
     Scraper(QObject *parent=0);
+
+    virtual bool haveCapability(const SearchCapabilities capability) const{
+        return true;
+    }
+
     virtual QIcon getIcon() const =0;
     virtual QString getName() const = 0;
 

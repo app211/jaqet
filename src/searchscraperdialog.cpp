@@ -17,14 +17,16 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
 {
     ui->setupUi(this);
 
+    init(scrapers);
+
     FileNameScanner fns;
     analyse=fns.analyze(fileInfo);
+
     ui->lineEditTitle->setText(fns.getFilteredName(fileInfo));
 
     if (analyse.mediaType.year>=1900){
         ui->dateEdit->setDate(QDate(analyse.mediaType.year,1,1));
     }
-    QMenu *menuFichier = new QMenu(this);
 
     ui->labelFilename->setText(fileInfo.fileName());
     if (analyse.mediaType.isValidForTV()){
@@ -35,6 +37,51 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
         ui->radioMovie->setChecked(true);
 
     }
+}
+
+void SearchScraperDialog::updateMenu(){
+    if (this->findButton != nullptr){
+        QMenu *menuFichier = this->findButton->menu();
+        if (menuFichier != nullptr){
+            for( QAction* action: menuFichier->actions()){
+                Scraper* scraper= (Scraper*)action->data().value<void *>();
+                if(scraper != nullptr)
+                {
+                    if (ui->radioMovie->isChecked()){
+                        action->setEnabled(scraper->haveCapability(Scraper::Movie));
+                    } else {
+                        action->setEnabled(scraper->haveCapability(Scraper::TV));
+                    }
+                }
+            }
+        }
+    }
+}
+
+SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& foundResult, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
+    QDialog(parent),
+    ui(new Ui::SearchScraperDialog),
+    m_manager(manager)
+
+{
+    ui->setupUi(this);
+
+    init(scrapers);
+
+    ui->lineEditTitle->setText(foundResult.originalTitle);
+
+    if (foundResult.isTV()){
+        ui->radioTV->setChecked(true);
+        ui->spinBoxSeason->setValue(foundResult.season);
+        ui->spinBoxEpisode->setValue(foundResult.episode);
+    } else {
+        ui->radioMovie->setChecked(true);
+    }
+}
+
+void SearchScraperDialog::init(QList<Scraper*> scrapers){
+    QMenu *menuFichier = new QMenu(this);
+
     foreach (Scraper* scraper,scrapers){
         QAction* scraperAction = new QAction(scraper->getIcon(),scraper->getName(), this);
         scraperAction->setData(qVariantFromValue((void*)scraper));
@@ -52,12 +99,11 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     }
 
 
-    QPushButton* findButton = new QPushButton(tr("&Search"));
+    findButton = new QPushButton(tr("&Search"));
 
     findButton->setMenu(menuFichier);
 
     ui->buttonBox->addButton(findButton, QDialogButtonBox::AcceptRole);
-
 }
 
 void SearchScraperDialog::searchScraper(){
@@ -69,21 +115,18 @@ void SearchScraperDialog::searchScraper(){
         return;
     }
 
-    action->data();
-
     Scraper* scraper= (Scraper*)action->data().value<void *>();
     if(scraper == nullptr)
     {
         return;
     }
 
-    if (analyse.mediaType.isValidForTV()){
+    if (ui->radioTV->isChecked()){
         scraper->searchTV(m_manager,ui->lineEditTitle->text());
     } else {
         scraper->searchFilm(m_manager,ui->lineEditTitle->text());
     }
 }
-
 
 void SearchScraperDialog::found(FilmPrtList result){
     Scraper *scraper = qobject_cast<Scraper *>(this->sender());
@@ -115,20 +158,20 @@ void SearchScraperDialog::found(FilmPrtList result){
         accept(scraper, result.at(0));
     } else {
         QMessageBox::information(this, tr("My Application"),
-                                        tr("Nothing found"));
+                                 tr("Nothing found"));
     }
 }
 
 void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
     if (!filmPtr.isNull()){
-        result= FoundResult(scraper, filmPtr->code);
+        result= FoundResult(scraper, filmPtr->originalTitle, filmPtr->code);
         done(QDialog::Accepted);
     }
 }
 
 void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, showPtr->code, analyse.mediaType.season, analyse.mediaType.episode);
+        result= FoundResult(scraper, showPtr->originalTitle, showPtr->code, analyse.mediaType.season, analyse.mediaType.episode);
         done(QDialog::Accepted);
     }
 }
@@ -146,11 +189,11 @@ void SearchScraperDialog::found(ShowPtrList shows){
         accept(scraper, shows.at(0));
     } else {
         QMessageBox::information(this, tr("My Application"),
-                                        tr("Nothing found"));
+                                 tr("Nothing found"));
     }
 }
 
-SearchScraperDialog::FoundResult SearchScraperDialog::getResult() const {
+FoundResult SearchScraperDialog::getResult() const {
     return result;
 }
 

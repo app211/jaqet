@@ -47,6 +47,7 @@ private:
         QFileInfo fileInfo;
         MediaInfo mediaInfo;
         QMap<Template::Properties, QVariant> texts;
+        FoundResult fd;
     };
 
 

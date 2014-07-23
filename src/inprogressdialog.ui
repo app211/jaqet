@@ -23,7 +23,20 @@
     </rect>
    </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Loadin">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>40</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Loading...</string>
    </property>
   </widget>
  </widget>

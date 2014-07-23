@@ -131,10 +131,10 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
         currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
 
 
-
         SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
         if (fd.exec()==QDialog::Accepted){
             if (!fd.getResult().isNull()){
+                currentSearch.fd=fd.getResult();
                 if (!fd.getResult().isTV()){
                     fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
                 } else {
@@ -285,7 +285,7 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
         QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
         pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-        Promise* promise=Promise::loadAsync(manager,realUrl,false,true,QNetworkRequest::LowPriority);
+        Promise* promise=Promise::loadAsync(manager,realUrl,false,false,QNetworkRequest::LowPriority);
         QObject::connect(promise, &Promise::completed, [=]()
         {
             if (promise->reply->error() ==QNetworkReply::NoError){
@@ -472,7 +472,7 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
 
         QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,originalSize,currentSearch.engine->getPosterSize());
 
-        Promise* promise=Promise::loadAsync(manager,url,false);
+        Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
 
         //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
@@ -603,7 +603,7 @@ void PanelView::proceed(){
 
 void PanelView::rescrap() {
 
-    SearchScraperDialog fd(this, currentSearch.fileInfo , this->scrapes, &this->manager);
+    SearchScraperDialog fd(this, currentSearch.fd , this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
         if (!fd.getResult().isNull()){
             if (!fd.getResult().isTV()){

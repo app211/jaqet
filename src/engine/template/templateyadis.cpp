@@ -6,7 +6,6 @@
 #include <QGraphicsProxyWidget>
 #include <QInputDialog>
 #include <QStandardPaths>
-#include <QDebug>
 #include <QFileInfo>
 #include <QDir>
 #include <QPainter>
@@ -496,7 +495,6 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if (mediaInfo.audioStreamCount()>0){
             QPixmap pstatic;
             QString f=QString("%1.png").arg(mediaInfo.metaDataValue( MediaInfo::Format).toString());
-            qDebug() << f;
             if (pstatic.load(getAbsoluteFilePath(f)) ){
                 pixPaint.drawPixmap(x,y,w,h,pstatic);
             }
@@ -513,9 +511,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
                 } else {
                     f=QString("%1_%2.png").arg(ratio.at(0),ratio.at(1));
                 }
-
-                qDebug() << f;
-                if (pstatic.load(getAbsoluteFilePath(f)) ){
+            if (pstatic.load(getAbsoluteFilePath(f)) ){
                     pixPaint.drawPixmap(x,y,w,h,pstatic);
                 }
             }
@@ -537,7 +533,6 @@ bool TemplateYadis::execNode(QDomElement synopsisNode, QPainter &result, Context
     while(!n.isNull()) {
         QDomElement e = n.toElement();
         if(!e.isNull()) {
-            qDebug() << e.tagName() << e.text();
             if (e.tagName()=="image"){
                 execImage(e,result);
             }else if (e.tagName()=="text"){

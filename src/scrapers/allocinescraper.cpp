@@ -10,6 +10,7 @@
 #include <QApplication>
 
 #include "../promise.h"
+#include "../utils.h"
 
 AlloCineScraper::AlloCineScraper(QObject *parent)
     :Scraper(parent)
@@ -47,6 +48,7 @@ void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const Q
     {
         if (promise->reply->error() ==QNetworkReply::NoError){
             const QByteArray data=promise->reply->readAll();
+            qDebug() << data;
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -90,8 +92,8 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, con
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
     params["code"]=QUrl::toPercentEncoding(movieCode);
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
-    params["profile"]=QUrl::toPercentEncoding("large");
+   params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+           params["profile"]=QUrl::toPercentEncoding("large");
 
     QString url=createURL("rest/v3/movie",params);
     Promise* promise=Promise::loadAsync(*manager,url);
@@ -267,7 +269,7 @@ bool parseMedia(const QJsonArray& mediaArray, QStringList& postersHref, QList<QS
                 if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
                     QJsonObject thumbnailObject=media["thumbnail"].toObject();
                     if (thumbnailObject["href"].isString()){
-                        qDebug() << QSize(media["width"].toInt(), media["height"].toInt());
+                        qDebug() << thumbnailObject["href"].toString() << thumbnailObject["path"].toString();
                         if (typeObject["$"].toString()=="Affiche"){
                             postersHref.append(thumbnailObject["href"].toString());
                             postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
@@ -441,15 +443,19 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
      return true;
 }
 
-QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
-    QUrl url(filePath);
-     if (originalSize.expandedTo(size)==size){
-            return filePath;
-        } else {
-            const QSize trueSize=originalSize.scaled(size,mode);
-            return QString("http://%1/c_%2_%3/b_1_d6d6d6%4").arg(url.host()).arg(trueSize.width()).arg(trueSize.height()).arg(url.path());
-        }
 
+QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
+
+    if (!originalSize.isNull() && size.expandedTo(originalSize)==size){
+       return filePath;
+   } else {
+
+    QUrl url(filePath);
+    QSize scaledSize = originalSize.scaled(size, Qt::KeepAspectRatio);
+
+    // Cf. https://raw.githubusercontent.com/etienne-gauvin/api-allocine-helper/master/AlloImage.class.php
+    return QString("http://%1/r_%2_%3%4").arg("fr.web.img5.acsta.net").arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
+    }
 }
 
 FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) const{

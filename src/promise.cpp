@@ -73,6 +73,9 @@ Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url,
 
     req.setPriority(priority);
 
+
+    qDebug() << url << priority;
+
     QNetworkReply * reply = manager.get(req);
 
     Promise * promise = new Promise;

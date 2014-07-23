@@ -13,10 +13,12 @@ void TVIXEngine::init(const QString& path){
    //b.loadTemplate("/home/teddy/Developpement/Tribute Glass Mix/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-  //   b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
+   //  b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
 
-    // b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
-    b.loadTemplate("/home/teddy/Developpement/Tribute Full/template.xml");
+   //  b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
+   // b.loadTemplate("/home/teddy/Developpement/Tribute Full/template.xml");
+
+     b.loadTemplate("/home/teddy/Developpement/Ciné Yadis 2.0/template.xml");
 #endif
 
     visibleFileExtensions = { "*.asf"

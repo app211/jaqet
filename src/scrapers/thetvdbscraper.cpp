@@ -152,7 +152,7 @@ void TheTVDBScraper::parseSeriesList( QNetworkAccessManager* manager, const QStr
     emit found(shows);
 }
 
-void TheTVDBScraper::parseMirrorList( const QByteArray& data)
+bool TheTVDBScraper::parseMirrorList( const QByteArray& data)
 {
     QXmlStreamReader xml( data );
     if ( xml.readNextStartElement() ) {
@@ -194,6 +194,8 @@ void TheTVDBScraper::parseMirrorList( const QByteArray& data)
             }
         }
     }
+
+    return true;
 }
 
 
@@ -401,15 +403,18 @@ void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QS
 
 void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const{
     if  (retrieveMirror){
-        retrieveMirror= false;
         QString url = QString("http://thetvdb.com/api/%1/mirrors.xml").arg(API_KEY);
         Promise* promise=Promise::loadAsync(*manager,url,false);
         QObject::connect(promise, &Promise::completed, [=]()
         {
             QByteArray data= promise->reply->readAll();
             if (promise->reply->error() ==QNetworkReply::NoError){
-                parseMirrorList(data);
-                internalSearchTV(manager,toSearch,language);
+                if (parseMirrorList(data)){
+                    retrieveMirror= false;
+                    internalSearchTV(manager,toSearch,language);
+                } else {
+                    emit scraperError(tr("Unable to parse 'mirrors.xml'"));
+                }
             } else {
                 emit scraperError(tr("Unable to retrieve 'mirrors.xml'"));
             }

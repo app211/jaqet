@@ -352,12 +352,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>124</y>
+     <x>143</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>283</x>
-     <y>124</y>
+     <x>327</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>
@@ -368,12 +368,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>141</x>
-     <y>124</y>
+     <x>114</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>408</x>
-     <y>124</y>
+     <x>327</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>
@@ -400,8 +400,8 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>509</x>
-     <y>40</y>
+     <x>533</x>
+     <y>48</y>
     </hint>
     <hint type="destinationlabel">
      <x>454</x>
@@ -425,8 +425,41 @@ QRadioButton#radioMovie::indicator::pressed {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>radioMovie</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SearchScraperDialog</receiver>
+   <slot>updateMenu()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>96</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>-8</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioTV</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>SearchScraperDialog</receiver>
+   <slot>updateMenu()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>133</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>search()</slot>
+  <slot>updateMenu()</slot>
  </slots>
 </ui>

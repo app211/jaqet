@@ -10,7 +10,7 @@ class TheTVDBScraper : public Scraper
 
 private:
     void parseSeriesList( QNetworkAccessManager* manager, const QString& toSearch, const QByteArray& data, const QString& language);
-    void parseMirrorList( const QByteArray& data);
+    bool parseMirrorList( const QByteArray& data);
     QString getXMLURL() const ;
     QString getZIPURL() const ;
     QString getBannerURL() const ;
@@ -31,6 +31,9 @@ public:
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
     QString getBestImageUrl(const QString& url,const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode=Qt::KeepAspectRatio, ImageType imageType=ImageType::UNKNOWN) const;
 
+    bool haveCapability(const SearchCapabilities capability) const{
+        return capability==TV;
+    }
 };
 
 #endif // THETVDBSCRAPER_H
