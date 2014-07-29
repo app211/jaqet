@@ -62,6 +62,7 @@ void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) 
     bool execImage(const QDomElement& imageElement, QPainter &result);
     bool execNode(QDomElement e, QPainter &result, Context context);
     bool execText(const QDomElement& textElement, QPainter &pixPaint, Context context);
+    bool execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context);
     int getX( int x );
     int getY( int y );
 

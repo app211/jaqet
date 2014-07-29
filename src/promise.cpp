@@ -56,10 +56,9 @@ void Promise::cancel(){
     }
 }
 
-Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
+Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
     QNetworkRequest req;
     req.setUrl(QUrl(url));
-
     if (useRandomUserAgent){
         req.setRawHeader( "User-Agent" , getRandomUserAgent().toLatin1());
     }
@@ -76,7 +75,7 @@ Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url,
 
     qDebug() << url << priority;
 
-    QNetworkReply * reply = manager.get(req);
+     QNetworkReply * reply = manager.get(req);
 
     Promise * promise = new Promise;
     promise->reply=reply;
@@ -85,3 +84,5 @@ Promise* Promise::loadAsync(QNetworkAccessManager & manager, const QString& url,
 
     return promise;
 }
+
+

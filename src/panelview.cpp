@@ -218,16 +218,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            Promise* promise=Promise::loadAsync(manager,realUrl,false,true,QNetworkRequest::LowPriority);
-            QObject::connect(promise, &Promise::completed, [=]()
-            {
-                if (promise->reply->error() ==QNetworkReply::NoError){
-                    QByteArray qb=promise->reply->readAll();
-                    setImageFromInternet( qb, pi,  x,  y,  w,  h);
-                } else {
-                    qDebug() << promise->reply->errorString();
-                }
-            });
+            this->addRequest(manager,realUrl, pi,  x,  y,  w,  h);
 
             QPushButton* b = new QPushButton("Plus");
 
@@ -285,16 +276,7 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
         QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
         pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-        Promise* promise=Promise::loadAsync(manager,realUrl,false,false,QNetworkRequest::LowPriority);
-        QObject::connect(promise, &Promise::completed, [=]()
-        {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
-                setImageFromInternet( qb, pi,  x,  y,  w,  h);
-            } else {
-                qDebug() << promise->reply->errorString();
-            }
-        });
+        addRequest(manager,realUrl, pi,  x,  y,  w,  h);
 
         QPushButton* b = new QPushButton("Plus");
 
@@ -317,7 +299,49 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
     }
 }
 
+QList<PanelView::M_M> PanelView::urls;
+Promise* PanelView::currentPromise=nullptr;
+
+void PanelView::startPromise( QNetworkAccessManager* manager){
+    if (urls.isEmpty() || currentPromise != nullptr){
+        return;
+    }
+
+    M_M url=urls.takeFirst();
+    currentPromise=Promise::loadAsync(*manager,url.url,false,false,QNetworkRequest::LowPriority);
+
+    QObject::connect(currentPromise, &Promise::completed, [=]()
+    {
+        if (currentPromise->reply->error() ==QNetworkReply::NoError){
+            QByteArray qb=currentPromise->reply->readAll();
+            setImageFromInternet(qb,url.itemToUpdate,url.x,url.y,url.w,url.h);
+
+        } else {
+            qDebug() << currentPromise->reply->errorString();
+        }
+
+        currentPromise=nullptr;
+        startPromise(manager);
+    });
+
+}
+
+void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
+    M_M f;
+    f.h=h;
+    f.itemToUpdate=itemToUpdate;
+    f.url=url;
+    f.w=w;
+    f.x=x;
+    f.y=y;
+    urls.append(f);
+    startPromise(&manager);
+}
+
+
 void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
+
+    urls.clear();
 
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;

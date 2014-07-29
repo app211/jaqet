@@ -8,6 +8,7 @@
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
 #include "engine/template/template.h"
+#include "promise.h"
 
 class MyProxyModel;
 class Engine;
@@ -59,6 +60,18 @@ private:
 
     QGraphicsScene* scene;
 
+    struct M_M {
+        QString url;
+        QGraphicsPixmapItem* itemToUpdate;
+        int x;
+        int y;
+        int w;
+        int h;
+    };
+
+    static QList<M_M> urls;
+    static Promise* currentPromise;
+
     void setBackdropState(NETRESOURCE fa, const QPixmap &backDrop=QPixmap());
     void setPosterState(NETRESOURCE posterState, const QPixmap& poster=QPixmap());
     void setBannerState(NETRESOURCE bannerState, const QPixmap& banner=QPixmap());
@@ -67,6 +80,9 @@ private:
     void setCast(const QStringList& actors);
     void setDirectors(const QStringList& directors);
     void addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
+
+    void addRequest( QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
+    void startPromise( QNetworkAccessManager* manager);
 
 private slots:
 

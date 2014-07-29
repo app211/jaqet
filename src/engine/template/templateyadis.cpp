@@ -266,7 +266,7 @@ QSize TemplateYadis::getPosterSize() const{
 QSize TemplateYadis::getBackdropSize() const{
     QSize result(0,0);
     searchSizeForTag(doc.documentElement(),"fanart",result);
-     return result;
+    return result;
 }
 
 QSize TemplateYadis::getBannerSize() const{
@@ -435,7 +435,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if(properties.contains(Template::Properties::backdrop)){
             QPixmap backdrop=properties[Template::Properties::backdrop].value<QPixmap>();
             if (!backdrop.isNull()){
-                 QPixmap scaled=backdrop.scaled(QSize(w,h),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+                QPixmap scaled=backdrop.scaled(QSize(w,h),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
                 int _w= scaled.width();
@@ -500,7 +500,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
             }
         }
     }else if (type=="aspect"){
-        if (mediaInfo.audioStreamCount()>0 && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
+        if (mediaInfo.videoStreamCount()>0 && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
             QString aspectRatioString=mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString();
             QStringList ratio=aspectRatioString.split(QRegExp("(/|:)"));
             QString f;
@@ -511,13 +511,116 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
                 } else {
                     f=QString("%1_%2.png").arg(ratio.at(0),ratio.at(1));
                 }
-            if (pstatic.load(getAbsoluteFilePath(f)) ){
+                if (pstatic.load(getAbsoluteFilePath(f)) ){
                     pixPaint.drawPixmap(x,y,w,h,pstatic);
                 }
             }
         }
     }
 
+
+    return true;
+}
+
+
+bool TemplateYadis::execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context){
+
+    MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
+
+    if (mediaInfo.audioStreamCount()==0){
+        return 0;
+    }
+
+    for (int i=0; i<mediaInfo.audioStreamCount();i++){
+      qDebug() << mediaInfo.audioStreamValue(i, MediaInfo::AudioLanguage).toString();
+    }
+
+    QDomElement  audioElement = languagesElement.firstChildElement("audio");
+    if (audioElement.isNull()){
+        return false;
+    }
+
+    QDomElement  backimageElement = languagesElement.firstChildElement("backimage");
+    if (backimageElement.isNull()){
+        return false;
+    }
+
+    QDomElement  textElement = languagesElement.firstChildElement("text");
+    if (textElement.isNull()){
+        return false;
+    }
+
+    bool bOk;
+    int x_audio=audioElement.attribute("x").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    int y_audio=audioElement.attribute("y").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    int width=backimageElement.attribute("width").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    int height=backimageElement.attribute("height").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    int spacing=backimageElement.attribute("spacing").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    QString font=textElement.attribute("font");
+
+    int size=textElement.attribute("size").toInt(&bOk);
+    if (!bOk){
+        return false;
+    }
+
+    QString color=textElement.attribute("color");
+
+    int x= x_audio;
+    int y=y_audio;
+    int w= width;
+    int h=height;
+
+    QString image = backimageElement.text();
+
+    for (int i=0; i<3;i++){
+        QString textToDraw="FR";
+
+        if (!textToDraw.isEmpty()){
+            if (!font.isEmpty()){
+                QFont _font(font);
+                if (size>0){
+                    _font.setPointSize(size);
+                }
+                pixPaint.setFont(_font);
+            }
+
+            if (!color.isEmpty()){
+                pixPaint.setPen(QPen(QColor(color)));
+            }
+
+            if (!image.isEmpty()){
+                QPixmap pstatic;
+
+                if (pstatic.load(getAbsoluteFilePath(image)) ){
+                    pixPaint.drawPixmap(getX(x) ,getY(y),w,h,pstatic);
+                }
+            }
+
+            pixPaint.drawText(getX(x),getY(y),w,h,Qt::AlignCenter,textToDraw);
+
+            x += spacing;
+        }
+    }
 
     return true;
 }
@@ -533,7 +636,9 @@ bool TemplateYadis::execNode(QDomElement synopsisNode, QPainter &result, Context
     while(!n.isNull()) {
         QDomElement e = n.toElement();
         if(!e.isNull()) {
-            if (e.tagName()=="image"){
+            if (e.tagName()=="languages"){
+                execLanguages(e,result,context);
+            } else if (e.tagName()=="image"){
                 execImage(e,result);
             }else if (e.tagName()=="text"){
                 execText(e,result,context);
