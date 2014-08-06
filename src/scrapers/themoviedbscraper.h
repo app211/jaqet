@@ -28,11 +28,11 @@ class TheMovieDBScraper: public Scraper
     QStringList posterSizes;
     QStringList backdropSizes;
 
-    void searchFilmConfigurationOk( QNetworkAccessManager* manager, const QString& toSearch);
+    void searchFilmConfigurationOk( QNetworkAccessManager* manager, const QString& toSearch, int year);
     void searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch);
 
 protected :
-    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
+    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
     void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
     void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const ;

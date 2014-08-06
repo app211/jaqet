@@ -365,56 +365,141 @@ void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const
     emit scraperError("Unsupported Operation");
 }
 
+bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int season, const int episode, bool& foundEpisode){
+    if(xml.tokenType() != QXmlStreamReader::StartElement && xml.name() == "Episode") {
+        return false;
+    }
+
+    int episodeNumber=-1;
+    int seasonNumber=-1;
+    QString overview;
+    QString filename;
+    QString thumb_height;
+    QString thumb_width;
+    QString rating;
+    QString episodeTitle;
+    QString director;
+
+    while(!(xml.tokenType() == QXmlStreamReader::EndElement &&  xml.name() == "Episode")) {
+        if(xml.tokenType() == QXmlStreamReader::StartElement) {
+            if ( xml.name() == QLatin1String( "EpisodeNumber" ) ) {
+                episodeNumber=xml.readElementText().toInt();
+            } else if ( xml.name() == QLatin1String( "SeasonNumber" ) ) {
+                seasonNumber=xml.readElementText().toInt();
+            }else if ( xml.name() == QLatin1String( "Overview" ) ) {
+                overview=xml.readElementText();
+            }else if ( xml.name() == QLatin1String( "filename" ) ) {
+                filename=xml.readElementText();
+            }else if ( xml.name() == QLatin1String( "thumb_height" ) ) {
+                thumb_height=xml.readElementText();
+            }else if ( xml.name() == QLatin1String( "thumb_width" ) ) {
+                thumb_width=xml.readElementText();
+            } else if ( xml.name() == QLatin1String( "Rating" ) ) {
+                rating=xml.readElementText();
+            } else if ( xml.name() == QLatin1String( "EpisodeName" ) ) {
+                episodeTitle=xml.readElementText();
+            } else if ( xml.name() == QLatin1String( "Director" ) ) {
+                director=xml.readElementText();
+            }
+        }
+
+        xml.readNext();
+
+    }
+
+
+    if (episodeNumber==episode&&season==seasonNumber){
+        result.synopsis=overview;
+        result.rating=rating.isEmpty()?-1:rating.toDouble();
+        result.episodeTitle=episodeTitle;
+        result.season=season;
+        result.episode=episode;
+        if (!director.isEmpty()){
+            result.directors.append(director);
+        }
+        if (!filename.isEmpty()){
+            result.backdropsHref.append(filename);
+            int w=thumb_width.toInt();
+            int h=thumb_height.toInt();
+            result.backdropsSize.append(QSize(w,h));
+        }
+
+        foundEpisode= true;
+    } else {
+        foundEpisode=false;
+    }
+
+    return true;
+}
+
+
+bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , const int ){
+    if(xml.tokenType() != QXmlStreamReader::StartElement && xml.name() == "Series") {
+        return false;
+    }
+
+    QString title;
+    QString runtime;
+    QString network;
+
+    while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Series")) {
+        if(xml.tokenType() == QXmlStreamReader::StartElement) {
+            qDebug() <<  xml.name();
+            if ( xml.name() == QLatin1String( "SeriesName" ) ) {
+                title=xml.readElementText();
+            }  if ( xml.name() == QLatin1String( "Runtime" ) ) {
+                runtime=xml.readElementText();
+
+            } if ( xml.name() == QLatin1String( "Network" ) ) {
+                network=xml.readElementText();
+            }
+        }
+        xml.readNext();
+    }
+
+
+    result.title=title;
+    result.network=network;
+
+    int runtimeAsInt=runtime.toInt()*60;
+    if (runtimeAsInt>0){
+        result.runtime=runtimeAsInt;
+    }
+
+    return true;
+}
+
 bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int season, const int episode){
     qDebug() << data;
     QXmlStreamReader xml( data );
-    if ( xml.readNextStartElement() && xml.name()==QLatin1String("Data")){
-        while ( xml.readNextStartElement()) {
-            if (xml.name() == QLatin1String( "Episode" ) ) {
-                int episodeNumber=-1;
-                int seasonNumber=-1;
-                QString overview;
-                QString filename;
-                QString thumb_height;
-                QString thumb_width;
-                while ( xml.readNextStartElement()) {
-                    if ( xml.name() == QLatin1String( "EpisodeNumber" ) ) {
-                        episodeNumber=xml.readElementText().toInt();
-                    } else if ( xml.name() == QLatin1String( "SeasonNumber" ) ) {
-                        seasonNumber=xml.readElementText().toInt();
-                    }else if ( xml.name() == QLatin1String( "Overview" ) ) {
-                        overview=xml.readElementText();
-                    }else if ( xml.name() == QLatin1String( "filename" ) ) {
-                        filename=xml.readElementText();
-                    }else if ( xml.name() == QLatin1String( "thumb_height" ) ) {
-                        thumb_height=xml.readElementText();
-                    }else if ( xml.name() == QLatin1String( "thumb_width" ) ) {
-                        thumb_width=xml.readElementText();
-                    }
-                    else {
-                        xml.skipCurrentElement();
-                    }
-                }
+    bool episodeFound=false;
 
-                if (episodeNumber==episode&&season==seasonNumber){
-                    result.synopsis=overview;
-                    if (!filename.isEmpty()){
-                        result.backdropsHref.append(filename);
-                        int w=thumb_width.toInt();
-                        int h=thumb_height.toInt();
-                        result.backdropsSize.append(QSize(w,h));
-                    }
+    while(!xml.atEnd() &&
+          !xml.hasError()) {
 
-                    return true;
+        QXmlStreamReader::TokenType token = xml.readNext();
+        if(token == QXmlStreamReader::StartDocument) {
+            continue;
+        }
+        if(token == QXmlStreamReader::StartElement) {
+            if(xml.name() == "Data") {
+                continue;
+            } else  if(xml.name() == "Series") {
+                if (!parseSeries(xml,result, season, episode)){
+                    return false;
                 }
-            } else  {
-                xml.skipCurrentElement();
+            } else if(xml.name() == "Episode" && !episodeFound) {
+                if (!parseEpisode(xml,result, season, episode,episodeFound)){
+                    return false;
+                }
             }
         }
     }
 
-    return false;
+    return true;
 }
+
+
 
 bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
     QXmlStreamReader xml( data );
@@ -559,7 +644,7 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, con
 }
 
 
-void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
+void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const {
     emit scraperError("Unsupported Operation");
 }
 
@@ -621,8 +706,8 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
 
 QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, ImageType imageType) const {
     //if (imageType==ImageType::BANNER){
-        return getBannerURL().append("/banners/").append(url);
-  //  }
+    return getBannerURL().append("/banners/").append(url);
+    //  }
 }
 
 const uchar TheTVDBScraper::icon_png[] = {

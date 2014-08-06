@@ -61,7 +61,7 @@ void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const 
     });
 }
 
-void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) const {
+void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language, int year) const {
     QMap<QString,QString> params;
 
     QString url=createURL("configuration",params);
@@ -73,7 +73,7 @@ void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const
             QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
             if (e.error== QJsonParseError::NoError){
                 if (parseConfiguration(doc)){
-                    searchFilmConfigurationOk(manager,toSearch);
+                    searchFilmConfigurationOk(manager,toSearch, year);
                 } else {
                     emit scraperError();
                 }
@@ -180,11 +180,16 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
     });
 }
 
-void TheMovieDBScraper::searchFilmConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch) {
+void TheMovieDBScraper::searchFilmConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch, int year) {
 
     QMap<QString,QString> params;
     params["query"]=QUrl::toPercentEncoding(toSearch);
     params["language"]="fr";
+    if (year>0){
+        params["year"]=QString::number(year);
+    }
+
+    //params["search_type"]="ngram";
 
     QString url=createURL("search/movie",params);
     Promise* promise=Promise::loadAsync(*manager, url);
@@ -376,7 +381,7 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
         }
     }
 
-    info.productionYear=0;
+    info.productionYear=-1;
     if (movieObject["release_date"].isString() ){
         QDate releaseDate=QDate::fromString(movieObject["release_date"].toString(), "yyyy-MM-dd");
         if (releaseDate.isValid()){
@@ -384,7 +389,15 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
         }
     }
 
-    //info.runtime=movieObject["runtime"].toInt()*60;
+    info.runtime=-1;
+    if (movieObject["runtime"].isDouble()){
+        info.runtime=movieObject["runtime"].toInt()*60;
+    }
+
+    info.rating=-1;
+    if (movieObject["vote_average"].isDouble()){
+        info.rating=movieObject["vote_average"].toDouble();
+    }
 
     return true;
 }

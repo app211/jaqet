@@ -37,11 +37,11 @@ Scraper::Scraper(QObject *parent)
 
 InProgressDialog* p=nullptr;
 
-void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch) const {
+void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year) const {
 
     p=InProgressDialog::create();
 
-    internalSearchFilm( manager, toSearch,"fr");
+    internalSearchFilm( manager, toSearch,"fr", year);
 }
 
 void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {

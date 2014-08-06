@@ -14,7 +14,7 @@ public:
     explicit Template(QObject *parent = 0);
 
     enum class Properties {
-        tv,actors,banner,director,synopsis,year,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
+        tv,actors,banner,director,synopsis,network,year,rating,runtime,title,poster,backdrop,mediainfo,fileinfo,originaltitle,season,episode,episodetitle
     };
 
 

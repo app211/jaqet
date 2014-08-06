@@ -25,7 +25,10 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     ui->lineEditTitle->setText(fns.getFilteredName(fileInfo));
 
     if (analyse.mediaType.year>=1900){
+        ui->checkBoxUseYear->setChecked(true);
         ui->dateEdit->setDate(QDate(analyse.mediaType.year,1,1));
+    } else {
+        ui->checkBoxUseYear->setChecked(false);
     }
 
     ui->labelFilename->setText(fileInfo.fileName());
@@ -77,6 +80,14 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& fou
     } else {
         ui->radioMovie->setChecked(true);
     }
+
+    if (!foundResult.year.isEmpty()){
+        ui->checkBoxUseYear->setChecked(true);
+        ui->dateEdit->setDate(QDate(foundResult.year.toInt(),1,1));
+    } else {
+        ui->checkBoxUseYear->setChecked(false);
+    }
+
 }
 
 void SearchScraperDialog::init(QList<Scraper*> scrapers){
@@ -121,10 +132,12 @@ void SearchScraperDialog::searchScraper(){
         return;
     }
 
+    int year=ui->checkBoxUseYear->isChecked()?ui->dateEdit->date().year():-1;
+
     if (ui->radioTV->isChecked()){
         scraper->searchTV(m_manager,ui->lineEditTitle->text());
     } else {
-        scraper->searchFilm(m_manager,ui->lineEditTitle->text());
+        scraper->searchFilm(m_manager,ui->lineEditTitle->text(), year);
     }
 }
 
@@ -164,7 +177,7 @@ void SearchScraperDialog::found(FilmPrtList result){
 
 void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
     if (!filmPtr.isNull()){
-        result= FoundResult(scraper, filmPtr->originalTitle, filmPtr->code);
+        result= FoundResult(scraper, filmPtr->originalTitle, filmPtr->code, filmPtr->productionYear);
         done(QDialog::Accepted);
     }
 }

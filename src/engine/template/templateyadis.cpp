@@ -22,7 +22,7 @@ TemplateYadis::TemplateYadis()
 {
 }
 
-void TemplateYadis::parseMoviePoster(const QDomElement& e){
+bool TemplateYadis::execPoster(const QDomElement& e){
     QDomElement standard=e.firstChildElement("standard");
     if (!standard.isNull()){
         QDomElement size=standard.firstChildElement("size");
@@ -42,6 +42,8 @@ void TemplateYadis::parseMoviePoster(const QDomElement& e){
             poster_standard_frame=frame.text();
         }
     }
+
+    return true;
 }
 
 QString TemplateYadis::getAbsoluteFilePath(const QString& fileName){
@@ -74,52 +76,44 @@ QSize TemplateYadis::getSize(){
     return QSize(w,h);
 }
 
-bool TemplateYadis::buildPoster(const ScraperResource& poster, QPixmap& pixmap){
-    
-    bool bOk;
-    int w=poster_standard_width.toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
-    
-    int h=poster_standard_height.toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
-    
-    QPixmap result(w,h);
+QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSize){
+
+
+    int standard_width=poster_standard_width.toInt();
+    int standard_height=poster_standard_height.toInt();
+    int standard_border=poster_standard_border.toInt();
+
+    QSize standardSize(standard_width,standard_height);
+
+    QSize size= standardSize.isNull()?desiredSize:standardSize;
+
+    QPixmap scaledPoster = poster.scaled(size,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+
+    QPixmap result(size);
     result.fill(Qt::transparent);
     QPainter pixPaint(&result);
-    
-    
-    /*
-    QPixmap pposter;
-    loadPixmap(poster.scraper->getBestImageUrl(poster.resources,QSize(w,h)),pposter);
-    pposter=pposter.scaled(QSize(w,h),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     
     if (!poster_standard_mask.isEmpty()){
         QPixmap mask;
         if (!mask.load(getAbsoluteFilePath(poster_standard_mask))){
-            return false;
+            return QPixmap();
         }
-        
-        pposter.setMask(mask.scaled(QSize(w,h),Qt::IgnoreAspectRatio,Qt::SmoothTransformation).mask());
+
+        scaledPoster.setMask(mask.scaled(size,Qt::IgnoreAspectRatio,Qt::SmoothTransformation).mask());
     }
-    
-    pixPaint.drawPixmap(0,0,w,h,pposter);
-    
+
+    pixPaint.drawPixmap(0,0,size.width(),size.height(),scaledPoster);
+
     if (!poster_standard_frame.isEmpty()){
         QPixmap frame;
         if (!frame.load(getAbsoluteFilePath(poster_standard_frame))){
-            return false;
+            return QPixmap();;
         }
-        
-        pixPaint.drawPixmap(0,0,w,h,frame);
+
+        pixPaint.drawPixmap(0,0,size.width(),size.height(),frame.scaled(size,Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
     }
-    */
-    pixmap=result;
-    
-    return true;
+
+    return result;
 }
 
 
@@ -287,7 +281,6 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
     QString language = textElement.attribute("language");
     QString font = textElement.attribute("font");
 
-
     bool bOk;
     int size=-1;
     if (textElement.hasAttribute("size")){
@@ -338,6 +331,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=properties[Template::Properties::year].toString();
     } else if (type=="runtime" && properties.contains(Template::Properties::runtime)){
         textToDraw=properties[Template::Properties::runtime].toString();
+    }else if (type=="rating" && properties.contains(Template::Properties::rating)){
+        textToDraw=properties[Template::Properties::rating].toString();
     }else if (type=="title") {
         if ((context==Context::tv_synopsis_common || context==Context::movie_synopsis) && properties.contains(Template::Properties::title)){
             textToDraw=properties[Template::Properties::title].toString();
@@ -354,6 +349,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=QString("%1").arg(mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).toInt());
     } else if (type=="aspect" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).isNull()){
         textToDraw=QString("%1").arg(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString());
+    } else if (type=="network" && properties.contains(Template::Properties::network)){
+        textToDraw=properties[Template::Properties::network].toString();
     }
 
     if (!textToDraw.isEmpty()){
@@ -389,7 +386,6 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
 
     return true;
 }
-
 
 bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPaint){
 
@@ -447,7 +443,8 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if(properties.contains(Template::Properties::poster)){
             QPixmap poster=properties[Template::Properties::poster].value<QPixmap>();
             if (!poster.isNull()){
-                QPixmap scaled=poster.scaled(QSize(w,h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                QPixmap scaled= buildPoster(poster,QSize(w,h));
+                qDebug() << QSize(w,h) << scaled.size();
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
                 int _w= scaled.width();
@@ -528,11 +525,15 @@ bool TemplateYadis::execLanguages(const QDomElement& languagesElement, QPainter 
     MediaInfo mediaInfo=getProperty<MediaInfo>(properties,Properties::mediainfo);
 
     if (mediaInfo.audioStreamCount()==0){
-        return 0;
+        return true;
     }
 
+    QStringList audioLanguages;
     for (int i=0; i<mediaInfo.audioStreamCount();i++){
-      qDebug() << mediaInfo.audioStreamValue(i, MediaInfo::AudioLanguage).toString();
+        QString audioLanguage=mediaInfo.audioStreamValue(i, MediaInfo::AudioLanguage).toString();
+        if (!audioLanguage.isEmpty()){
+            audioLanguages << audioLanguage;
+        }
     }
 
     QDomElement  audioElement = languagesElement.firstChildElement("audio");
@@ -592,8 +593,8 @@ bool TemplateYadis::execLanguages(const QDomElement& languagesElement, QPainter 
 
     QString image = backimageElement.text();
 
-    for (int i=0; i<3;i++){
-        QString textToDraw="FR";
+    for (int i=0; i<qMin<int>(3,audioLanguages.size());i++){
+        QString textToDraw=audioLanguages.at(i).toUpper();
 
         if (!textToDraw.isEmpty()){
             if (!font.isEmpty()){
@@ -690,7 +691,7 @@ bool TemplateYadis::execMovie(const QDomElement& e, QPainter &result){
         QDomElement e = n.toElement();
         if(!e.isNull()) {
             if (e.tagName()=="poster"){
-                //      parseMoviePoster(e);
+                 execPoster(e);
             }else if (e.tagName()=="synopsis"){
                 execNode(e,result,Context::movie_synopsis);
             }

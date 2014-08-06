@@ -152,6 +152,19 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     currentSearch.texts[Template::Properties::season]=QVariant(b.season);
     currentSearch.texts[Template::Properties::episode]=QVariant(b.episode);
     currentSearch.texts[Template::Properties::episodetitle]=b.episodeTitle;
+    currentSearch.texts[Template::Properties::network]=b.network;
+
+    if (b.productionYear>1900){
+        currentSearch.texts[Template::Properties::year]=b.productionYear;
+    }
+
+    if (b.runtime>0){
+        currentSearch.texts[Template::Properties::runtime]=QDateTime::fromTime_t(b.runtime).toUTC().toString("h'H 'mm");
+    }
+
+    if (b.rating>0. && b.rating<=10.){
+        currentSearch.texts[Template::Properties::rating]=QString::number(b.rating,'f',1);
+    }
 
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 
@@ -346,6 +359,18 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
     currentSearch.texts[Template::Properties::tv]=QVariant(false);
+
+    if (b.productionYear>1900){
+        currentSearch.texts[Template::Properties::year]=b.productionYear;
+    }
+
+    if (b.runtime>0){
+        currentSearch.texts[Template::Properties::runtime]=QDateTime::fromTime_t(b.runtime).toUTC().toString("h'H 'mm");
+    }
+
+    if (b.rating>0. && b.rating<=10.){
+        currentSearch.texts[Template::Properties::rating]=QString::number(b.rating,'f',1);
+    }
 
     ui->toolButtonRescrap->setIcon(scraper->getIcon());
 

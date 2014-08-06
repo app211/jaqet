@@ -55,7 +55,7 @@ public:
     QStringList actors;
     int productionYear;
     int runtime;
-
+    double rating;
 };
 
 class SearchEpisodeInfo {
@@ -79,6 +79,10 @@ public:
     QString originalShowTitle;
     int productionYear;
     QStringList actors;
+    int runtime;
+    double rating;
+    QStringList directors;
+    QString network;
 
 };
 
@@ -89,12 +93,13 @@ struct FoundResult {
     FoundResult() : isnull(true){
     }
 
-    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code)
+    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code, const QString& year)
         :  isnull(false),
           tv(false),
           code(code),
           scraper(scraper),
-          originalTitle(originalTitle)
+          originalTitle(originalTitle),
+          year(year)
           {
     }
 
@@ -140,6 +145,7 @@ struct FoundResult {
     int season;
     int episode;
     QString originalTitle;
+    QString year;
 
 };
 
@@ -166,7 +172,7 @@ public:
 
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
-    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch) const;
+    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year) const;
     void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
     void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
@@ -178,7 +184,7 @@ public:
     virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,ImageType imageType=ImageType::UNKNOWN) const=0;
 
 protected:
-    virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
+    virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
     virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
     virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;

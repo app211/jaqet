@@ -58,29 +58,9 @@
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
           <layout class="QFormLayout" name="formLayout">
-           <item row="3" column="0">
-            <widget class="QLabel" name="testLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filename :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QTextEdit" name="labelFilename">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="detectedLabel">
              <property name="sizePolicy">
@@ -314,8 +294,31 @@ QRadioButton#radioMovie::indicator::pressed {
              </property>
             </widget>
            </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="testLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filename :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QTextEdit" name="labelFilename">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label">
+            <widget class="QCheckBox" name="checkBoxUseYear">
              <property name="text">
               <string>year</string>
              </property>
@@ -454,6 +457,22 @@ QRadioButton#radioMovie::indicator::pressed {
     <hint type="destinationlabel">
      <x>133</x>
      <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxUseYear</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dateEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>30</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>94</x>
+     <y>138</y>
     </hint>
    </hints>
   </connection>

@@ -36,7 +36,7 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
     return fullQuery;
 }
 
-void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) const
+void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString&, int year) const
 {
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
@@ -438,6 +438,27 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
 
     if (movieObject["media"].isArray()){
         parseMedia(movieObject["media"].toArray(), info.postersHref, info.postersSize,info.backdropsHref,info.backdropsSize );
+
+    }
+
+    info.rating=-1;
+    if (movieObject["statistics"].isObject()){
+        QJsonObject statisticsObject = movieObject["statistics"].toObject();
+        double rating=0;
+        int diviseur=0;
+        if (statisticsObject["userRating"].isDouble()){
+            rating += statisticsObject["userRating"].toDouble();
+            diviseur++;
+        }
+
+        if (statisticsObject["pressRating"].isDouble()){
+            rating += statisticsObject["pressRating"].toDouble();
+            diviseur++;
+        }
+
+        if (diviseur!=0){
+            info.rating=double(2)*rating/double(diviseur);
+        }
     }
 
      return true;

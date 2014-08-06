@@ -46,12 +46,11 @@ public:
 private:
     QMap<QString, QString> texts;
 
-    void parseMoviePoster(const QDomElement& e);
 void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) const;
 
     QString getAbsoluteFilePath(const QString& fileName);
 
-    bool buildPoster(const ScraperResource& poster, QPixmap &pixmap);
+    QPixmap buildPoster(const QPixmap &pixmap, const QSize& size);
     void  proceed(const QFileInfo& f);
     QPixmap createBackdrop();
 
@@ -63,6 +62,7 @@ void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) 
     bool execNode(QDomElement e, QPainter &result, Context context);
     bool execText(const QDomElement& textElement, QPainter &pixPaint, Context context);
     bool execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context);
+    bool execPoster(const QDomElement& e);
     int getX( int x );
     int getY( int y );
 
