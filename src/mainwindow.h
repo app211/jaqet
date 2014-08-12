@@ -37,11 +37,7 @@ private slots:
     void chooseTizzBirdFolder();
      void ctxMenu(const QPoint &pos) ;
 
-    void doubleClicked ( const QModelIndex & index );
-    void setMovieInfo( const SearchMovieInfo&);
-     void buildTvix();
-
-    void s_clicked_texte(QPixmap result);
+    void doubleClicked (const QModelIndex &);
 
  private:
     MyProxyModel* model;

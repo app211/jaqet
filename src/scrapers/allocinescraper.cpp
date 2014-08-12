@@ -304,6 +304,7 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
     result.code=episodeObject["code"].toString();
     result.episodeTitle=episodeObject["title"].toString();
     result.originalEpisodeTitle=episodeObject["originalTitle"].toString();
+//originalBroadcastDate
 
     QJsonArray jsonArray = episodeObject["link"].toArray();
 

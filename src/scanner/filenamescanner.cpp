@@ -235,10 +235,11 @@ QString FileNameScanner::filterBlacklist(const QString &name)
 
     //Remove blacklisted regexp
     foreach(const QString & pattern, REGEXBLACKLIST) {
-        qDebug() << "filterBlacklist" <<pattern;
 
         QRegularExpression reg(pattern);
+        qDebug() << "regex:" <<pattern;
         clean.replace(reg, " ");
+        qDebug() << clean;
     }
 
     clean.replace(".", " ");

@@ -27,7 +27,7 @@ public :
 
     virtual TypeItem getTypeItem(const QModelIndex & index) const=0;
     virtual QStringList getVisibleFileExtensions() const = 0;
-    virtual QFileInfo getFileInfo(const QModelIndex &index){return QFileInfo();}
+    virtual QFileInfo getFileInfo(const QModelIndex &){return QFileInfo();}
     virtual void internalDoubleClicked ( const QModelIndex & index )=0;
 
     virtual void preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset=false)=0;

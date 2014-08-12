@@ -138,10 +138,10 @@ struct FoundResult {
         return episode;
     }
 
+    bool isnull;
     bool tv;
     QString code;
     Scraper *scraper;
-    /*const*/ bool isnull;
     int season;
     int episode;
     QString originalTitle;

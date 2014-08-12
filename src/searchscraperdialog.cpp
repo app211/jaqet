@@ -25,9 +25,10 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     ui->lineEditTitle->setText(fns.getFilteredName(fileInfo));
 
     if (analyse.mediaType.year>=1900){
-        ui->checkBoxUseYear->setChecked(true);
         ui->dateEdit->setDate(QDate(analyse.mediaType.year,1,1));
+        ui->checkBoxUseYear->setChecked(true);
     } else {
+        ui->dateEdit->setDate(QDate());
         ui->checkBoxUseYear->setChecked(false);
     }
 
@@ -82,11 +83,12 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& fou
     }
 
     if (!foundResult.year.isEmpty()){
-        ui->checkBoxUseYear->setChecked(true);
         ui->dateEdit->setDate(QDate(foundResult.year.toInt(),1,1));
-    } else {
+        ui->checkBoxUseYear->setChecked(true);
+     } else {
+        ui->dateEdit->setDate(QDate());
         ui->checkBoxUseYear->setChecked(false);
-    }
+       }
 
 }
 

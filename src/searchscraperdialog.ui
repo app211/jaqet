@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>642</width>
-    <height>267</height>
+    <width>639</width>
+    <height>239</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -56,7 +62,7 @@
          <string>Info</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
+         <item row="1" column="0">
           <layout class="QFormLayout" name="formLayout">
            <property name="fieldGrowthPolicy">
             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -287,14 +293,57 @@ QRadioButton#radioMovie::indicator::pressed {
              </layout>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QDateEdit" name="dateEdit">
-             <property name="displayFormat">
-              <string>yyyy</string>
+           <item row="4" column="1">
+            <widget class="QWidget" name="widget_5" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QCheckBox" name="checkBoxUseYear">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDateEdit" name="dateEdit">
+                <property name="displayFormat">
+                 <string>yyyy</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="testLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -307,21 +356,58 @@ QRadioButton#radioMovie::indicator::pressed {
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QTextEdit" name="labelFilename">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Year :</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBoxUseYear">
-             <property name="text">
-              <string>year</string>
-             </property>
+           <item row="5" column="1">
+            <widget class="QWidget" name="widget_6" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="labelFilename">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="whatsThis">
+                 <string/>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="toolButton_2">
+                <property name="text">
+                 <string>...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -387,12 +473,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>632</x>
-     <y>121</y>
+     <x>629</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
-     <y>244</y>
+     <y>238</y>
     </hint>
    </hints>
   </connection>
@@ -403,8 +489,8 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>533</x>
-     <y>48</y>
+     <x>520</x>
+     <y>51</y>
     </hint>
     <hint type="destinationlabel">
      <x>454</x>
@@ -435,12 +521,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>updateMenu()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>96</y>
+     <x>141</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
      <x>237</x>
-     <y>-8</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -451,8 +537,8 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>updateMenu()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>98</y>
+     <x>170</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
      <x>133</x>
@@ -467,12 +553,12 @@ QRadioButton#radioMovie::indicator::pressed {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>30</x>
-     <y>131</y>
+     <x>119</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
-     <x>94</x>
-     <y>138</y>
+     <x>206</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>

@@ -40,7 +40,7 @@
 
 
 
-void MainWindow::doubleClicked ( const QModelIndex & index){
+void MainWindow::doubleClicked ( const QModelIndex & ){
 
  /*  if (index.isValid()){
         QVariant v=modelB->data(index,Qt::DisplayRole);
@@ -139,34 +139,6 @@ void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* item
 
 
 
-
-void MainWindow::buildTvix() {
-    //b.createTivx(this->manager,_poster, _backdrop,_texts);
-    //   b.canceled();
-}
-
-void MainWindow::s_clicked_texte(QPixmap result){
-  //  ui->labelPoster->setPixmap(result);
-}
-
-
-void MainWindow::setMovieInfo( const SearchMovieInfo& searchMovieInfo){
-
-    this->_texts["synopsis"]=searchMovieInfo.synopsis;
-    this->_texts["actors"]=searchMovieInfo.actors.join(',');
-    this->_texts["directors"]=searchMovieInfo.directors.join(',');
-
-    if (searchMovieInfo.productionYear>0){
-        this->_texts["year"]=QString::number(searchMovieInfo.productionYear);
-    }
-
-    if (searchMovieInfo.runtime>0){
-        this->_texts["runtime"]=QString::number(searchMovieInfo.runtime);
-    }
-
-    buildTvix();
-
-}
 
 
 
