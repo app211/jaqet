@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>PanelView</class>
  <widget class="QWidget" name="PanelView">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -142,90 +145,173 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-           <widget class="QTabWidget" name="tabWidget_2">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="tab_2">
-             <attribute name="title">
-              <string>Tab 1</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="4" column="3">
-               <widget class="QToolButton" name="castToolButton">
-                <property name="text">
-                 <string>...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="directorLineEdit"/>
-              </item>
-              <item row="4" column="1" colspan="2">
-               <widget class="QListWidget" name="castListWidget"/>
-              </item>
-              <item row="2" column="3">
-               <widget class="QToolButton" name="directorToolButton">
-                <property name="text">
-                 <string>...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Cast</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>Director</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QToolButton" name="toolButtonSysnopsis">
-                <property name="text">
-                 <string>...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="3">
-               <widget class="QLabel" name="labelUrl">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>TextLabel</string>
-                </property>
-                <property name="openExternalLinks">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="3">
-               <widget class="QTextEdit" name="synopsis"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_3">
-             <attribute name="title">
-              <string>Tab 2</string>
-             </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_6">
-              <item>
-               <widget class="QGraphicsView" name="graphicsViewPosters"/>
-              </item>
-             </layout>
-            </widget>
-           </widget>
-           <widget class="QGraphicsView" name="graphicsView"/>
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>Tab 1</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="9" column="4">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Duration</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="5">
+             <widget class="QLineEdit" name="lineEdit_2"/>
+            </item>
+            <item row="4" column="0" rowspan="5">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Cast</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="7">
+             <widget class="QLabel" name="labelUrl">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+              <property name="openExternalLinks">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <widget class="QLineEdit" name="yearEdit"/>
+            </item>
+            <item row="4" column="2" rowspan="4" colspan="4">
+             <widget class="QListWidget" name="castListWidget">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="6">
+             <widget class="QToolButton" name="toolButton_2">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="6">
+             <widget class="QTextEdit" name="synopsis">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="6">
+             <widget class="QToolButton" name="toolButton_3">
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset theme="list-add">
+                <normaloff/>
+               </iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Director(s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="3">
+             <widget class="QToolButton" name="toolButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Year</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="6">
+             <widget class="QToolButton" name="toolButtonSysnopsis">
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="6">
+             <widget class="QToolButton" name="actionCastRemove">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset theme="list-remove">
+                <normaloff/>
+               </iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2" colspan="4">
+             <widget class="QListWidget" name="directorlistWidget">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="6">
+             <widget class="QToolButton" name="directorToolButton">
+              <property name="text">
+               <string>...</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Tab 2</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QGraphicsView" name="graphicsViewPosters"/>
+            </item>
+           </layout>
+          </widget>
          </widget>
+         <widget class="QGraphicsView" name="graphicsView"/>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -247,13 +333,13 @@
  <connections>
   <connection>
    <sender>ProceedToolButton</sender>
-   <signal>pressed()</signal>
+   <signal>toggled(bool)</signal>
    <receiver>PanelView</receiver>
    <slot>proceed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>835</x>
-     <y>43</y>
+     <x>927</x>
+     <y>55</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -277,9 +363,76 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>castListWidget</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>PanelView</receiver>
+   <slot>enableCastRemove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>551</x>
+     <y>495</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>directorToolButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>directorlistWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>923</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>810</x>
+     <y>306</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButtonSysnopsis</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>PanelView</receiver>
+   <slot>enableSynopsis(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>912</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCastRemove</sender>
+   <signal>pressed()</signal>
+   <receiver>PanelView</receiver>
+   <slot>castRemove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>902</x>
+     <y>471</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>proceed()</slot>
   <slot>rescrap()</slot>
+  <slot>enableCastRemove()</slot>
+  <slot>enableSynopsis(bool)</slot>
+  <slot>castRemove()</slot>
  </slots>
 </ui>

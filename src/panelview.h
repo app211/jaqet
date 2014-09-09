@@ -101,6 +101,9 @@ private slots:
     void setBanner(const QString& url, const Scraper *scrape);
     void proceed();
     void rescrap();
+    void enableCastRemove();
+    void castRemove();
+    void enableSynopsis(bool enable);
 
     // From Engine
     void previewOK(QGraphicsScene*);

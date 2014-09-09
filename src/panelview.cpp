@@ -28,6 +28,7 @@ static QPixmap createDefaultPoster(int w, int h){
     return result;
 }
 
+
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelView)
@@ -79,6 +80,29 @@ PanelView::PanelView(QWidget *parent) :
 PanelView::~PanelView()
 {
     delete ui;
+}
+
+void PanelView::enableCastRemove(){
+    if(ui->castListWidget->currentItem() && ui->castListWidget->currentItem()->isSelected() == true)
+         ui->actionCastRemove->setEnabled(true);
+     else
+         ui->actionCastRemove->setEnabled(false);
+}
+
+void PanelView::castRemove(){
+    qDeleteAll(ui->castListWidget->selectedItems());
+
+    QStringList castList;
+    for(int i = 0 ; i < ui->castListWidget->count() ; i++)
+    {
+       QListWidgetItem *item = ui->castListWidget->item(i);
+       if (item){
+           castList << item->text();
+       }
+    }
+
+    setCast(castList);
+    rebuildTemplate();
 }
 
 void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
@@ -173,25 +197,29 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     ui->stackedWidget->setCurrentIndex(1);
     ui->synopsis->setText(b.synopsis);
-    ui->toolButtonSysnopsis->disconnect();
 
     ui->castListWidget->clear();
-    for (const QString& actor : b.actors){
-        ui->castListWidget->addItem(actor);
+    ui->castListWidget->addItems(b.actors);
+
+    ui->directorlistWidget->clear();
+    for (const QString& director : b.directors){
+        ui->directorlistWidget->addItem(director);
     }
 
-    ui->castToolButton->disconnect();
+    /*ui->castToolButton->disconnect();
     QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
     {
         setCast(b.actors);
         rebuildTemplate();
     });
+*/
+  /*   ui->toolButtonSysnopsis->disconnect();
 
-    QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
+ QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
         setSynopsis(b.synopsis);
         rebuildTemplate();
-    });
+    });*/
 
     ui->labelEpisodeTitle->setText(b.title);
 
@@ -401,23 +429,27 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         ui->castListWidget->addItem(actor);
     }
 
-    ui->castToolButton->disconnect();
+    ui->directorlistWidget->clear();
+    for (const QString& director : b.directors){
+        ui->directorlistWidget->addItem(director);
+    }
+    /*ui->castToolButton->disconnect();
     QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
     {
         setCast(b.actors);
         rebuildTemplate();
     });
-
+*/
     //  ui->directorLineEdit->setText(b.directors);
 
 
-    ui->toolButtonSysnopsis->disconnect();
+ /*   ui->toolButtonSysnopsis->disconnect();
     QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
         setSynopsis(b.synopsis);
         rebuildTemplate();
     });
-
+*/
     ui->directorToolButton->disconnect();
     QObject::connect(ui->directorToolButton, &QPushButton::released, [=]()
     {
@@ -441,6 +473,16 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     ui->graphicsViewPosters->setScene(scene);
 
     rebuildTemplate(true);
+}
+
+
+void  PanelView::enableSynopsis(bool enable){
+    this->ui->synopsis->setReadOnly(!enable);
+
+    if (!enable){
+        setSynopsis(this->ui->synopsis->toPlainText());
+        rebuildTemplate();
+    }
 }
 
 void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
