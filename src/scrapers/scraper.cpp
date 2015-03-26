@@ -64,14 +64,14 @@ void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movi
 
     p=InProgressDialog::create();
 
-    internalFindMovieInfo(manager,  movieCode);
+    internalFindMovieInfo(manager,  movieCode,"fr");
 }
 
 void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
 
     p=InProgressDialog::create();
 
-    internalFindEpisodeInfo(manager, showCode, season,  episode);
+    internalFindEpisodeInfo(manager, showCode, season,  episode,"fr");
 }
 
 

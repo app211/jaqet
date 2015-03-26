@@ -361,7 +361,7 @@ bool parseLanguageList( const QByteArray& data)
 }
 
 
-void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const {
+void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString &language) const {
     emit scraperError("Unsupported Operation");
 }
 
@@ -599,7 +599,7 @@ bool parseActors(const QByteArray &data, SearchEpisodeInfo& result){
 }
 
 
-void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const {
 
     QString lang="fr";
     QString command=QString::fromLatin1( "%1/series/%2/all/%3.zip" ).arg(API_KEY).arg( showCode ).arg( lang ) ;

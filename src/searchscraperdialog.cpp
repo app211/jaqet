@@ -20,7 +20,7 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     init(scrapers);
 
     FileNameScanner fns;
-    analyse=fns.analyze(fileInfo);
+    Scanner::AnalysisResult analyse=fns.analyze(fileInfo);
 
     ui->lineEditTitle->setText(fns.getFilteredName(fileInfo));
 
@@ -150,13 +150,16 @@ void SearchScraperDialog::found(FilmPrtList result){
         FilmPrtList candidates;
 
         // Filter result by year
-        if (analyse.mediaType.year>=1900){
+        if (ui->checkBoxUseYear->isChecked()){
+            QDate d=ui->dateEdit->date();
+            if( d.isValid() && d.year()>=1900){
             for (FilmPtr film : result){
                 bool bOk;
                 int productionYear= film->productionYear.toInt(&bOk);
-                if (bOk && productionYear==analyse.mediaType.year){
+                if (bOk && productionYear==d.year()){
                     candidates.append(film);
                 }
+            }
             }
         }
 
@@ -186,7 +189,7 @@ void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
 
 void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, showPtr->originalTitle, showPtr->code, analyse.mediaType.season, analyse.mediaType.episode);
+        result= FoundResult(scraper, showPtr->originalTitle, showPtr->code, ui->spinBoxSeason->value(), ui->spinBoxEpisode->value());
         done(QDialog::Accepted);
     }
 }

@@ -186,8 +186,8 @@ public:
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
-    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const=0;
-    virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const=0;
+    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const=0;
+    virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const=0;
 
 public slots:
     void closeDialog();

@@ -88,7 +88,7 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     });
 }
 
-void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const{
+void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const{
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
     params["code"]=QUrl::toPercentEncoding(movieCode);
@@ -121,7 +121,7 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, con
 }
 
 
-void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString &language) const {
 
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(showCode);

@@ -24,7 +24,6 @@ public:
 private:
     Ui::SearchScraperDialog *ui;
     QNetworkAccessManager* m_manager;
-    Scanner::AnalysisResult analyse;
     void accept(Scraper *scraper, FilmPtr filmPtr) ;
     void accept(Scraper *scraper, ShowPtr showPtr);
     void init(QList<Scraper*> scrapers);

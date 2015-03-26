@@ -50,7 +50,7 @@ void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const 
                 if (!parseConfiguration(doc)){
                     emit scraperError();
                 } else {
-                    searchTVConfigurationOk(manager,toSearch);
+                    searchTVConfigurationOk(manager,toSearch, language);
                 }
             } else {
                 emit scraperError(e.errorString());
@@ -73,7 +73,7 @@ void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const
             QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
             if (e.error== QJsonParseError::NoError){
                 if (parseConfiguration(doc)){
-                    searchFilmConfigurationOk(manager,toSearch, year);
+                    searchFilmConfigurationOk(manager,toSearch, year, language);
                 } else {
                     emit scraperError();
                 }
@@ -86,10 +86,10 @@ void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const
     });
 }
 
-void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, const QString& movieCode) const {
+void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, const QString& movieCode, const QString &language) const {
 
     QMap<QString,QString> params;
-    params["language"]="fr";
+    params["language"]=language;
     params["append_to_response"]="credits";
 
     QString url=createURL(QString("movie/%1").arg(movieCode),params);
@@ -117,10 +117,10 @@ void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, c
     });
 }
 
-void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString &language) const {
 
     QMap<QString,QString> params;
-    //  params["language"]="fr";
+    params["language"]=language;
 
 
     QString url=createURL(QString("tv/%1/season/%2/episode/%3").arg(showCode).arg(season).arg(episode),params);
@@ -150,7 +150,7 @@ void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, 
     });
 }
 
-void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch) {
+void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) {
     QMap<QString,QString> params;
 
     QByteArray headerData;
@@ -159,7 +159,7 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
     headerData.clear();
     data.clear();
     params["query"]=QUrl::toPercentEncoding(toSearch);
-    params["language"]="fr";
+    params["language"]=language;
 
     QString url=createURL("search/tv",params);
     Promise* promise=Promise::loadAsync(*manager, url);
@@ -180,11 +180,12 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
     });
 }
 
-void TheMovieDBScraper::searchFilmConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch, int year) {
+void TheMovieDBScraper::searchFilmConfigurationOk(QNetworkAccessManager* manager, const QString& toSearch, int year, const QString &language) {
 
     QMap<QString,QString> params;
     params["query"]=QUrl::toPercentEncoding(toSearch);
-    params["language"]="fr";
+    params["language"]=language;
+
     if (year>0){
         params["year"]=QString::number(year);
     }
@@ -486,6 +487,7 @@ bool TheMovieDBScraper::parseEpisodeInfo(const QJsonDocument& resultset, SearchE
     info.synopsis = episodeObject["overview"].toString();
     info.season = episodeObject["season_number"].toInt();
     info.episode= episodeObject["episode_number"].toInt();
+    info.rating = episodeObject["vote_average"].toDouble();
     return true;
 }
 
@@ -516,6 +518,8 @@ bool TheMovieDBScraper::parseCreditInfo(const QJsonDocument& resultset, SearchEp
             }
         }
     }
+
+    return true;
 }
 
 bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const{

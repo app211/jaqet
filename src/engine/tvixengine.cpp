@@ -23,26 +23,25 @@ void TVIXEngine::init(const QString& path){
     b.loadTemplate("/home/teddy/Developpement/templates/Origins/template.xml");
 #endif
 
-    visibleFileExtensions = { "*.asf"
-                              ,"*.avi"
-                              ,"*.dat"
-                              ,"*.divx"
-                              ,"*.ifo"
-                              ,"*.iso"
-                              ,"*.m2v"
-                              ,"*.mkv"
-                              ,"*.mpeg"
-                              ,"*.mpg"
-                              ,"*.tp"
-                              ,"*.trp"
-                              ,"*.ts"
-                              ,"*.vob"
-                              ,"*.wmv"
-                              ,"*.wvx"
-                              ,"*.xvid",
+    visibleFileExtensions << "*.asf"
+                              <<"*.avi"
+                              <<"*.dat"
+                              <<"*.divx"
+                              <<"*.ifo"
+                              <<"*.iso"
+                              <<"*.m2v"
+                              <<"*.mkv"
+                              <<"*.mpeg"
+                              <<"*.mpg"
+                              <<"*.tp"
+                              <<"*.trp"
+                              <<"*.ts"
+                              <<"*.vob"
+                              <<"*.wmv"
+                              <<"*.wvx"
+                              <<"*.xvid"<<
                               "*.mp4"
-                            ,"*.wma"
-                            };
+                            <<"*.wma";
 
     FileEngine::init(path);
 

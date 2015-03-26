@@ -18,8 +18,8 @@ private:
 protected:
     void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const;
 
     QString postMirrorCreateURL(const QString& , const QMap<QString, QString>& params) const;
 
