@@ -353,6 +353,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=properties[Template::Properties::network].toString();
     }
 
+    qDebug() << type << textToDraw;
+
     if (!textToDraw.isEmpty()){
         QFont _font(font);
         if (size>0){
@@ -369,8 +371,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         }
 
         pixPaint.drawText(getX(x),getY(y),w,h,_align|Qt::TextWordWrap|Qt::AlignTop,textToDraw);
-
-#ifdef QT_DEBUG
+/*
         const QPointF points[4] = {
             QPointF(getX(x) ,getY(y)),
             QPointF(getX(x+w),getY( y)),
@@ -380,8 +381,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
 
         pixPaint.setPen(QPen(Qt::red));
         pixPaint.drawPolygon(points,4);
-#endif
-
+*/
     }
 
     return true;

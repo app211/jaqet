@@ -77,7 +77,7 @@ public:
     int episode;
     QString showTitle;
     QString originalShowTitle;
-    int productionYear;
+    int productionYear=0;
     QStringList actors;
     int runtime;
     double rating;
@@ -103,14 +103,11 @@ struct FoundResult {
           {
     }
 
-    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code, int season, int episode)
+    FoundResult(Scraper *scraper, const Show& show)
         : isnull(false),
           tv(true),
-          code(code),
           scraper(scraper),
-          season(season),
-          episode(episode),
-          originalTitle(originalTitle)
+          show( show)
     {
     }
 
@@ -146,7 +143,7 @@ struct FoundResult {
     int episode;
     QString originalTitle;
     QString year;
-
+    Show show;
 };
 
 

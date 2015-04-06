@@ -169,9 +169,11 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
     }
 }
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
+
+    currentSearch.texts.clear();
+
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
-    currentSearch.texts[Template::Properties::year]=b.productionYear;
     currentSearch.texts[Template::Properties::tv]=QVariant(true);
     currentSearch.texts[Template::Properties::season]=QVariant(b.season);
     currentSearch.texts[Template::Properties::episode]=QVariant(b.episode);
@@ -179,7 +181,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     currentSearch.texts[Template::Properties::network]=b.network;
 
     if (b.productionYear>1900){
-        currentSearch.texts[Template::Properties::year]=b.productionYear;
+        currentSearch.texts[Template::Properties::year]=QString::number(b.productionYear);
     }
 
     if (b.runtime>0){

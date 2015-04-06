@@ -189,7 +189,7 @@ void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
 
 void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, showPtr->originalTitle, showPtr->code, ui->spinBoxSeason->value(), ui->spinBoxEpisode->value());
+        result= FoundResult(scraper, *showPtr.data());
         done(QDialog::Accepted);
     }
 }
