@@ -24,8 +24,8 @@ public:
 private:
     Ui::SearchScraperDialog *ui;
     QNetworkAccessManager* m_manager;
-    void accept(Scraper *scraper, FilmPtr filmPtr) ;
-    void accept(Scraper *scraper, ShowPtr showPtr);
+    void accept(Scraper *scraper, const FilmPtr& filmPtr) ;
+    void accept(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode);
     void init(QList<Scraper*> scrapers);
 
     FoundResult result;

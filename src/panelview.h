@@ -5,6 +5,8 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsProxyWidget>
+
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
 #include "engine/template/template.h"
@@ -63,6 +65,7 @@ private:
     struct M_M {
         QString url;
         QGraphicsPixmapItem* itemToUpdate;
+        QGraphicsProxyWidget* busyIndicator;
         int x;
         int y;
         int w;
@@ -81,7 +84,7 @@ private:
     void setDirectors(const QStringList& directors);
     void addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
 
-    void addRequest( QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
+    void addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h, QGraphicsProxyWidget *busyIndicator);
     void startPromise( QNetworkAccessManager* manager);
 
 private slots:

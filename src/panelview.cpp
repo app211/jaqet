@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QGraphicsProxyWidget>
 #include <QPushButton>
+#include <QMovie>
 
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
@@ -168,6 +169,7 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
         }
     }
 }
+
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     currentSearch.texts.clear();
@@ -261,7 +263,15 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
             QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
             pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-            this->addRequest(manager,realUrl, pi,  x,  y,  w,  h);
+            QLabel *gif_anim = new QLabel();
+            QMovie *movie = new QMovie(":/resources/animations/busy-1.gif");
+            gif_anim->setMovie(movie);
+            movie->start();
+
+            QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
+            proxy->setPos(x+(w-32)/2,y+(h-32)/2);
+
+            this->addRequest(manager,realUrl, pi,  x,  y,  w,  h, proxy);
 
             QPushButton* b = new QPushButton("Plus");
 
@@ -281,18 +291,6 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     ui->graphicsViewPosters->setScene(scene);
 
     rebuildTemplate(true);
-}
-
-
-#include <QTime>
-
-void delay( int millisecondsToWait )
-{
-    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
-    {
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-    }
 }
 
 void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type){
@@ -319,7 +317,15 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
         QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
         pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
-        addRequest(manager,realUrl, pi,  x,  y,  w,  h);
+        QLabel *gif_anim = new QLabel();
+        QMovie *movie = new QMovie(":/resources/animations/busy-1.gif");
+        gif_anim->setMovie(movie);
+        movie->start();
+
+        QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
+        proxy->setPos(x+(w-32)/2,y+(h-32)/2);
+
+        addRequest(manager,realUrl, pi,  x,  y,  w,  h,proxy);
 
         QPushButton* b = new QPushButton("Plus");
 
@@ -355,6 +361,9 @@ void PanelView::startPromise( QNetworkAccessManager* manager){
 
     QObject::connect(currentPromise, &Promise::completed, [=]()
     {
+        if (url.busyIndicator!=nullptr){
+            url.busyIndicator->setVisible(false);
+        }
         if (currentPromise->reply->error() ==QNetworkReply::NoError){
             QByteArray qb=currentPromise->reply->readAll();
             setImageFromInternet(qb,url.itemToUpdate,url.x,url.y,url.w,url.h);
@@ -369,7 +378,7 @@ void PanelView::startPromise( QNetworkAccessManager* manager){
 
 }
 
-void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
+void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h,  QGraphicsProxyWidget *busyIndicator){
     M_M f;
     f.h=h;
     f.itemToUpdate=itemToUpdate;
@@ -377,6 +386,7 @@ void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url, 
     f.w=w;
     f.x=x;
     f.y=y;
+    f.busyIndicator=busyIndicator;
     urls.append(f);
     startPromise(&manager);
 }
@@ -384,9 +394,7 @@ void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url, 
 
 void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
-    urls.clear();
-
-    currentSearch.texts[Template::Properties::title]=b.title;
+      currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
     currentSearch.texts[Template::Properties::tv]=QVariant(false);
 
@@ -458,9 +466,10 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         setDirectors(b.directors);
         rebuildTemplate();
     });
-    scene->clear();
 
     ui->graphicsViewPosters->setScene(nullptr);
+
+    scene->clear();
 
     int x=0;
     int y=20;
@@ -517,7 +526,7 @@ void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemT
 }
 
 
-void PanelView::setBanner(const QString& url, const Scraper *_currentScrape){
+void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
     currentSearch._banner=ScraperResource(url,QSize(),_currentScrape);
 
     if (!currentSearch._banner.resources.isEmpty()){

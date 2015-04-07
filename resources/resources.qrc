@@ -28,5 +28,6 @@
         <file alias="DownloadIcon.png">images/arrow416.png</file>
         <file alias="Proceed.png">images/auto32.png</file>
         <file alias="Edit.png">images/edit_icon.png</file>
+        <file>animations/busy-1.gif</file>
     </qresource>
 </RCC>

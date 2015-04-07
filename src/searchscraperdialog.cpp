@@ -72,18 +72,18 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& fou
 
     init(scrapers);
 
-    ui->lineEditTitle->setText(foundResult.originalTitle);
+    ui->lineEditTitle->setText(foundResult.getOriginalTitle());
 
     if (foundResult.isTV()){
         ui->radioTV->setChecked(true);
-        ui->spinBoxSeason->setValue(foundResult.season);
-        ui->spinBoxEpisode->setValue(foundResult.episode);
+        ui->spinBoxSeason->setValue(foundResult.getSeason());
+        ui->spinBoxEpisode->setValue(foundResult.getEpisode());
     } else {
         ui->radioMovie->setChecked(true);
     }
 
-    if (!foundResult.year.isEmpty()){
-        ui->dateEdit->setDate(QDate(foundResult.year.toInt(),1,1));
+    if (!foundResult.getProductionYear().isEmpty()){
+        ui->dateEdit->setDate(QDate(foundResult.getProductionYear().toInt(),1,1));
         ui->checkBoxUseYear->setChecked(true);
      } else {
         ui->dateEdit->setDate(QDate());
@@ -180,16 +180,16 @@ void SearchScraperDialog::found(FilmPrtList result){
     }
 }
 
-void SearchScraperDialog::accept(Scraper *scraper, FilmPtr filmPtr) {
+void SearchScraperDialog::accept(Scraper *scraper, const FilmPtr& filmPtr) {
     if (!filmPtr.isNull()){
-        result= FoundResult(scraper, filmPtr->originalTitle, filmPtr->code, filmPtr->productionYear);
+        result= FoundResult(scraper, filmPtr);
         done(QDialog::Accepted);
     }
 }
 
-void SearchScraperDialog::accept(Scraper *scraper, ShowPtr showPtr) {
+void SearchScraperDialog::accept(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, *showPtr.data());
+        result= FoundResult(scraper, showPtr,season,episode);
         done(QDialog::Accepted);
     }
 }
@@ -201,10 +201,10 @@ void SearchScraperDialog::found(ShowPtrList shows){
         ChooseItemDialog ch;
         ch.setList(shows);
         if (ch.exec()==QDialog::Accepted){
-            accept(scraper, ch.getSelectedShow());
+            accept(scraper, ch.getSelectedShow(),ui->spinBoxSeason->value(),ui->spinBoxEpisode->value());
         }
     } else if (shows.size()==1){
-        accept(scraper, shows.at(0));
+        accept(scraper, shows.at(0), ui->spinBoxSeason->value(),ui->spinBoxEpisode->value());
     } else {
         QMessageBox::information(this, tr("My Application"),
                                  tr("Nothing found"));

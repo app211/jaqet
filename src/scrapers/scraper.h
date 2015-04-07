@@ -90,60 +90,62 @@ class Scraper;
 
 struct FoundResult {
 
-    FoundResult() : isnull(true){
+    FoundResult() {
     }
 
-    FoundResult(Scraper *scraper, const QString& originalTitle, const QString& code, const QString& year)
-        :  isnull(false),
-          tv(false),
-          code(code),
+    FoundResult(Scraper *scraper, const FilmPtr& filmPtr)
+        :
           scraper(scraper),
-          originalTitle(originalTitle),
-          year(year)
-          {
+          filmPtr(filmPtr)
+    {
     }
 
-    FoundResult(Scraper *scraper, const Show& show)
-        : isnull(false),
-          tv(true),
-          scraper(scraper),
-          show( show)
+    FoundResult(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode)
+        : scraper(scraper),
+          showPtr( showPtr)
+        , season(season)
+        ,episode(episode)
     {
     }
 
     bool isNull() const {
-        return isnull;
+        return showPtr.isNull() && filmPtr.isNull();
     }
 
     bool isTV() const {
-        return tv;
+        return !showPtr.isNull();
     }
 
     QString getCode() const {
-        return code;
+        return isNull()?"":(isTV()?showPtr->code:filmPtr->code);
     }
 
+    QString getOriginalTitle() const {
+        return isNull()?"":(isTV()?showPtr->originalTitle:filmPtr->originalTitle);
+
+    }
     Scraper *getScraper() const {
         return scraper;
     }
 
-    int getSeason(){
-        return season;
+    int getSeason() const{
+        return isTV()?season:-1;
     }
 
-    int getEpisode(){
-        return episode;
+    int getEpisode() const{
+        return  isTV()?episode:-1;
     }
 
-    bool isnull;
-    bool tv;
-    QString code;
+    QString getProductionYear() const{
+        return isNull()?"":(isTV()?showPtr->productionYear:filmPtr->productionYear);
+
+    }
+
     Scraper *scraper;
     int season;
     int episode;
-    QString originalTitle;
-    QString year;
-    Show show;
+    ShowPtr showPtr;
+    FilmPtr filmPtr;
 };
 
 
