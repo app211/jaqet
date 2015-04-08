@@ -60,11 +60,11 @@ void Scraper::showErrorDialog(const QString& error){
     msgBox.exec();
 }
 
-void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const {
+void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor) const {
 
     p=InProgressDialog::create();
 
-    internalFindMovieInfo(manager,  movieCode,"fr");
+    internalFindMovieInfo(manager,  movieCode, searchFor, "fr");
 }
 
 void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {

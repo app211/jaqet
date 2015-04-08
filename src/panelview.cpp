@@ -161,7 +161,7 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
             if (!fd.getResult().isNull()){
                 currentSearch.fd=fd.getResult();
                 if (!fd.getResult().isTV()){
-                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
+                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::Poster);
                 } else {
                     fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
                 }
@@ -709,7 +709,7 @@ void PanelView::rescrap() {
     if (fd.exec()==QDialog::Accepted){
         if (!fd.getResult().isNull()){
             if (!fd.getResult().isTV()){
-                fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode());
+                fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::Poster);
             } else {
                 fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
             }

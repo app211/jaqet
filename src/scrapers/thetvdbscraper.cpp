@@ -361,7 +361,7 @@ bool parseLanguageList( const QByteArray& data)
 }
 
 
-void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString &language) const {
+void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager* , const QString&, const SearchFor&, const QString&) const {
     emit scraperError("Unsupported Operation");
 }
 

@@ -16,13 +16,13 @@ class TheMovieDBScraper: public Scraper
     bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
     bool parseEpisodeInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info, const int season, const int episode) const;
 
-    void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode,  SearchMovieInfo &result) const;
+    void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode, const SearchFor &searchFor,  SearchMovieInfo &result) const;
     void findEpisodeInfoGetImage(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
     void findEpisodeInfoGetCredit(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
 
 
-    bool parseImageInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
-    bool parseImageInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const;
+    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, SearchMovieInfo& info) const;
+    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, SearchEpisodeInfo& info) const;
     bool parseCreditInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const;
 
     QStringList posterSizes;
@@ -34,7 +34,7 @@ class TheMovieDBScraper: public Scraper
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor, const QString& language) const;
     void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const ;
 
 public:

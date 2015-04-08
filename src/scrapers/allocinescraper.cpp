@@ -88,12 +88,17 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     });
 }
 
-void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const{
+void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) const{
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
     params["code"]=QUrl::toPercentEncoding(movieCode);
-   params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
-           params["profile"]=QUrl::toPercentEncoding("large");
+    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+
+    if (searchFor & SearchOption::Image){
+        params["profile"]=QUrl::toPercentEncoding("large");
+    } else {
+        params["profile"]=QUrl::toPercentEncoding("medium");
+    }
 
     QString url=createURL("rest/v3/movie",params);
     Promise* promise=Promise::loadAsync(*manager,url);
@@ -106,7 +111,7 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, con
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 SearchMovieInfo rseult;
-                if(parseMovieInfo(manager,doc,rseult)){
+                if(parseMovieInfo(manager,doc,searchFor,rseult)){
                     emit found(this, rseult);
                 } else {
                     emit scraperError();
@@ -258,31 +263,36 @@ void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager,const 
     });
 }
 
-bool parseMedia(const QJsonArray& mediaArray, QStringList& postersHref, QList<QSize>& postersSize, QStringList& backdropsHref, QList<QSize>& backdropsSize ){
+bool parseMedia(const QJsonArray& mediaArray,const Scraper::SearchFor& searchFor, QStringList& postersHref, QList<QSize>& postersSize, QStringList& backdropsHref, QList<QSize>& backdropsSize ){
 
-    foreach (const QJsonValue & value, mediaArray)
-    {
-        QJsonObject media = value.toObject();
-        if (media["class"]=="picture"){
-            if (media["type"].isObject()){
-                QJsonObject typeObject = media["type"].toObject();
-                if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
-                    QJsonObject thumbnailObject=media["thumbnail"].toObject();
-                    if (thumbnailObject["href"].isString()){
-                        qDebug() << thumbnailObject["href"].toString() << thumbnailObject["path"].toString();
-                        if (typeObject["$"].toString()=="Affiche"){
-                            postersHref.append(thumbnailObject["href"].toString());
-                            postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
-                        } else {
-                            backdropsHref.append(thumbnailObject["href"].toString());
-                            backdropsSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
+    if (searchFor & Scraper::SearchOption::Image){
+        foreach (const QJsonValue & value, mediaArray)
+        {
+            QJsonObject media = value.toObject();
+            if (media["class"]=="picture"){
+                if (media["type"].isObject()){
+                    QJsonObject typeObject = media["type"].toObject();
+                    if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
+                        QJsonObject thumbnailObject=media["thumbnail"].toObject();
+                        if (thumbnailObject["href"].isString()){
+                            qDebug() << thumbnailObject["href"].toString() << thumbnailObject["path"].toString();
+                            if (typeObject["$"].toString()=="Affiche"){
+                                if (searchFor & Scraper::SearchOption::Poster){
+                                    postersHref.append(thumbnailObject["href"].toString());
+                                    postersSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
+                                }
+                            } else {
+                                if (searchFor & Scraper::SearchOption::BackDrop){
+                                    backdropsHref.append(thumbnailObject["href"].toString());
+                                    backdropsSize.append(QSize(media["width"].toInt(), media["height"].toInt()));
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-
     return true;
 }
 
@@ -304,7 +314,7 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
     result.code=episodeObject["code"].toString();
     result.episodeTitle=episodeObject["title"].toString();
     result.originalEpisodeTitle=episodeObject["originalTitle"].toString();
-//originalBroadcastDate
+    //originalBroadcastDate
 
     QJsonArray jsonArray = episodeObject["link"].toArray();
 
@@ -323,7 +333,7 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
     }
 
     if (episodeObject["media"].isArray()){
-        parseMedia(episodeObject["media"].toArray(), result.postersHref, result.postersSize,result.backdropsHref,result.backdropsSize );
+        parseMedia(episodeObject["media"].toArray(), Scraper::SearchOption::All, result.postersHref, result.postersSize,result.backdropsHref,result.backdropsSize );
     }
 
     if (episodeObject["castMember"].isArray()){
@@ -335,7 +345,7 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
             if (cast["person"].isObject() && cast["activity"].isObject()){
                 if (cast["activity"].toObject()["$"]=="Acteur"){
                     result.actors.append(cast["person"].toObject()["name"].toString());
-               }
+                }
             }
         }
     }
@@ -406,7 +416,7 @@ void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, cons
 }
 
 
-bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, SearchMovieInfo& info) const{
+bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor& searchFor, SearchMovieInfo &info) const{
 
     if (!resultset.isObject()){
         return false;
@@ -438,8 +448,9 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     }
 
     if (movieObject["media"].isArray()){
-        parseMedia(movieObject["media"].toArray(), info.postersHref, info.postersSize,info.backdropsHref,info.backdropsSize );
-
+        if (searchFor & SearchOption::Image){
+            parseMedia(movieObject["media"].toArray(), searchFor, info.postersHref, info.postersSize,info.backdropsHref,info.backdropsSize );
+        }
     }
 
     info.rating=-1;
@@ -462,21 +473,21 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
         }
     }
 
-     return true;
+    return true;
 }
 
 
 QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
 
     if (!originalSize.isNull() && size.expandedTo(originalSize)==size){
-       return filePath;
-   } else {
+        return filePath;
+    } else {
 
-    QUrl url(filePath);
-    QSize scaledSize = originalSize.scaled(size, Qt::KeepAspectRatio);
+        QUrl url(filePath);
+        QSize scaledSize = originalSize.scaled(size, Qt::KeepAspectRatio);
 
-    // Cf. https://raw.githubusercontent.com/etienne-gauvin/api-allocine-helper/master/AlloImage.class.php
-    return QString("http://%1/r_%2_%3%4").arg("fr.web.img5.acsta.net").arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
+        // Cf. https://raw.githubusercontent.com/etienne-gauvin/api-allocine-helper/master/AlloImage.class.php
+        return QString("http://%1/r_%2_%3%4").arg("fr.web.img5.acsta.net").arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
     }
 }
 

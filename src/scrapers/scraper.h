@@ -160,6 +160,18 @@ public:
         TV = 0x0002
     };
 
+    enum SearchOption {
+        Information = 1,
+        Poster = 2,
+        BackDrop = 4,
+        Banner = 8,
+        Image = Poster | BackDrop | Banner,
+        All = Information | Image
+
+    };
+
+    Q_DECLARE_FLAGS(SearchFor, SearchOption)
+
     Scraper(QObject *parent=0);
 
     virtual bool haveCapability(const SearchCapabilities capability) const{
@@ -173,7 +185,7 @@ public:
 
     void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year) const;
     void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
-    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode) const;
+    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor) const;
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
 
     enum class ImageType {
@@ -185,7 +197,7 @@ public:
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
-    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const QString& language) const=0;
+    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) const=0;
     virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const=0;
 
 public slots:
@@ -201,6 +213,8 @@ Q_SIGNALS:
     void found(const Scraper* scraper,SearchEpisodeInfo films) const;
     void progress(const QString& progressInfo) const;
  };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Scraper::SearchFor)
 
 
 class ScraperResource {
