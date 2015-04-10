@@ -44,7 +44,8 @@ SOURCES += src/main.cpp\
     src/engine/tvixengine.cpp \
     src/engine/fileengine.cpp \
     src/engine/fileenginefilesystemwatcher.cpp \
-    src/utils.cpp
+    src/utils.cpp \
+    src/scrapers/defaultscraper.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -72,7 +73,8 @@ HEADERS  += src/mainwindow.h \
     src/engine/tvixengine.h \
     src/engine/fileengine.h \
     src/engine/fileenginefilesystemwatcher.h \
-    src/utils.h
+    src/utils.h \
+    src/scrapers/defaultscraper.h
 
 
 FORMS    += src/mainwindow.ui \

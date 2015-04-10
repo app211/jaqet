@@ -34,8 +34,8 @@ class TheMovieDBScraper: public Scraper
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor, const QString& language) const;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const ;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor, const QString& language) ;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor &searchFor, const QString& language)  ;
 
 public:
     TheMovieDBScraper(QObject *parent=0);

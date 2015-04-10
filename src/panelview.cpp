@@ -10,6 +10,7 @@
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
 #include "scrapers/thetvdbscraper.h"
+#include "scrapers/defaultscraper.h"
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
@@ -35,6 +36,18 @@ PanelView::PanelView(QWidget *parent) :
     ui(new Ui::PanelView)
 {
     ui->setupUi(this);
+
+    Scraper* defaultScraper=new DefaultScraper(this);
+    QAction* tmdbActionDefault = new QAction(defaultScraper->getIcon(),defaultScraper->getName(), this);
+    tmdbActionDefault->setData(qVariantFromValue((void*)defaultScraper));
+
+    connect(defaultScraper, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
+            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+
+    connect(defaultScraper, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
+            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+
+    this->scrapes.append(defaultScraper);
 
     Scraper* s=new TheMovieDBScraper(this);
     QAction* tmdbAction = new QAction(s->getIcon(),s->getName(), this);
@@ -161,9 +174,9 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
             if (!fd.getResult().isNull()){
                 currentSearch.fd=fd.getResult();
                 if (!fd.getResult().isTV()){
-                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::Poster);
+                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::All);
                 } else {
-                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
+                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode(), Scraper::SearchOption::All);
                 }
             }
         }
@@ -303,7 +316,7 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
             posterSize=sizes[i];
         }
 
-        QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h));
+        QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h),Qt::KeepAspectRatio, type);
         if (urls.contains(realUrl)){
             continue;
         }
@@ -711,7 +724,7 @@ void PanelView::rescrap() {
             if (!fd.getResult().isTV()){
                 fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::Poster);
             } else {
-                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode());
+                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode(),Scraper::SearchOption::Poster);
             }
         }
     }

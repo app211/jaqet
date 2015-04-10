@@ -88,13 +88,13 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     });
 }
 
-void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) const{
+void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) {
     QMap<QString,QString> params;
     params["filter"]=QUrl::toPercentEncoding("movie");
     params["code"]=QUrl::toPercentEncoding(movieCode);
     params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
 
-    if (searchFor & SearchOption::Image){
+    if (searchFor & SearchOption::AllMedia){
         params["profile"]=QUrl::toPercentEncoding("large");
     } else {
         params["profile"]=QUrl::toPercentEncoding("medium");
@@ -126,7 +126,7 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, con
 }
 
 
-void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString &language) const {
+void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor &searchFor, const QString &language)  {
 
     QMap<QString,QString> params;
     params["code"]=QUrl::toPercentEncoding(showCode);
@@ -265,7 +265,7 @@ void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager,const 
 
 bool parseMedia(const QJsonArray& mediaArray,const Scraper::SearchFor& searchFor, QStringList& postersHref, QList<QSize>& postersSize, QStringList& backdropsHref, QList<QSize>& backdropsSize ){
 
-    if (searchFor & Scraper::SearchOption::Image){
+    if (searchFor & Scraper::SearchOption::AllMedia){
         foreach (const QJsonValue & value, mediaArray)
         {
             QJsonObject media = value.toObject();
@@ -448,7 +448,7 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     }
 
     if (movieObject["media"].isArray()){
-        if (searchFor & SearchOption::Image){
+        if (searchFor & SearchOption::AllMedia){
             parseMedia(movieObject["media"].toArray(), searchFor, info.postersHref, info.postersSize,info.backdropsHref,info.backdropsSize );
         }
     }

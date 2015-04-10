@@ -86,7 +86,7 @@ void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const
     });
 }
 
-void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, const QString& movieCode, const SearchFor& searchFor, const QString &language) const {
+void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, const QString& movieCode, const SearchFor& searchFor, const QString &language)  {
     if (searchFor.testFlag(SearchOption::Information)){
         QMap<QString,QString> params;
         params["language"]=language;
@@ -121,8 +121,7 @@ void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, c
     }
 }
 
-void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString &language) const {
-
+void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor &searchFor, const QString &language)  {
     QMap<QString,QString> params;
     params["language"]=language;
 
@@ -410,7 +409,7 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, SearchMov
 
 
 void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode,  const SearchFor& searchFor, SearchMovieInfo& result) const{
-    if (searchFor & SearchOption::Image){
+    if (searchFor & SearchOption::AllMedia){
         QMap<QString,QString> params;
         QString url=createURL(QString("movie/%1/images").arg(movieCode),params);
         Promise* promise=Promise::loadAsync(*manager, url);

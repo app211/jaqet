@@ -39,14 +39,14 @@ InProgressDialog* p=nullptr;
 
 void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year) const {
 
-    p=InProgressDialog::create();
+    p=(p==nullptr)?InProgressDialog::create():p;
 
     internalSearchFilm( manager, toSearch,"fr", year);
 }
 
 void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {
 
-    p=InProgressDialog::create();
+    p=(p==nullptr)?InProgressDialog::create():p;
 
     internalSearchTV( manager, toSearch,"fr");
 }
@@ -60,18 +60,18 @@ void Scraper::showErrorDialog(const QString& error){
     msgBox.exec();
 }
 
-void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor) const {
+void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor)  {
 
-    p=InProgressDialog::create();
+    p=(p==nullptr)?InProgressDialog::create():p;
 
     internalFindMovieInfo(manager,  movieCode, searchFor, "fr");
 }
 
-void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const {
+void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor)  {
 
-    p=InProgressDialog::create();
+    p=(p==nullptr)?InProgressDialog::create():p;
 
-    internalFindEpisodeInfo(manager, showCode, season,  episode,"fr");
+    internalFindEpisodeInfo(manager, showCode, season,  episode, searchFor, "fr");
 }
 
 

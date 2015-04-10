@@ -1,19 +1,32 @@
-#ifndef THETVDBSCRAPER_H
-#define THETVDBSCRAPER_H
+#ifndef DEFAULTSCRAPER_H
+#define DEFAULTSCRAPER_H
 
 #include "scraper.h"
+#include <QList>
+#include <QPair>
 
-class TheTVDBScraper : public Scraper
+class DefaultScraper : public Scraper
 {
-    static const QString API_KEY;
+    Q_OBJECT
+
     static const uchar icon_png[];
 
-private:
-    void parseSeriesList( QNetworkAccessManager* manager, const QString& toSearch, const QByteArray& data, const QString& language);
-    bool parseMirrorList( const QByteArray& data);
-    QString getXMLURL() const ;
-    QString getZIPURL() const ;
-    QString getBannerURL() const ;
+    Scraper* m_bannerScraper;
+    Scraper* m_bannerScraper2;
+
+    QString showCode;
+    int season,  episode;
+    SearchFor searchFor;
+    QString language;
+    QNetworkAccessManager *manager;
+    SearchEpisodeInfo searchEpisodeInfo;
+    Scraper* currentScraper;
+    SearchFor currentSearchFor;
+
+    QList<QPair<Scraper*,SearchFor>> scrapers;
+    QList<QPair<Scraper*,SearchFor>> scrapers2;
+
+    void doFindEpisodeInfo();
 
 protected:
     void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
@@ -24,16 +37,22 @@ protected:
     QString postMirrorCreateURL(const QString& , const QMap<QString, QString>& params) const;
 
 public:
-    TheTVDBScraper(QObject *parent=0);
+    DefaultScraper(QObject *parent=0);
     QIcon getIcon()const;
     QString getName() const;
 
     QString createURL(const QString& , const QMap<QString, QString>& params) const;
     QString getBestImageUrl(const QString& url,const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode=Qt::KeepAspectRatio, ImageType imageType=ImageType::UNKNOWN) const;
 
-    bool haveCapability(const SearchCapabilities capability) const{
-        return capability==TV;
-    }
+    bool haveCapability(const SearchCapabilities capability) const;
+
+private slots:
+    void _searchScraper();
+    void _found(FilmPrtList result);
+    void _found(ShowPtrList shows);
+    void _found(const Scraper* scraper,SearchMovieInfo films) ;
+    void _found(const Scraper* scraper, SearchEpisodeInfo shows) ;
+
 };
 
-#endif // THETVDBSCRAPER_H
+#endif // DEFAULTSCRAPER_H

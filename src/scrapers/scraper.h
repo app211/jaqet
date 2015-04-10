@@ -165,8 +165,8 @@ public:
         Poster = 2,
         BackDrop = 4,
         Banner = 8,
-        Image = Poster | BackDrop | Banner,
-        All = Information | Image
+        AllMedia = Poster | BackDrop | Banner,
+        All = Information | AllMedia
 
     };
 
@@ -185,8 +185,8 @@ public:
 
     void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year) const;
     void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
-    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor) const;
-    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode) const;
+    void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor) ;
+    void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor) ;
 
     enum class ImageType {
         UNKNOWN, BANNER, POSTER,BACKDROP
@@ -197,8 +197,8 @@ public:
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
-    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) const=0;
-    virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const QString& language) const=0;
+    virtual void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) =0;
+    virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor, const QString& language) =0;
 
 public slots:
     void closeDialog();
