@@ -343,8 +343,11 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
             QJsonObject cast = value.toObject();
 
             if (cast["person"].isObject() && cast["activity"].isObject()){
-                if (cast["activity"].toObject()["$"]=="Acteur"){
+                QString activite=cast["activity"].toObject()["$"].toString();
+                if (activite=="Acteur"){
                     result.actors.append(cast["person"].toObject()["name"].toString());
+                } else if (activite=="Réalisateur"){
+                    result.directors.append(cast["person"].toObject()["name"].toString());
                 }
             }
         }

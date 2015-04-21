@@ -76,12 +76,7 @@ QSize TemplateYadis::getSize(){
     return QSize(w,h);
 }
 
-QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSize){
-
-
-    int standard_width=poster_standard_width.toInt();
-    int standard_height=poster_standard_height.toInt();
-    int standard_border=poster_standard_border.toInt();
+QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame  ){
 
     QSize standardSize(standard_width,standard_height);
 
@@ -329,8 +324,12 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=properties[Template::Properties::director].toStringList().join(", ");
     } else if (type=="year" && properties.contains(Template::Properties::year)){
         textToDraw=properties[Template::Properties::year].toString();
-    } else if (type=="runtime" && properties.contains(Template::Properties::runtime)){
-        textToDraw=properties[Template::Properties::runtime].toString();
+    } else if (type=="runtime") {
+        if (properties.contains(Template::Properties::runtime)){
+            textToDraw=QDateTime::fromTime_t(properties[Template::Properties::runtime].toInt()).toUTC().toString("h'H 'mm");
+        } else if (!mediaInfo.isEmpty() && mediaInfo.durationSecs()>0 ){
+            textToDraw=QDateTime::fromTime_t(mediaInfo.durationSecs()).toUTC().toString("h'H 'mm");
+        }
     }else if (type=="rating" && properties.contains(Template::Properties::rating)){
         textToDraw=properties[Template::Properties::rating].toString();
     }else if (type=="title") {
@@ -371,7 +370,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         }
 
         pixPaint.drawText(getX(x),getY(y),w,h,_align|Qt::TextWordWrap|Qt::AlignTop,textToDraw);
-/*
+        /*
         const QPointF points[4] = {
             QPointF(getX(x) ,getY(y)),
             QPointF(getX(x+w),getY( y)),
@@ -443,7 +442,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
         if(properties.contains(Template::Properties::poster)){
             QPixmap poster=properties[Template::Properties::poster].value<QPixmap>();
             if (!poster.isNull()){
-                QPixmap scaled= buildPoster(poster,QSize(w,h));
+                QPixmap scaled= buildPoster(poster,QSize(w,h),  poster_standard_width.toInt(), poster_standard_height.toInt(), poster_standard_border.toInt(), poster_standard_mask,  poster_standard_frame  );
                 qDebug() << QSize(w,h) << scaled.size();
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
@@ -452,11 +451,23 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
                 pixPaint.drawPixmap(_x,_y,_w,_h,scaled);
             }
         }
-    }else if (type=="banner"){
+    }else if (type=="thumbnail"){
+        if(properties.contains(Template::Properties::thumbnail)){
+            QPixmap thumbnail=properties[Template::Properties::thumbnail].value<QPixmap>();
+            if (!thumbnail.isNull()){
+                QPixmap scaled= buildPoster(thumbnail,QSize(w,h),  episodeWidth, episodeHeight, 0, episodeMask,  episodeFrame  );
+                int _x= x+ (w-scaled.width())/2;
+                int _y= y+ (h-scaled.height())/2;
+                int _w= scaled.width();
+                int _h=scaled.height();
+                pixPaint.drawPixmap(_x,_y,_w,_h,scaled);
+            }
+        }
+    } else if (type=="banner"){
         if(properties.contains(Template::Properties::banner)){
             QPixmap banner=properties[Template::Properties::banner].value<QPixmap>();
             if (!banner.isNull()){
-                QPixmap scaled=banner.scaled(QSize(w,h),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+                QPixmap scaled= buildPoster(banner,QSize(w,h),  bannerWidth, bannerHeight, bannerBorder, bannerMask,  bannerFrame  );
                 int _x= x+ (w-scaled.width())/2;
                 int _y= y+ (h-scaled.height())/2;
                 int _w= scaled.width();
@@ -691,7 +702,7 @@ bool TemplateYadis::execMovie(const QDomElement& e, QPainter &result){
         QDomElement e = n.toElement();
         if(!e.isNull()) {
             if (e.tagName()=="poster"){
-                 execPoster(e);
+                execPoster(e);
             }else if (e.tagName()=="synopsis"){
                 execNode(e,result,Context::movie_synopsis);
             }
@@ -707,11 +718,47 @@ bool TemplateYadis::execTV(QDomElement e, QPainter &result){
         tvBackground = e.attribute("background");
     }
 
+
     QDomNode n = e.firstChild();
     while(!n.isNull()) {
         QDomElement e = n.toElement();
         if(!e.isNull()) {
-            if (e.tagName()=="poster"){
+            if (e.tagName() == "banner"){
+                QDomNode n2 = e.firstChild();
+                while(!n2.isNull()) {
+                    QDomElement e2 = n2.toElement();
+                    if(!e2.isNull()) {
+                        if (e2.tagName()=="size"){
+                            bannerWidth=e2.attribute("width","0").toInt();
+                            bannerHeight=e2.attribute("height","0").toInt();
+                            bannerBorder=e2.attribute("border","0").toInt();
+
+                        } else if (e2.tagName()=="mask"){
+                            bannerMask=e2.text();
+                        }else if (e2.tagName()=="frame"){
+                            bannerFrame=e2.text();
+                        }
+                    }
+                    n2 = n2.nextSibling();
+                }
+            } else if (e.tagName() == "episode"){
+                QDomNode n2 = e.firstChild();
+                while(!n2.isNull()) {
+                    QDomElement e2 = n2.toElement();
+                    if(!e2.isNull()) {
+                        if (e2.tagName()=="size"){
+                            episodeWidth=e2.attribute("width","0").toInt();
+                            episodeHeight=e2.attribute("height","0").toInt();
+
+                        } else if (e2.tagName()=="mask"){
+                            episodeMask=e2.text();
+                        }else if (e2.tagName()=="frame"){
+                            episodeFrame=e2.text();
+                        }
+                    }
+                    n2 = n2.nextSibling();
+                }
+            } else if (e.tagName()=="poster"){
                 // parseMoviePoster(e);
             }else if (e.tagName()=="synopsis"){
                 QDomNode n2 = e.firstChild();

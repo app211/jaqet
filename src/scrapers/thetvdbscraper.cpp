@@ -22,125 +22,6 @@ static bool retrieveMirror = true;
 static QList<QString> m_languages;
 static bool retriveLanguages = true;
 
-/*
-struct language2locale {
-    QLocale::Language qtLanguage;
-    int tvdbLanguage;
-
-} LANGUAGE2LANGUAGE[] =
-{
-{ QLocale::English,	7},
-{ QLocale::Norwegian,	9}
-{ QLocale::Danish,	10}, //  <name>Dansk</name>   <abbreviation>da</abbreviation>  <id>10</id>
-{ QLocale::Finnish,	11}, <name>Suomeksi</name> <abbreviation>fi</abbreviation>  <id>11</id>
-{ QLocale::Finnish,	11}, </Language>
- <Language>
-   <name>Nederlands</name>
-   <abbreviation>nl</abbreviation>
-   <id>13</id>
- </Language>
- <Language>
-   <name>Deutsch</name>
-   <abbreviation>de</abbreviation>
-   <id>14</id>
- </Language>
- <Language>
-   <name>Italiano</name>
-   <abbreviation>it</abbreviation>
-   <id>15</id>
- </Language>
- <Language>
-   <name>Español</name>
-   <abbreviation>es</abbreviation>
-   <id>16</id>
- </Language>
- <Language>
-   <name>Français</name>
-   <abbreviation>fr</abbreviation>
-   <id>17</id>
- </Language>
- <Language>
-   <name>Polski</name>
-   <abbreviation>pl</abbreviation>
-   <id>18</id>
- </Language>
- <Language>
-   <name>Magyar</name>
-   <abbreviation>hu</abbreviation>
-   <id>19</id>
- </Language>
- <Language>
-   <name>????????</name>
-   <abbreviation>el</abbreviation>
-   <id>20</id>
- </Language>
- <Language>
-   <name>Türkçe</name>
-   <abbreviation>tr</abbreviation>
-   <id>21</id>
- </Language>
- <Language>
-   <name>??????? ????</name>
-   <abbreviation>ru</abbreviation>
-   <id>22</id>
- </Language>
- <Language>
-   <name> ?????</name>
-   <abbreviation>he</abbreviation>
-   <id>24</id>
- </Language>
- <Language>
-   <name>???</name>
-   <abbreviation>ja</abbreviation>
-   <id>25</id>
- </Language>
- <Language>
-   <name>Português</name>
-   <abbreviation>pt</abbreviation>
-   <id>26</id>
- </Language>
- <Language>
-   <name>??</name>
-   <abbreviation>zh</abbreviation>
-   <id>27</id>
- </Language>
- <Language>
-   <name>?eština</name>
-   <abbreviation>cs</abbreviation>
-   <id>28</id>
- </Language>
- <Language>
-   <name>Slovenski</name>
-   <abbreviation>sl</abbreviation>
-   <id>30</id>
- </Language>
- <Language>
-   <name>Hrvatski</name>
-   <abbreviation>hr</abbreviation>
-   <id>31</id>
- </Language>
- <Language>
-   <name>???</name>
-   <abbreviation>ko</abbreviation>
-   <id>32</id>
- </Language>
- <Language>
-   <name>English</name>
-   <abbreviation>en</abbreviation>
-   <id>7</id>
- </Language>
- <Language>
-   <name>Svenska</name>
-   <abbreviation>sv</abbreviation>
-   <id>8</id>
- </Language>
- <Language>
-   <name>Norsk</name>
-   <abbreviation>no</abbreviation>
-   <id>9</id>
- </Language>
-</Languages>
-}*/
 
 const QString TheTVDBScraper::API_KEY="C526A71D6E158EF0";
 
@@ -418,10 +299,10 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
             result.directors.append(director);
         }
         if (!filename.isEmpty()){
-            result.backdropsHref.append(filename);
+            result.postersHref.append(filename);
             int w=thumb_width.toInt();
             int h=thumb_height.toInt();
-            result.backdropsSize.append(QSize(w,h));
+            result.postersSize.append(QSize(w,h));
         }
 
         foundEpisode= true;
@@ -463,7 +344,7 @@ bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , c
 
     int runtimeAsInt=runtime.toInt()*60;
     if (runtimeAsInt>0){
-        result.runtime=runtimeAsInt;
+        result.runtimeInSec=runtimeAsInt;
     }
 
     return true;
@@ -508,42 +389,41 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
             if (xml.name() == QLatin1String( "Banner" ) ) {
                 QString bannerPath;
                 QString bannerType;
+                QString bannerType2;
                 while ( xml.readNextStartElement() ) {
                     if ( xml.name() == QLatin1String( "id" ) ) {
                         xml.skipCurrentElement();
-                        //       qDebug() << "id " << xml.readElementText().toInt();
                     } else if ( xml.name() == QLatin1String( "BannerPath" ) ) {
                         bannerPath=  xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "BannerType" ) ) {
                         bannerType= xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "BannerType2" ) ) {
-                        xml.skipCurrentElement();
-                        //      qDebug() << "BannerType2 " << xml.readElementText();
+                        bannerType2=xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "Colors" ) ) {
                         xml.skipCurrentElement();
-                        //       qDebug() << "Colors " << xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "Language" ) ) {
                         xml.skipCurrentElement();
-                        //      qDebug() << "Language " << xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "RatingCount" ) ) {
                         xml.skipCurrentElement();
-                        //     qDebug() << "RatingCount " << xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "SeriesName" ) ) {
                         xml.skipCurrentElement();
-                        //    qDebug() << "SeriesName " << xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "ThumbnailPath" ) ) {
                         xml.skipCurrentElement();
-                        //    qDebug() << "ThumbnailPath " << xml.readElementText();
                     } else if ( xml.name() == QLatin1String( "VignettePath" ) ) {
                         xml.skipCurrentElement();
-                        //    qDebug() << "VignettePath " << xml.readElementText();
                     } else {
                         xml.skipCurrentElement();
                     }
                 }
 
-                if (!bannerPath.isEmpty() && bannerType==QLatin1String( "series" )){
-                    result.bannersHref.append(bannerPath);
+                if (!bannerPath.isEmpty()){
+                    if (bannerType==QLatin1String( "series" ) && bannerType2==QLatin1String( "graphical")){
+                        result.bannersHref.append(bannerPath);
+                    } else if (bannerType==QLatin1String( "fanart" ))  {
+                        result.backdropsHref.append(bannerPath);
+
+                    }
+
                 }
             } else {
                 return false;

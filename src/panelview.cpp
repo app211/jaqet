@@ -98,9 +98,9 @@ PanelView::~PanelView()
 
 void PanelView::enableCastRemove(){
     if(ui->castListWidget->currentItem() && ui->castListWidget->currentItem()->isSelected() == true)
-         ui->actionCastRemove->setEnabled(true);
-     else
-         ui->actionCastRemove->setEnabled(false);
+        ui->actionCastRemove->setEnabled(true);
+    else
+        ui->actionCastRemove->setEnabled(false);
 }
 
 void PanelView::castRemove(){
@@ -109,10 +109,10 @@ void PanelView::castRemove(){
     QStringList castList;
     for(int i = 0 ; i < ui->castListWidget->count() ; i++)
     {
-       QListWidgetItem *item = ui->castListWidget->item(i);
-       if (item){
-           castList << item->text();
-       }
+        QListWidgetItem *item = ui->castListWidget->item(i);
+        if (item){
+            castList << item->text();
+        }
     }
 
     setCast(castList);
@@ -185,7 +185,6 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
 
 void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
-    currentSearch.texts.clear();
 
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
@@ -199,8 +198,8 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         currentSearch.texts[Template::Properties::year]=QString::number(b.productionYear);
     }
 
-    if (b.runtime>0){
-        currentSearch.texts[Template::Properties::runtime]=QDateTime::fromTime_t(b.runtime).toUTC().toString("h'H 'mm");
+    if (b.runtimeInSec>0){
+        currentSearch.texts[Template::Properties::runtime]=b.runtimeInSec;
     }
 
     if (b.rating>0. && b.rating<=10.){
@@ -213,14 +212,22 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     ui->labelSeasonEpisode->setVisible(true);
 
     ui->stackedWidget->setCurrentIndex(1);
+
     ui->synopsis->setText(b.synopsis);
+    if (currentSearch.texts[Template::Properties::synopsis].isNull()){
+        setSynopsis(b.synopsis);
+    }
 
     ui->castListWidget->clear();
     ui->castListWidget->addItems(b.actors);
+    if (currentSearch.texts[Template::Properties::actors].isNull()){
+       setCast(b.actors);
+    }
 
     ui->directorlistWidget->clear();
-    for (const QString& director : b.directors){
-        ui->directorlistWidget->addItem(director);
+    ui->directorlistWidget->addItems(b.directors);
+    if (currentSearch.texts[Template::Properties::director].isNull()){
+        setDirectors(b.directors);
     }
 
     /*ui->castToolButton->disconnect();
@@ -230,7 +237,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         rebuildTemplate();
     });
 */
-  /*   ui->toolButtonSysnopsis->disconnect();
+    /*   ui->toolButtonSysnopsis->disconnect();
 
  QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
@@ -253,7 +260,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     QSet<QString> urls;
 
-    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::POSTER);
+    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
     addImages( urls, x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
 
     if (!b.bannersHref.isEmpty()){
@@ -286,7 +293,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
             this->addRequest(manager,realUrl, pi,  x,  y,  w,  h, proxy);
 
-            QPushButton* b = new QPushButton("Plus");
+            QPushButton* b = new QPushButton("Banner");
 
             QObject::connect(b, &QPushButton::released, [=]()
             {
@@ -340,14 +347,21 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
 
         addRequest(manager,realUrl, pi,  x,  y,  w,  h,proxy);
 
-        QPushButton* b = new QPushButton("Plus");
-
+        QPushButton* b;
         if (type==Scraper::ImageType::POSTER){
+            b = new QPushButton("Poster");
             QObject::connect(b, &QPushButton::released, [=]()
             {
                 setPoster(url,posterSize,scraper);
             });
+        } if (type==Scraper::ImageType::THUMBNAIL){
+            b = new QPushButton("THUMBNAIL");
+            QObject::connect(b, &QPushButton::released, [=]()
+            {
+                setThumbnail(url,posterSize,scraper);
+            });
         } else  if (type==Scraper::ImageType::BACKDROP) {
+            b = new QPushButton("BACKDROP");
             QObject::connect(b, &QPushButton::released, [=]()
             {
                 setBackdrop(url,posterSize,scraper);
@@ -407,7 +421,7 @@ void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url, 
 
 void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
-      currentSearch.texts[Template::Properties::title]=b.title;
+    currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
     currentSearch.texts[Template::Properties::tv]=QVariant(false);
 
@@ -466,7 +480,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     //  ui->directorLineEdit->setText(b.directors);
 
 
- /*   ui->toolButtonSysnopsis->disconnect();
+    /*   ui->toolButtonSysnopsis->disconnect();
     QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
     {
         setSynopsis(b.synopsis);
@@ -577,6 +591,45 @@ void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
     }
 
 }
+
+void PanelView::setThumbnail (const QString& url, const QSize& originalSize, const Scraper *_currentScrape){
+
+    currentSearch._thumbnail=ScraperResource(url,originalSize,_currentScrape);
+
+    if (!currentSearch._thumbnail.resources.isEmpty()){
+
+        InProgressDialog* p=InProgressDialog::create();
+
+        QString url=currentSearch._thumbnail.scraper->getBestImageUrl(currentSearch._thumbnail.resources,originalSize,currentSearch.engine->getPosterSize());
+
+        Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
+
+        QObject::connect(promise, &Promise::completed, [=]()
+        {
+            if (promise->reply->error() ==QNetworkReply::NoError){
+                QByteArray qb=promise->reply->readAll();
+                QPixmap thumbnail;
+                if (thumbnail.loadFromData(qb)){
+                    setThumbnailState(NETRESOURCE::OK, thumbnail);
+                }else {
+                    setThumbnailState(NETRESOURCE::ERROR);
+                }
+            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+                setThumbnailState(NETRESOURCE::CANCELED);
+            } else {
+                setThumbnailState(NETRESOURCE::ERROR);
+            }
+
+            p->closeAndDeleteLater();
+        });
+
+    } else {
+        setThumbnailState(NETRESOURCE::NONE);
+    }
+
+}
+
+
 void PanelView::setPoster (const QString& url, const QSize& originalSize, const Scraper *_currentScrape){
 
     currentSearch._poster=ScraperResource(url,originalSize,_currentScrape);
@@ -588,8 +641,6 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
         QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,originalSize,currentSearch.engine->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
-
-        //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
@@ -641,6 +692,17 @@ void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap
     }
 }
 
+void PanelView::setThumbnailState(PanelView::NETRESOURCE thumbnailState, const QPixmap& thumbnail){
+    bool same=currentSearch.thumbnailState != thumbnailState;
+    if (same){
+        QPixmap currentThumbnail=currentSearch.texts[Template::Properties::thumbnail].value<QPixmap>();
+        same = thumbnail.toImage()==currentThumbnail.toImage();
+    }
+    if (!same){
+        currentSearch.texts[Template::Properties::thumbnail]=thumbnail;
+        rebuildTemplate();
+    }
+}
 void PanelView::setBannerState(PanelView::NETRESOURCE bannerState, const QPixmap& banner){
     bool same=currentSearch.bannerState != bannerState;
     if (same){

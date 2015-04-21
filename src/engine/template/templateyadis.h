@@ -50,7 +50,7 @@ void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) 
 
     QString getAbsoluteFilePath(const QString& fileName);
 
-    QPixmap buildPoster(const QPixmap &pixmap, const QSize& size);
+    QPixmap buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame  );
     void  proceed(const QFileInfo& f);
     QPixmap createBackdrop();
 
@@ -78,6 +78,17 @@ public:
     QString poster_standard_border;
     QString poster_standard_mask;
     QString poster_standard_frame;
+
+    int bannerWidth=0;
+    int bannerHeight=0;
+    int bannerBorder=0;
+    QString bannerMask;
+    QString bannerFrame;
+
+    int episodeWidth=0;
+    int episodeHeight=0;
+    QString episodeMask;
+    QString episodeFrame;
 
 
 signals :

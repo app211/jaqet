@@ -47,6 +47,9 @@ private:
         ScraperResource _banner;
         NETRESOURCE bannerState=NETRESOURCE::UNKNOWN;
 
+        ScraperResource _thumbnail;
+        NETRESOURCE thumbnailState=NETRESOURCE::UNKNOWN;
+
         QFileInfo fileInfo;
         MediaInfo mediaInfo;
         QMap<Template::Properties, QVariant> texts;
@@ -78,6 +81,7 @@ private:
     void setBackdropState(NETRESOURCE fa, const QPixmap &backDrop=QPixmap());
     void setPosterState(NETRESOURCE posterState, const QPixmap& poster=QPixmap());
     void setBannerState(NETRESOURCE bannerState, const QPixmap& banner=QPixmap());
+    void setThumbnailState(NETRESOURCE thumbnailState, const QPixmap& thumbnail=QPixmap());
     void rebuildTemplate(bool reset=false);
     void setSynopsis(const QString& synopsis);
     void setCast(const QStringList& actors);
@@ -100,6 +104,7 @@ private slots:
 
     // From UI
     void setPoster (const QString& url, const QSize &originalSize, const Scraper *scrape );
+    void setThumbnail (const QString& url, const QSize &originalSize, const Scraper *scrape );
     void setBackdrop(const QString& url, const QSize& originalSize, const Scraper *scrape);
     void setBanner(const QString& url, const Scraper *scrape);
     void proceed();

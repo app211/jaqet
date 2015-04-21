@@ -53,9 +53,9 @@ public:
     QString linkHref;
     QStringList directors;
     QStringList actors;
-    int productionYear;
-    int runtime;
-    double rating;
+    int productionYear=0;
+    int runtime=0;
+    double rating=0;
 };
 
 class SearchEpisodeInfo {
@@ -73,14 +73,14 @@ public:
     QStringList bannersHref;
     QString linkName;
     QString linkHref;
-    int season;
-    int episode;
+    int season=-1;
+    int episode=-1;
     QString showTitle;
     QString originalShowTitle;
     int productionYear=0;
     QStringList actors;
-    int runtime;
-    double rating;
+    int runtimeInSec=0;
+    double rating=0;
     QStringList directors;
     QString network;
 
@@ -121,7 +121,7 @@ struct FoundResult {
     }
 
     QString getOriginalTitle() const {
-        return isNull()?"":(isTV()?showPtr->originalTitle:filmPtr->originalTitle);
+        return isNull()?"":(isTV()?showPtr->title:filmPtr->originalTitle);
 
     }
     Scraper *getScraper() const {
@@ -189,7 +189,7 @@ public:
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor) ;
 
     enum class ImageType {
-        UNKNOWN, BANNER, POSTER,BACKDROP
+        UNKNOWN, BANNER, POSTER,BACKDROP,THUMBNAIL
     };
 
     virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,ImageType imageType=ImageType::UNKNOWN) const=0;
