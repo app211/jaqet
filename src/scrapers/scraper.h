@@ -13,6 +13,7 @@
 #include <QSize>
 #include <QSharedPointer>
 #include <QIcon>
+#include <QDateTime>
 
 class QNetworkAccessManager;
 
@@ -83,6 +84,7 @@ public:
     double rating=0;
     QStringList directors;
     QString network;
+    QDateTime aired;
 
 };
 
@@ -139,6 +141,10 @@ struct FoundResult {
     QString getProductionYear() const{
         return isNull()?"":(isTV()?showPtr->productionYear:filmPtr->productionYear);
 
+    }
+
+    QString getPosterHref() const {
+        return isNull()?QString::null:(isTV()?showPtr->posterHref:filmPtr->posterHref);
     }
 
     Scraper *scraper;

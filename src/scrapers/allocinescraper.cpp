@@ -175,6 +175,10 @@ bool AlloCineScraper::extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDo
 
     QJsonObject season = jsonObject["season"].toObject();
 
+    if (season["originalChannel"].isObject() && season["originalChannel"].toObject()["channel"].isObject()){
+        result.network=season["originalChannel"].toObject()["channel"].toObject()["name"].toString();
+    }
+
     if (!season["episode"].isArray()){
         return false;
     }
@@ -314,7 +318,9 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
     result.code=episodeObject["code"].toString();
     result.episodeTitle=episodeObject["title"].toString();
     result.originalEpisodeTitle=episodeObject["originalTitle"].toString();
-    //originalBroadcastDate
+    if (result.episodeTitle.isEmpty()) {
+        result.episodeTitle=result.originalEpisodeTitle;
+    }
 
     QJsonArray jsonArray = episodeObject["link"].toArray();
 
@@ -343,15 +349,38 @@ bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, SearchEpisodeInfo& 
             QJsonObject cast = value.toObject();
 
             if (cast["person"].isObject() && cast["activity"].isObject()){
-                QString activite=cast["activity"].toObject()["$"].toString();
-                if (activite=="Acteur"){
+                int code=cast["activity"].toObject()["code"].toInt();
+                if (code==8001){
                     result.actors.append(cast["person"].toObject()["name"].toString());
-                } else if (activite=="Réalisateur"){
+                } else if (code==8002){
                     result.directors.append(cast["person"].toObject()["name"].toString());
                 }
             }
         }
     }
+
+    if (episodeObject["broadcast"].isArray()){
+        QJsonArray broadcastArray = episodeObject["broadcast"].toArray();
+        foreach (const QJsonValue & value, broadcastArray)
+        {
+            QJsonObject broadcast = value.toObject();
+
+            if (broadcast["channel"].isObject()){
+                 result.network=broadcast["channel"].toObject()["$"].toString();
+            }
+
+            QString dateTime=broadcast["datetime"].toString();
+            QStringList d =dateTime.split('T');
+            if (d.size()==2){
+                QDate date = QDate::fromString(d.at(0), "yyyy-MM-dd");
+                QTime time = QTime::fromString(d.at(1), "h:m:s");
+                if (date.isValid() && time.isValid()){
+                    result.aired = QDateTime(date,time);
+                }
+            }
+        }
+    }
+
 
     return true;
 }
@@ -572,9 +601,9 @@ ShowPtrList AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) co
         show->title= obj["originalTitle"].toString();
         show->productionYear = QString::number(obj["yearStart"].toDouble());
         show->code= QString::number(obj["code"].toDouble());
-        //        if(obj["poster"].isObject()){
-        //            show->posterHref = obj["poster"].toObject()["href"].toString();
-        //        }
+        if(obj["poster"].isObject()){
+            show->posterHref = obj["poster"].toObject()["href"].toString();
+        }
 
         shows.append(show);
     }

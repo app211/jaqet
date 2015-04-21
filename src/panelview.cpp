@@ -193,6 +193,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     currentSearch.texts[Template::Properties::episode]=QVariant(b.episode);
     currentSearch.texts[Template::Properties::episodetitle]=b.episodeTitle;
     currentSearch.texts[Template::Properties::network]=b.network;
+    currentSearch.texts[Template::Properties::aired]=b.aired;
 
     if (b.productionYear>1900){
         currentSearch.texts[Template::Properties::year]=QString::number(b.productionYear);
@@ -258,7 +259,15 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     int w=200;
     int h=200;
 
+
     QSet<QString> urls;
+
+    if (!this->currentSearch.fd.isNull() && !this->currentSearch.fd.getPosterHref().isEmpty()){
+        QStringList postersHref;
+        postersHref << this->currentSearch.fd.getPosterHref();
+        QList<QSize> sizes;
+        addImages( urls, x,  y, w, h, scene, scraper,  manager, postersHref, sizes,Scraper::ImageType::BACKDROP);
+    }
 
     addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
     addImages( urls, x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);

@@ -15,6 +15,8 @@ private:
     QString getZIPURL() const ;
     QString getBannerURL() const ;
 
+    bool parseActors(const QByteArray &data, SearchEpisodeInfo& result);
+
 protected:
     void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;

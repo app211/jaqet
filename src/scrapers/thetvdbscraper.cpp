@@ -247,6 +247,11 @@ void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager* , const QStrin
 }
 
 bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int season, const int episode, bool& foundEpisode){
+
+    //
+    // Cf. http://thetvdb.com/wiki/index.php?title=API:Base_Episode_Record
+    //
+
     if(xml.tokenType() != QXmlStreamReader::StartElement && xml.name() == "Episode") {
         return false;
     }
@@ -259,7 +264,8 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
     QString thumb_width;
     QString rating;
     QString episodeTitle;
-    QString director;
+    QStringList directors;
+    QDateTime firstAired;
 
     while(!(xml.tokenType() == QXmlStreamReader::EndElement &&  xml.name() == "Episode")) {
         if(xml.tokenType() == QXmlStreamReader::StartElement) {
@@ -280,7 +286,12 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
             } else if ( xml.name() == QLatin1String( "EpisodeName" ) ) {
                 episodeTitle=xml.readElementText();
             } else if ( xml.name() == QLatin1String( "Director" ) ) {
-                director=xml.readElementText();
+               directors =xml.readElementText().split('|',QString::SkipEmptyParts);
+            } else if ( xml.name() == QLatin1String( "FirstAired" ) ) {
+                QDate date = QDate::fromString(xml.readElementText(), "yyyy-MM-dd");
+                if (date.isValid() ){
+                    firstAired = QDateTime(date);
+                }
             }
         }
 
@@ -295,9 +306,9 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
         result.episodeTitle=episodeTitle;
         result.season=season;
         result.episode=episode;
-        if (!director.isEmpty()){
-            result.directors.append(director);
-        }
+        result.directors.append(directors);
+        result.aired=firstAired;
+
         if (!filename.isEmpty()){
             result.postersHref.append(filename);
             int w=thumb_width.toInt();
@@ -435,7 +446,11 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
     }
 }
 
-bool parseActors(const QByteArray &data, SearchEpisodeInfo& result){
+
+bool TheTVDBScraper::parseActors(const QByteArray &data, SearchEpisodeInfo& result){
+    //
+    // Cf. http://thetvdb.com/wiki/index.php?title=API:actors.xml
+    //
     QXmlStreamReader xml( data );
     if ( xml.readNextStartElement() && xml.name()==QLatin1String("Actors")){
         QStringList actors[4];

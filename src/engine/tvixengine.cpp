@@ -10,7 +10,9 @@ void TVIXEngine::init(const QString& path){
 #ifdef Q_OS_WIN32
     b.loadTemplate("C:/Program Files (x86)/yaDISS/templates/Origins/template.xml");
 #else
-   b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+//    b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+    b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/CryFibril/template.xml");
+
    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
     // b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");

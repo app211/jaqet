@@ -286,6 +286,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         }
     }
 
+
+
     QString align;
     if (textElement.hasAttribute("align")){
         align=textElement.attribute("align");
@@ -332,13 +334,24 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         }
     }else if (type=="rating" && properties.contains(Template::Properties::rating)){
         textToDraw=properties[Template::Properties::rating].toString();
+    }else if (type=="aired" && properties.contains(Template::Properties::aired)){
+        QDateTime airedDateTime=properties[Template::Properties::aired].toDateTime();
+        if (airedDateTime.isValid()){
+            textToDraw=airedDateTime.toUTC().toString("dd-MM-yyyy");
+        }
     }else if (type=="title") {
+
         if ((context==Context::tv_synopsis_common || context==Context::movie_synopsis) && properties.contains(Template::Properties::title)){
             textToDraw=properties[Template::Properties::title].toString();
         }
         else if (context==Context::tv_synopsis_episode_episodeicon && properties.contains(Template::Properties::episodetitle)){
             textToDraw=properties[Template::Properties::episodetitle].toString();
         }
+
+        if (textElement.attribute("episodenumber")=="yes" ){
+            QString separator= textElement.hasAttribute("separator")? textElement.attribute("separator") : " ";
+            textToDraw = properties[Template::Properties::episode].toString()+separator+textToDraw;
+         }
     } else if (type=="resolution" && !mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).isNull()){
         QSize v=mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize();
         textToDraw=QString("%1").arg(v.height());
@@ -352,9 +365,11 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         textToDraw=properties[Template::Properties::network].toString();
     }
 
-    qDebug() << type << textToDraw;
+ //   qDebug() << type << textToDraw;
 
     if (!textToDraw.isEmpty()){
+        textToDraw = textToDraw.trimmed();
+
         QFont _font(font);
         if (size>0){
             _font.setPointSize(size);
