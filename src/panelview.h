@@ -116,6 +116,7 @@ private slots:
     // From Engine
     void previewOK(QGraphicsScene*);
 
- };
+    void on_pushButton_pressed();
+};
 
 #endif // PANELVIEW_H

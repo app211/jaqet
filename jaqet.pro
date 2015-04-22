@@ -45,7 +45,9 @@ SOURCES += src/main.cpp\
     src/engine/fileengine.cpp \
     src/engine/fileenginefilesystemwatcher.cpp \
     src/utils.cpp \
-    src/scrapers/defaultscraper.cpp
+    src/scrapers/defaultscraper.cpp \
+    src/mediapanel.cpp \
+    src/mediachooserwidget.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -74,14 +76,18 @@ HEADERS  += src/mainwindow.h \
     src/engine/fileengine.h \
     src/engine/fileenginefilesystemwatcher.h \
     src/utils.h \
-    src/scrapers/defaultscraper.h
+    src/scrapers/defaultscraper.h \
+    src/mediapanel.h \
+    src/mediachooserwidget.h
 
 
 FORMS    += src/mainwindow.ui \
     src/searchscraperdialog.ui \
     src/chooseitemdialog.ui \
     src/inprogressdialog.ui \
-    src/panelview.ui
+    src/panelview.ui \
+    src/mediapanel.ui \
+    src/mediachooserwidget.ui
 
 RESOURCES += \
     resources/resources.qrc

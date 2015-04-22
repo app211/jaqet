@@ -29,5 +29,7 @@
         <file alias="Proceed.png">images/auto32.png</file>
         <file alias="Edit.png">images/edit_icon.png</file>
         <file>animations/busy-1.gif</file>
+        <file>images/lock.png</file>
+        <file>images/un_lock.png</file>
     </qresource>
 </RCC>

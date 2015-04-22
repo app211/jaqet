@@ -31,6 +31,10 @@ static QPixmap createDefaultPoster(int w, int h){
 }
 
 
+#include "mediachooserwidget.h"
+
+MediaChooserWidget* c;
+
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelView)
@@ -89,6 +93,8 @@ PanelView::PanelView(QWidget *parent) :
 
     setDir();
 
+    c=new MediaChooserWidget(this);
+    c->hide();
 }
 
 PanelView::~PanelView()
@@ -252,7 +258,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     scene->clear();
 
-    ui->graphicsViewPosters->setScene(nullptr);
+    //ui->graphicsViewPosters->setScene(nullptr);
 
     int x=0;
     int y=20;
@@ -317,8 +323,8 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         }
     }
 
-    ui->graphicsViewPosters->setScene(scene);
-
+ //  ui->graphicsViewPosters->setScene(scene);
+  c->setScene(scene);
     rebuildTemplate(true);
 }
 
@@ -462,10 +468,10 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
 
     ui->stackedWidget->setCurrentIndex(1);
     if (!b.linkHref.isEmpty()){
-        ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
+        /*ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
         ui->labelUrl->setTextFormat(Qt::RichText);
         ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        ui->labelUrl->setOpenExternalLinks(true);
+        ui->labelUrl->setOpenExternalLinks(true);*/
     }
 
     ui->synopsis->setText(b.synopsis);
@@ -503,7 +509,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         rebuildTemplate();
     });
 
-    ui->graphicsViewPosters->setScene(nullptr);
+    //ui->graphicsViewPosters->setScene(nullptr);
 
     scene->clear();
 
@@ -517,7 +523,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::POSTER);
     addImages( urls, x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
 
-    ui->graphicsViewPosters->setScene(scene);
+    //ui->graphicsViewPosters->setScene(scene);
 
     rebuildTemplate(true);
 }
@@ -799,4 +805,20 @@ void PanelView::rescrap() {
             }
         }
     }
+}
+
+
+void PanelView::on_pushButton_pressed()
+{
+    QPushButton* button=ui->pushButton;
+    QPoint p(0,0);
+    QPoint p2=button->mapToGlobal(p);
+    QSize menuSize = c->size();
+    if (p2.y()-menuSize.height() > 0){
+        c->move(QPoint(p2.x(),p2.y()-menuSize.height()));
+
+    }
+
+
+    c->show();
 }
