@@ -1,0 +1,458 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<template name="CryFibril" author="djoole" version="3.5">
+  <menu background="background.jpg">
+    <main>
+      <area x="0" y="816" width="1920" height="118" image="menubar.png" mask="menumask.png" />
+      <text font="Santana-Black" size="48" case="upper" style="bold" color="#4dffffff" selectedcolor="#ffffff" spacing="60" offset="2" />
+      <background></background>
+    </main>
+    <index>
+      <area x="0" y="916" width="1920" height="48" image="submenubar.png" mask="menumask.png" />
+      <text font="Santana-Black" size="24" case="upper" style="bold" color="#4d000000" selectedcolor="#9a000000" spacing="60" offset="6" />
+      <alphabet>
+        <area x="0" y="964" width="1920" height="48" margin="100" image="submenubar.png">
+          <columns>26</columns>
+          <rows>1</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#4dffffff" selectedcolor="#ffffff" />
+      </alphabet>
+      <genres>
+        <area x="199" y="114" width="1522" height="602" margin="25" image="panel_genres.png">
+          <columns>3</columns>
+          <rows>8</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </genres>
+      <actors>
+        <area x="575" y="114" width="762" height="602" margin="25" image="panel_cast.png">
+          <columns>1</columns>
+          <rows>8</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </actors>
+      <directors>
+        <area x="575" y="114" width="762" height="602" margin="25" image="panel_cast.png">
+          <columns>1</columns>
+          <rows>8</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </directors>
+      <durations>
+        <area x="784" y="264" width="352" height="452" margin="25" image="panel_durations.png">
+          <columns>1</columns>
+          <rows>6</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </durations>
+      <countries>
+        <area x="575" y="114" width="762" height="602" margin="25" image="panel_cast.png">
+          <columns>1</columns>
+          <rows>8</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </countries>
+      <years>
+        <area x="784" y="114" width="352" height="602" margin="25" image="panel_years.png">
+          <columns>1</columns>
+          <rows>8</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </years>
+      <ratings>
+        <area x="784" y="264" width="352" height="452" margin="25" image="panel_durations.png">
+          <columns>1</columns>
+          <rows>6</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </ratings>
+      <types>
+        <area x="784" y="264" width="352" height="452" margin="25" image="panel_durations.png">
+          <columns>1</columns>
+          <rows>6</rows>
+        </area>
+        <text font="Santana-Black" size="24" case="upper" style="bold" color="#6a6a69" selectedcolor="#ffffff" />
+      </types>
+    </index>
+  </menu>
+  <movie background="background.jpg">
+    <poster>
+      <standard>
+        <size width="503" height="720" border="0" />
+        <inner x="23" y="80" width="445" height="602" />
+        <!--<mask>cover_mask.png</mask>-->
+        <frame>cover_frame.png</frame>
+      </standard>
+      <case>
+        <size width="503" height="720" border="0" />
+        <inner x="23" y="80" width="445" height="602" />
+      </case>
+    </poster>
+    <synopsis>
+      <image type="fanart" x="0" y="0" width="1920" height="1080" />
+      <image type="static" x="0" y="0" width="1920" height="1080">grid.png</image>
+      <image type="poster" x="13" y="391" width="397" height="568" />
+      <image type="vcodec" x="196" y="977" width="105" height="50" />
+      <image type="acodec" x="1752" y="728" width="136" height="60" />
+      <image type="format" x="40" y="977" width="105" height="50" />
+      <!--<image type="certification" x="1640" y="1004" width="249" height="57" />-->
+      <image type="country" x="430" y="1002" width="30" height="30" direction="horizontal" spacing="40" />
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="fr">Réalisateurs</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="en">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="bg">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="cs">Režie</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="da">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="de">Regisseure</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="es">Directores</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="hu">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="it">Registi</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="nl">Regisseurs</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="pl">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="pt">Realizadores</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="ro">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="ru">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="sv">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="th">Directors</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="715" width="290" height="32" language="tr">Directors</text>
+
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="fr">Acteurs</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="en">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="bg">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="cs">Hrají</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="da">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="de">Schauspieler</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="es">Actores</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="hu">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="it">Attori</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="nl">Acteurs</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="pl">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="pt">Actores</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="ro">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="ru">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="sv">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="th">Cast</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="427" y="795" width="290" height="32" language="tr">Cast</text>
+
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="fr">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="en">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="bg">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="cs">Zvuk</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="da">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="de">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="es">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="hu">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="it">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="nl">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="pl">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="pt">Som</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="ro">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="ru">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="sv">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="th">Audio</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="690" width="290" height="28" language="tr">Audio</text>
+
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="fr">Sous-titres</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="en">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="bg">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="cs">Titulky</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="da">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="de">Untertitel</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="es">Subtítulos</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="hu">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="it">Sottotitoli</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="nl">Ondertitels</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="pl">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="pt">Legendas</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="ro">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="ru">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="sv">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="th">Subtitles</text>
+      <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="885" width="290" height="28" language="tr">Subtitles</text>
+      <text type="originaltitle" font="ScoutCond Bold" size="60" color="#ffffff" x="25" y="10" width="1475" height="80" />
+      <!-- <text type="title" font="ScoutCond Bold" size="60" color="#ffffff" x="25" y="10" width="1475" height="80" /> -->
+      <text type="genres" font="ScoutCond Bold" size="24" color="#8cc8e6" x="795" y="715" width="860" height="28" separator=" / " />
+      <text type="year" font="ScoutCond Bold" size="60" color="#ffffff" x="1580" y="10" width="170" height="80" />
+      <text type="runtime" font="ScoutCond Bold" size="32" color="#ffffff" x="1704" y="1013" width="95" height="50" align="center" />
+      <text type="rating" font="Scout Black" size="26" color="#ffffff" x="1824" y="32" width="65" height="35" align="center" />
+      <text type="director" font="Scout Regular" size="22" color="#ffffff" x="427" y="750" width="330" height="32" separator=", " />
+      <text type="cast" font="Scout Regular" size="22" color="#ffffff" x="427" y="834" width="330" height="156" separator=", " direction="vertical" spacing="30" />
+      <text type="plot" font="Scout Regular" size="20" color="#ffffff" x="795" y="750" width="860" height="280" spacing="30" />
+      <text type="resolution" font="ScoutCond Bold" size="28" color="#000000" x="300" y="985" width="100" height="50" align="center" scantype="yes" />
+      <languages>
+        <text font="ScoutCond Bold" size="32" color="#000000" offset="4" />
+        <backimage width="60" height="60" spacing="76">rounded_box.png</backimage>
+        <audio x="1704" y="728" count="2" direction="vertical" />
+        <subtitles x="1704" y="924" count="2" direction="horizontal" />
+      </languages>
+    </synopsis>
+    <iconview>
+      <area x="30" y="30" width="1890" height="1020">
+        <columns>7</columns>
+        <rows>3</rows>  
+      </area>
+      <icon width="237" height="340" scale="0.85" />
+	  <background></background>
+    </iconview>
+    <saga>
+      <stamp x="18" y="285" width="32" height="32" image="saga.png" />
+      <iconview>
+        <area x="30" y="740" width="1890" height="300" />
+        <background>
+          <image type="fanart" x="0" y="0" width="1920" height="1080" />
+          <image type="static" x="0" y="0" width="1920" height="1080">grid_saga.png</image>
+		  <text type="title" font="ScoutCond Bold" size="60" color="#ffffff" x="50" y="10" width="1820" height="68" align="center" />
+        </background>
+      </iconview>
+    </saga>
+  </movie>
+  <tv background="background.jpg">
+    <banner>
+      <size width="758" height="140" border="20" />
+      <mask>banner_mask.png</mask>
+      <frame>banner_frame.png</frame>
+    </banner>
+    <episode>
+      <size width="284" height="160" />
+      <mask>episode_mask.png</mask>
+      <frame>episode_frame.png</frame>
+    </episode>
+    <synopsis>
+      <common>   
+        <image type="fanart" x="0" y="0" width="1920" height="1080" />
+        <image type="static" x="0" y="0" width="1920" height="1080">grid_tv.png</image>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="fr">Diffuseur</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="en">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="bg">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="cs">Kanál</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="da">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="de">Studio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="es">Canal</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="hu">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="it">Catena</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="nl">Zender</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="pl">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="pt">Canal</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="ro">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="ru">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="sv">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="th">Network</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="715" width="260" height="32" language="tr">Network</text>
+
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="fr">Acteurs</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="en">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="bg">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="cs">Hrají</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="da">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="de">Schauspieler</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="es">Actores</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="hu">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="it">Attori</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="nl">Acteurs</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="pl">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="pt">Actores</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="ro">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="ru">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="sv">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="th">Cast</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="457" y="795" width="260" height="32" language="tr">Cast</text>
+        <text type="title" font="ScoutCond Bold" size="60" color="#ffffff" x="25" y="10" width="1475" height="68" />
+        <text type="genres" font="ScoutCond Bold" size="24" color="#8cc8e6" x="795" y="715" width="860" height="28" separator=" / " />
+        <text type="year" font="ScoutCond Bold" size="60" color="#ffffff" x="1580" y="10" width="170" height="68" />
+        <text type="rating" font="Scout Black" size="26" color="#ffffff" x="1824" y="32" width="65" height="35" align="center" />
+        <text type="network" font="Scout Regular" size="22" color="#ffffff" x="457" y="750" width="300" height="32" separator=", " />
+        <text type="cast" font="Scout Regular" size="22" color="#ffffff" x="457" y="834" width="300" height="210" separator=", " direction="vertical" spacing="30" />
+      </common>
+      <season>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="fr">Saisons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="en">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="bg">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="cs">Řady</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="da">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="de">Staffeln</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="es">Temporada</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="hu">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="it">Stagioni</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="nl">Seizoenen</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="pl">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="pt">Estações</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="ro">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="ru">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="sv">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="th">Seasons</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="50" y="715" width="290" height="32" language="tr">Seasons</text>
+        <text type="plot" font="Scout Regular" size="20" color="#ffffff" x="795" y="750" width="860" height="280" spacing="30" />
+        <seasonicon>
+          <area x="35" y="750" width="352" height="330">
+            <columns>4</columns>
+            <rows>4</rows>
+          </area>
+          <icon width="72" height="54" scale="0.7">rounded_box.png</icon>
+          <text font="ScoutCond Bold" size="38" color="#000000" offset="4" />
+        </seasonicon>
+      </season>
+      <episode>
+        <image type="static" x="0" y="690" width="1920" height="390">grid_episode.png</image>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="fr">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="en">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="bg">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="cs">Zvuk</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="da">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="de">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="es">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="hu">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="it">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="nl">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="pl">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="pt">Som</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="ro">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="ru">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="sv">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="th">Audio</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="715" width="290" height="28" language="tr">Audio</text>
+
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="fr">Sous-titres</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="en">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="bg">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="cs">Titulky</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="da">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="de">Untertitel</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="es">Subtítulos</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="hu">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="it">Sottotitoli</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="nl">Ondertitels</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="pl">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="pt">Legendas</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="ro">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="ru">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="sv">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="th">Subtitles</text>
+        <text type="static" font="ScoutCond Bold" size="24" color="#8cc8e6" x="1700" y="910" width="290" height="28" language="tr">Subtitles</text>        
+
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="fr">Saison</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="en">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="et">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="bg">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="cs">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="da">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="de">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="es">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="hu">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="it">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="nl">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="pl">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="pt">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="ro">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="ru">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="sv">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="th">Season</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="795" y="970" width="300" height="28" language="tr">Season</text>
+
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="fr">Durée</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="en">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="et">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="bg">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="cs">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="da">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="de">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="es">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="hu">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="it">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="nl">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="pl">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="pt">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="ro">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="ru">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="sv">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="th">Duration</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="891" y="970" width="300" height="28" language="tr">Duration</text>
+        
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="fr">Réalisateur</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="en">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="et">Lavastaja</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="bg">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="cs">Režie</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="da">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="de">Regisseur</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="es">Directores</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="hu">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="it">Registi</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="nl">Regisseur</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="pl">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="pt">Realizadores</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="ro">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="ru">???????</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="sv">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="th">Director</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1083" y="970" width="300" height="28" language="tr">Director</text>
+        
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="fr">Diffusion</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="en">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="et">Linastus</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="bg">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="cs">Vysíláno</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="da">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="de">Erstausstrahlung</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="es">Emisión</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="hu">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="it">Diffusione</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="nl">Uitgezonden</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="pl">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="pt">Difundindo</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="ro">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="ru">В эфире</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="sv">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="th">Aired</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="1383" y="970" width="300" height="28" language="tr">Aired</text>
+        
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="fr">Note</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="en">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="bg">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="cs">Hodnocení</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="da">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="de">Bewertung</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="es">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="hu">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="it">Valutazione</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="nl">Cijfer</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="pl">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="pt">Cotação</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="ro">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="ru">Рейтинг</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="sv">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="th">Rating</text>
+        <text type="static" font="ScoutCond Bold" size="20" color="#8cc8e6" x="987" y="970" width="300" height="28" language="tr">Rating</text>
+        <episodeicon>
+          <area x="0" y="671" width="1920" height="359" />
+          <image type="vcodec" x="196" y="306" width="105" height="50" />
+          <image type="acodec" x="1752" y="80" width="136" height="60" />
+          <image type="format" x="40" y="306" width="105" height="50" />
+          <image type="thumbnail" x="75" y="30" width="284" height="160" />
+          <image type="special" x="75" y="30" width="48" height="48">special.png</image>
+          <image type="country" x="430" y="331" width="30" height="30" direction="horizontal" spacing="40" />
+          <text type="resolution" font="ScoutCond Bold" size="28" color="#000000" x="300" y="314" width="100" height="50" align="center" scantype="yes" />
+          <text type="title" font="ScoutCond Bold" size="30" color="#ffffff" x="0" y="200" width="430" height="96" spacing="10" align="center" episodenumber="yes" separator=".  " />
+          <text type="director" font="Scout Regular" size="24" color="#ffffff" x="1083" y="329" width="300" height="32" />
+          <text type="aired" font="Scout Regular" size="24" color="#ffffff" x="1383" y="329" width="192" height="32" />
+          <text type="rating" font="Scout Regular" size="24" color="#ffffff" x="987" y="329" width="96" height="32" />
+          <text type="plot" font="Scout Regular" size="20" color="#ffffff" x="795" y="80" width="860" height="220" spacing="30" />
+          <text type="special" font="ScoutCond Bold" size="28" color="#000000" x="77" y="38" width="48" height="48" align="center">SP</text>
+          <text type="season" font="Scout Regular" size="24" color="#ffffff" x="795" y="329" width="96" height="32" />
+          <text type="runtime" font="Scout Regular" size="24" color="#ffffff" x="891" y="329" width="96" height="32" />
+          <languages>
+            <backimage width="60" height="60" spacing="76">rounded_box.png</backimage>
+            <text font="ScoutCond Bold" size="32" color="#000000" offset="4" />
+            <audio x="1704" y="80" count="2" direction="vertical" />
+            <subtitles x="1704" y="276" count="2" direction="horizontal" />
+          </languages>
+        </episodeicon>
+      </episode>
+    </synopsis>
+    <iconview>
+      <area x="50" y="50" width="1820" height="980">
+        <columns>3</columns>
+        <rows>6</rows>
+      </area>
+      <icon width="600" height="135" scale="0.8" />
+      <background></background>
+    </iconview>
+  </tv>
+</template>

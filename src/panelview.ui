@@ -156,14 +156,14 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-67</y>
+                <y>-204</y>
                 <width>917</width>
-                <height>461</height>
+                <height>598</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
-                <widget class="QCheckBox" name="checkBox_2">
+                <widget class="QCheckBox" name="checkBoxLockSynopsis">
                  <property name="styleSheet">
                   <string notr="true">QCheckBox {
     spacing: 5px;
@@ -210,7 +210,7 @@ QCheckBox::indicator:indeterminate:pressed {
 </string>
                  </property>
                  <property name="text">
-                  <string>Synopsys</string>
+                  <string>Synopsis</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -254,7 +254,7 @@ QCheckBox::indicator:indeterminate:pressed {
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox">
+                <widget class="QCheckBox" name="checkBoxLockCast">
                  <property name="styleSheet">
                   <string notr="true">QCheckBox {
     spacing: 5px;
@@ -501,9 +501,103 @@ QCheckBox::indicator:indeterminate:pressed {
                 <widget class="QWidget" name="widget_10" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_6">
                   <item>
-                   <widget class="QPushButton" name="pushButton">
+                   <widget class="QPushButton" name="pushButtonBackDrop">
                     <property name="text">
-                     <string>PushButton</string>
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <activeon>:/resources/templates/CryFibril/preview.jpg</activeon>
+                     </iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>80</width>
+                      <height>80</height>
+                     </size>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
+                    <property name="default">
+                     <bool>false</bool>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox">
+                 <property name="styleSheet">
+                  <string notr="true">QCheckBox {
+    spacing: 5px;
+}
+
+QCheckBox:focus,
+QCheckBox::indicator:focus
+{
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/resources/images/lock.png);
+}
+
+
+QCheckBox::indicator:checked {
+    image: url(:/resources/images/un_lock.png);
+}
+
+QCheckBox::indicator:unchecked:hover {
+}
+
+QCheckBox::indicator:unchecked:pressed {
+ }
+
+
+QCheckBox::indicator:checked:hover {
+}
+
+QCheckBox::indicator:checked:pressed {
+ }
+
+QCheckBox::indicator:indeterminate:hover {
+}
+
+QCheckBox::indicator:indeterminate:pressed {
+}
+
+</string>
+                 </property>
+                 <property name="text">
+                  <string>CheckBox</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_11" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <item>
+                   <widget class="QPushButton" name="pushButtonThumbail">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>80</width>
+                      <height>80</height>
+                     </size>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>

@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsProxyWidget>
+#include <QPointer>
 
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
@@ -19,6 +20,43 @@ class Engine;
 namespace Ui {
 class PanelView;
 }
+
+class MyGraphicsObject : public QGraphicsObject {
+
+    QGraphicsPixmapItem* const m_p;
+
+public :
+    MyGraphicsObject(QGraphicsPixmapItem* p) : QGraphicsObject(p), m_p(p){
+
+    }
+
+    QRectF boundingRect() const
+    {
+        return m_p->boundingRect();
+    }
+
+    QPainterPath shape() const
+    {
+        return m_p->shape();
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+        m_p->paint(painter,  option, widget);
+    }
+
+
+    QGraphicsPixmapItem* graphicsPixmapItem(){
+        return m_p;
+
+    }
+
+protected:
+    bool sceneEvent(QEvent *event){
+        return false ; //m_p->sceneEvent(event);
+    }
+
+};
+
 
 class PanelView : public QWidget
 {
@@ -67,8 +105,8 @@ private:
 
     struct M_M {
         QString url;
-        QGraphicsPixmapItem* itemToUpdate;
-        QGraphicsProxyWidget* busyIndicator;
+        QPointer<MyGraphicsObject> itemToUpdate;
+        QPointer<QGraphicsProxyWidget> busyIndicator;
         int x;
         int y;
         int w;
@@ -86,9 +124,9 @@ private:
     void setSynopsis(const QString& synopsis);
     void setCast(const QStringList& actors);
     void setDirectors(const QStringList& directors);
-    void addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
+    void addImages( int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
 
-    void addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h, QGraphicsProxyWidget *busyIndicator);
+    void addRequest(QNetworkAccessManager & manager, const QString& url,  QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h, QPointer<QGraphicsProxyWidget> busyIndicator);
     void startPromise( QNetworkAccessManager* manager);
 
 private slots:
@@ -100,7 +138,7 @@ private slots:
     void foundEpisode(const Scraper *scraper, SearchEpisodeInfo b);
 
     // From Internet
-    void setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
+    void setImageFromInternet(QByteArray& qb, QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h);
 
     // From UI
     void setPoster (const QString& url, const QSize &originalSize, const Scraper *scrape );
@@ -116,7 +154,9 @@ private slots:
     // From Engine
     void previewOK(QGraphicsScene*);
 
-    void on_pushButton_pressed();
+
+    void on_pushButtonBackDrop_pressed();
+    void on_pushButtonThumbail_pressed();
 };
 
 #endif // PANELVIEW_H

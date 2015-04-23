@@ -11,7 +11,7 @@ void TVIXEngine::init(const QString& path){
     b.loadTemplate("C:/Program Files (x86)/yaDISS/templates/Origins/template.xml");
 #else
 //    b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/Origins/template.xml");
-    b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/CryFibril/template.xml");
+    b.loadTemplate(":/resources/templates/CryFibril/template.xml");
 
    //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
    //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");

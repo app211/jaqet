@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QNetworkReply>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsObject>
 #include <QPushButton>
 #include <QMovie>
 
@@ -220,15 +221,15 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     ui->stackedWidget->setCurrentIndex(1);
 
-    ui->synopsis->setText(b.synopsis);
-    if (currentSearch.texts[Template::Properties::synopsis].isNull()){
+    if (ui->checkBoxLockSynopsis->isChecked() /*&& currentSearch.texts[Template::Properties::synopsis].isNull()*/){
+        ui->synopsis->setText(b.synopsis);
         setSynopsis(b.synopsis);
     }
 
-    ui->castListWidget->clear();
-    ui->castListWidget->addItems(b.actors);
-    if (currentSearch.texts[Template::Properties::actors].isNull()){
-       setCast(b.actors);
+    if (ui->checkBoxLockCast->isChecked()){
+        ui->castListWidget->clear();
+        ui->castListWidget->addItems(b.actors);
+        setCast(b.actors);
     }
 
     ui->directorlistWidget->clear();
@@ -237,28 +238,9 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         setDirectors(b.directors);
     }
 
-    /*ui->castToolButton->disconnect();
-    QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
-    {
-        setCast(b.actors);
-        rebuildTemplate();
-    });
-*/
-    /*   ui->toolButtonSysnopsis->disconnect();
-
- QObject::connect(ui->toolButtonSysnopsis, &QPushButton::released, [=]()
-    {
-        setSynopsis(b.synopsis);
-        rebuildTemplate();
-    });*/
-
     ui->labelEpisodeTitle->setText(b.title);
 
-    // ui->labelSeasonEpisode->setText(QString("Season %1 - Episode %2").arg(b.season).arg(b.episode));*/
-
     scene->clear();
-
-    //ui->graphicsViewPosters->setScene(nullptr);
 
     int x=0;
     int y=20;
@@ -271,64 +253,20 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     if (!this->currentSearch.fd.isNull() && !this->currentSearch.fd.getPosterHref().isEmpty()){
         QStringList postersHref;
         postersHref << this->currentSearch.fd.getPosterHref();
-        QList<QSize> sizes;
-        addImages( urls, x,  y, w, h, scene, scraper,  manager, postersHref, sizes,Scraper::ImageType::BACKDROP);
+        addImages(  x,  y, w, h, scene, scraper,  manager, postersHref, QList<QSize>(),Scraper::ImageType::BACKDROP);
     }
 
-    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
-    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
+    addImages(  x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
+    addImages(  x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
+    addImages(  x,  y, w, h, scene, scraper,  manager, b.bannersHref, QList<QSize> (),Scraper::ImageType::BANNER);
 
-    if (!b.bannersHref.isEmpty()){
-        foreach (const QString& url , b.bannersHref){
+    c->setScene(scene);
 
-            QString realUrl=scraper->getBestImageUrl(url,QSize(),QSize(w,h), Qt::KeepAspectRatio,Scraper::ImageType::BANNER);
-
-            qDebug()<< realUrl;
-
-            if (urls.contains(realUrl)){
-                continue;
-            }
-
-            urls.insert(realUrl);
-
-            scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
-
-            QPixmap scaled = createDefaultPoster(w,h);
-
-            QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
-            pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
-
-            QLabel *gif_anim = new QLabel();
-            QMovie *movie = new QMovie(":/resources/animations/busy-1.gif");
-            gif_anim->setMovie(movie);
-            movie->start();
-
-            QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
-            proxy->setPos(x+(w-32)/2,y+(h-32)/2);
-
-            this->addRequest(manager,realUrl, pi,  x,  y,  w,  h, proxy);
-
-            QPushButton* b = new QPushButton("Banner");
-
-            QObject::connect(b, &QPushButton::released, [=]()
-            {
-                setBanner(url,scraper);
-            });
-
-            QGraphicsProxyWidget* button = scene->addWidget(b);
-            button->setPos(x,h);
-
-            x+=w+10;
-
-        }
-    }
-
- //  ui->graphicsViewPosters->setScene(scene);
-  c->setScene(scene);
     rebuildTemplate(true);
 }
 
-void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type){
+
+void PanelView::addImages(  int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type){
     for (int i=0; i<hrefs.size(); i++){
 
         QString url= hrefs[i];
@@ -339,18 +277,13 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
         }
 
         QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h),Qt::KeepAspectRatio, type);
-        if (urls.contains(realUrl)){
-            continue;
-        }
-
-        urls.insert(realUrl);
 
         scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
 
         QPixmap scaled = createDefaultPoster(w,h);
 
-        QGraphicsPixmapItem* pi=scene->addPixmap(scaled);
-        pi->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+        MyGraphicsObject* pi=new MyGraphicsObject(scene->addPixmap(scaled));
+        pi->parentItem()->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 
         QLabel *gif_anim = new QLabel();
         QMovie *movie = new QMovie(":/resources/animations/busy-1.gif");
@@ -360,7 +293,7 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
         QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
         proxy->setPos(x+(w-32)/2,y+(h-32)/2);
 
-        addRequest(manager,realUrl, pi,  x,  y,  w,  h,proxy);
+        addRequest(manager,realUrl, QPointer<MyGraphicsObject>(pi),  x,  y,  w,  h,QPointer<QGraphicsProxyWidget>(proxy));
 
         QPushButton* b;
         if (type==Scraper::ImageType::POSTER){
@@ -381,12 +314,18 @@ void PanelView::addImages( QSet<QString>& urls, int& x, int& y, int& w, int& h, 
             {
                 setBackdrop(url,posterSize,scraper);
             });
+        } else  if (type==Scraper::ImageType::BANNER) {
+            b = new QPushButton("BANNER");
+            QObject::connect(b, &QPushButton::released, [=]()
+            {
+                setBanner(url,scraper);
+            });
         }
 
         QGraphicsProxyWidget* button = scene->addWidget(b);
         button->setPos(x,h);
 
-        x+=w+10;
+        x+=(w+10);
     }
 }
 
@@ -394,16 +333,18 @@ QList<PanelView::M_M> PanelView::urls;
 Promise* PanelView::currentPromise=nullptr;
 
 void PanelView::startPromise( QNetworkAccessManager* manager){
+
     if (urls.isEmpty() || currentPromise != nullptr){
         return;
     }
 
     M_M url=urls.takeFirst();
+
     currentPromise=Promise::loadAsync(*manager,url.url,false,false,QNetworkRequest::LowPriority);
 
     QObject::connect(currentPromise, &Promise::completed, [=]()
     {
-        if (url.busyIndicator!=nullptr){
+        if (!url.busyIndicator.isNull()){
             url.busyIndicator->setVisible(false);
         }
         if (currentPromise->reply->error() ==QNetworkReply::NoError){
@@ -415,21 +356,25 @@ void PanelView::startPromise( QNetworkAccessManager* manager){
         }
 
         currentPromise=nullptr;
+
         startPromise(manager);
     });
 
 }
 
-void PanelView::addRequest(QNetworkAccessManager & manager, const QString& url,  QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h,  QGraphicsProxyWidget *busyIndicator){
+void PanelView::addRequest(QNetworkAccessManager& manager, const QString& url,  QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator){
     M_M f;
-    f.h=h;
-    f.itemToUpdate=itemToUpdate;
+
     f.url=url;
-    f.w=w;
     f.x=x;
     f.y=y;
+    f.w=w;
+    f.h=h;
+    f.itemToUpdate=itemToUpdate;
     f.busyIndicator=busyIndicator;
+
     urls.append(f);
+
     startPromise(&manager);
 }
 
@@ -509,8 +454,6 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         rebuildTemplate();
     });
 
-    //ui->graphicsViewPosters->setScene(nullptr);
-
     scene->clear();
 
     int x=0;
@@ -518,10 +461,9 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     int w=200;
     int h=200;
 
-    QSet<QString> urls;
 
-    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::POSTER);
-    addImages( urls, x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
+    addImages(  x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::POSTER);
+    addImages(  x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
 
     //ui->graphicsViewPosters->setScene(scene);
 
@@ -538,33 +480,19 @@ void  PanelView::enableSynopsis(bool enable){
     }
 }
 
-void PanelView::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
+void PanelView::setImageFromInternet( QByteArray& qb,  QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h){
 
-    if (itemToUpdate==nullptr){
+    if (itemToUpdate.isNull()){
         // Nothing to do
         return;
-    } else {
-        bool itemSeemsToExistsAnymore=false;
-        QList<QGraphicsItem*> all = this->scene->items();
-        for (int i = 0; i < all.size(); i++)
-        {
-            if (itemToUpdate==all[i]){
-                itemSeemsToExistsAnymore=true;
-                break;
-            }
-        }
-
-        if (!itemSeemsToExistsAnymore){
-            // Nothing to do
-            return;
-        }
     }
 
     QPixmap pixmap;
     pixmap.loadFromData(qb);
     QPixmap scaled = (pixmap.width()>w || pixmap.height()>h) ? pixmap.scaled(w,h,Qt::KeepAspectRatio):pixmap;
-    itemToUpdate->setPixmap(scaled);
-    itemToUpdate->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+
+    itemToUpdate->graphicsPixmapItem()->setPixmap(scaled);
+    itemToUpdate->parentItem()->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 }
 
 
@@ -691,6 +619,7 @@ void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPi
     }
     if (!same){
         currentSearch.texts[Template::Properties::backdrop]=backDrop;
+        ui->pushButtonBackDrop->setIcon(backDrop);
         rebuildTemplate();
     }
 }
@@ -715,6 +644,7 @@ void PanelView::setThumbnailState(PanelView::NETRESOURCE thumbnailState, const Q
     }
     if (!same){
         currentSearch.texts[Template::Properties::thumbnail]=thumbnail;
+        ui->pushButtonThumbail->setIcon(thumbnail);
         rebuildTemplate();
     }
 }
@@ -808,9 +738,26 @@ void PanelView::rescrap() {
 }
 
 
-void PanelView::on_pushButton_pressed()
+
+
+void PanelView::on_pushButtonBackDrop_pressed()
 {
-    QPushButton* button=ui->pushButton;
+    QPushButton* button=ui->pushButtonBackDrop;
+    QPoint p(0,0);
+    QPoint p2=button->mapToGlobal(p);
+    QSize menuSize = c->size();
+    if (p2.y()-menuSize.height() > 0){
+        c->move(QPoint(p2.x(),p2.y()-menuSize.height()));
+
+    }
+
+
+    c->show();
+}
+
+void PanelView::on_pushButtonThumbail_pressed()
+{
+    QPushButton* button=ui->pushButtonThumbail;
     QPoint p(0,0);
     QPoint p2=button->mapToGlobal(p);
     QSize menuSize = c->size();

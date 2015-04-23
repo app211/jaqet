@@ -31,5 +31,79 @@
         <file>animations/busy-1.gif</file>
         <file>images/lock.png</file>
         <file>images/un_lock.png</file>
+        <file>templates/CryFibril/3ivx.png</file>
+        <file>templates/CryFibril/aac.png</file>
+        <file>templates/CryFibril/ac3.png</file>
+        <file>templates/CryFibril/ac3+.png</file>
+        <file>templates/CryFibril/avc.png</file>
+        <file>templates/CryFibril/avi.png</file>
+        <file>templates/CryFibril/background.jpg</file>
+        <file>templates/CryFibril/banner_frame.png</file>
+        <file>templates/CryFibril/banner_mask.png</file>
+        <file>templates/CryFibril/bdav.png</file>
+        <file>templates/CryFibril/blu-ray.png</file>
+        <file>templates/CryFibril/case_blu-ray.png</file>
+        <file>templates/CryFibril/case_blu-ray 3d.png</file>
+        <file>templates/CryFibril/case_default.png</file>
+        <file>templates/CryFibril/case_divx.png</file>
+        <file>templates/CryFibril/case_dvd.png</file>
+        <file>templates/CryFibril/case_hd-dvd.png</file>
+        <file>templates/CryFibril/case_hdtv.png</file>
+        <file>templates/CryFibril/case_matroska.png</file>
+        <file>templates/CryFibril/cover_frame.png</file>
+        <file>templates/CryFibril/cover_frame_old.png</file>
+        <file>templates/CryFibril/cover_mask.png</file>
+        <file>templates/CryFibril/cover_mask_old.png</file>
+        <file>templates/CryFibril/divx.png</file>
+        <file>templates/CryFibril/dts.png</file>
+        <file>templates/CryFibril/dts-hd.png</file>
+        <file>templates/CryFibril/dts-hd hra.png</file>
+        <file>templates/CryFibril/dts-hd ma.png</file>
+        <file>templates/CryFibril/dvd.png</file>
+        <file>templates/CryFibril/episode_frame.png</file>
+        <file>templates/CryFibril/episode_mask.png</file>
+        <file>templates/CryFibril/flac.png</file>
+        <file>templates/CryFibril/grid.png</file>
+        <file>templates/CryFibril/grid_episode.png</file>
+        <file>templates/CryFibril/grid_saga.png</file>
+        <file>templates/CryFibril/grid_tv.png</file>
+        <file>templates/CryFibril/h.264.png</file>
+        <file>templates/CryFibril/matroska.png</file>
+        <file>templates/CryFibril/menubar.png</file>
+        <file>templates/CryFibril/menumask.png</file>
+        <file>templates/CryFibril/mp3.png</file>
+        <file>templates/CryFibril/mp4.png</file>
+        <file>templates/CryFibril/mpeg-1.png</file>
+        <file>templates/CryFibril/mpeg-2.png</file>
+        <file>templates/CryFibril/mpeg-4.png</file>
+        <file>templates/CryFibril/mpeg-ps.png</file>
+        <file>templates/CryFibril/mpeg-ts.png</file>
+        <file>templates/CryFibril/ogg.png</file>
+        <file>templates/CryFibril/panel_cast.png</file>
+        <file>templates/CryFibril/panel_durations.png</file>
+        <file>templates/CryFibril/panel_genres.png</file>
+        <file>templates/CryFibril/panel_years.png</file>
+        <file>templates/CryFibril/pcm.png</file>
+        <file>templates/CryFibril/preview.jpg</file>
+        <file>templates/CryFibril/quicktime.png</file>
+        <file>templates/CryFibril/realvideo.png</file>
+        <file>templates/CryFibril/rounded_box.png</file>
+        <file>templates/CryFibril/saga.png</file>
+        <file>templates/CryFibril/Santana_Black.ttf</file>
+        <file>templates/CryFibril/Scout_Black.ttf</file>
+        <file>templates/CryFibril/ScoutCond_Bold.ttf</file>
+        <file>templates/CryFibril/Scout_Regular.ttf</file>
+        <file>templates/CryFibril/scroll.png</file>
+        <file>templates/CryFibril/special.png</file>
+        <file>templates/CryFibril/submenubar.png</file>
+        <file>templates/CryFibril/template.xml</file>
+        <file>templates/CryFibril/Thumbs.db</file>
+        <file>templates/CryFibril/truehd.png</file>
+        <file>templates/CryFibril/vc-1.png</file>
+        <file>templates/CryFibril/vorbis.png</file>
+        <file>templates/CryFibril/windows media.png</file>
+        <file>templates/CryFibril/wma.png</file>
+        <file>templates/CryFibril/wmv.png</file>
+        <file>templates/CryFibril/xvid.png</file>
     </qresource>
 </RCC>
