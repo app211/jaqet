@@ -5,13 +5,14 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsProxyWidget>
+
 #include <QPointer>
 
 #include "scrapers/scraper.h"
 #include "scanner/scanner.h"
 #include "engine/template/template.h"
 #include "promise.h"
+#include "mygraphicsobject.h"
 
 class MyProxyModel;
 class Engine;
@@ -21,41 +22,6 @@ namespace Ui {
 class PanelView;
 }
 
-class MyGraphicsObject : public QGraphicsObject {
-
-    QGraphicsPixmapItem* const m_p;
-
-public :
-    MyGraphicsObject(QGraphicsPixmapItem* p) : QGraphicsObject(p), m_p(p){
-
-    }
-
-    QRectF boundingRect() const
-    {
-        return m_p->boundingRect();
-    }
-
-    QPainterPath shape() const
-    {
-        return m_p->shape();
-    }
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
-        m_p->paint(painter,  option, widget);
-    }
-
-
-    QGraphicsPixmapItem* graphicsPixmapItem(){
-        return m_p;
-
-    }
-
-protected:
-    bool sceneEvent(QEvent *event){
-        return false ; //m_p->sceneEvent(event);
-    }
-
-};
 
 
 class PanelView : public QWidget
@@ -149,7 +115,11 @@ private slots:
     void rescrap();
     void enableCastRemove();
     void castRemove();
+
     void enableSynopsis(bool enable);
+
+    void enableDirectorRemove();
+    void directorRemove();
 
     // From Engine
     void previewOK(QGraphicsScene*);

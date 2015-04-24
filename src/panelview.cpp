@@ -96,6 +96,10 @@ PanelView::PanelView(QWidget *parent) :
 
     c=new MediaChooserWidget(this);
     c->hide();
+
+    ui->chooseBackgroundButton->setPopup(c,Scraper::ImageType::BACKDROP);
+    ui->choosePosterButton->setPopup(c,Scraper::ImageType::POSTER);
+    ui->chooseThumbailButton->setPopup(c,Scraper::ImageType::THUMBNAIL);
 }
 
 PanelView::~PanelView()
@@ -108,6 +112,14 @@ void PanelView::enableCastRemove(){
         ui->actionCastRemove->setEnabled(true);
     else
         ui->actionCastRemove->setEnabled(false);
+}
+
+
+void PanelView::enableDirectorRemove(){
+    if(ui->directorListWidget->currentItem() && ui->directorListWidget->currentItem()->isSelected() == true)
+        ui->directorListWidget->setEnabled(true);
+    else
+        ui->directorListWidget->setEnabled(false);
 }
 
 void PanelView::castRemove(){
@@ -123,6 +135,22 @@ void PanelView::castRemove(){
     }
 
     setCast(castList);
+    rebuildTemplate();
+}
+
+void PanelView::directorRemove(){
+    qDeleteAll(ui->directorListWidget->selectedItems());
+
+    QStringList directorsList;
+    for(int i = 0 ; i < ui->directorListWidget->count() ; i++)
+    {
+        QListWidgetItem *item = ui->directorListWidget->item(i);
+        if (item){
+            directorsList << item->text();
+        }
+    }
+
+    this->setDirectors(directorsList);
     rebuildTemplate();
 }
 
@@ -232,8 +260,8 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         setCast(b.actors);
     }
 
-    ui->directorlistWidget->clear();
-    ui->directorlistWidget->addItems(b.directors);
+    ui->directorListWidget->clear();
+    ui->directorListWidget->addItems(b.directors);
     if (currentSearch.texts[Template::Properties::director].isNull()){
         setDirectors(b.directors);
     }
@@ -247,18 +275,33 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     int w=200;
     int h=200;
 
+    bool backDropSet = false;
+    bool thumbnailSet = false;
 
-    QSet<QString> urls;
-
-    if (!this->currentSearch.fd.isNull() && !this->currentSearch.fd.getPosterHref().isEmpty()){
-        QStringList postersHref;
-        postersHref << this->currentSearch.fd.getPosterHref();
-        addImages(  x,  y, w, h, scene, scraper,  manager, postersHref, QList<QSize>(),Scraper::ImageType::BACKDROP);
+    if (!this->currentSearch.fd.getPosterHref().isEmpty()){
+        addImages(  x,  y, w, h, scene, scraper,  manager, QStringList() << this->currentSearch.fd.getPosterHref(), QList<QSize>(),Scraper::ImageType::BACKDROP);
+        if (!backDropSet){
+            setBackdrop(this->currentSearch.fd.getPosterHref(),QSize(),scraper);
+            backDropSet=true;
+        }
     }
 
     addImages(  x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
+    if (!thumbnailSet && b.postersHref.size()>0){
+        this->setThumbnail(b.postersHref.at(0),b.postersSize.size()>0? b.postersSize.at(0) : QSize(),scraper);
+        thumbnailSet=true;
+    }
+
     addImages(  x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
+
+    if (!backDropSet && b.backdropsHref.size()>0){
+        setBackdrop(b.backdropsHref.at(0),b.backdropsSize.size()>0? b.backdropsSize.at(0) : QSize(),scraper);
+        backDropSet=true;
+    }
+
     addImages(  x,  y, w, h, scene, scraper,  manager, b.bannersHref, QList<QSize> (),Scraper::ImageType::BANNER);
+
+
 
     c->setScene(scene);
 
@@ -266,7 +309,9 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 }
 
 
-void PanelView::addImages(  int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type){
+void PanelView::addImages(  int& x2, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type){
+    int x=0;
+
     for (int i=0; i<hrefs.size(); i++){
 
         QString url= hrefs[i];
@@ -276,14 +321,18 @@ void PanelView::addImages(  int& x, int& y, int& w, int& h, QGraphicsScene* scen
             posterSize=sizes[i];
         }
 
+
         QString realUrl=scraper->getBestImageUrl(url,posterSize,QSize(w,h),Qt::KeepAspectRatio, type);
 
-        scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern));
+        QList<QGraphicsItem*> groupItems;
+
+        groupItems.append(scene->addRect(x,y,w,h, QPen(QBrush(Qt::BDiagPattern),1),QBrush(Qt::BDiagPattern)));
 
         QPixmap scaled = createDefaultPoster(w,h);
 
-        MyGraphicsObject* pi=new MyGraphicsObject(scene->addPixmap(scaled));
+        MyGraphicsObject* pi=new MyGraphicsObject(scene->addPixmap(scaled), type);
         pi->parentItem()->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
+        groupItems.append(pi->parentItem());
 
         QLabel *gif_anim = new QLabel();
         QMovie *movie = new QMovie(":/resources/animations/busy-1.gif");
@@ -292,6 +341,7 @@ void PanelView::addImages(  int& x, int& y, int& w, int& h, QGraphicsScene* scen
 
         QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
         proxy->setPos(x+(w-32)/2,y+(h-32)/2);
+        groupItems.append(proxy);
 
         addRequest(manager,realUrl, QPointer<MyGraphicsObject>(pi),  x,  y,  w,  h,QPointer<QGraphicsProxyWidget>(proxy));
 
@@ -325,7 +375,15 @@ void PanelView::addImages(  int& x, int& y, int& w, int& h, QGraphicsScene* scen
         QGraphicsProxyWidget* button = scene->addWidget(b);
         button->setPos(x,h);
 
-        x+=(w+10);
+        groupItems.append(button);
+
+        QGraphicsItemGroup * cliGroup = scene->createItemGroup(groupItems);
+        cliGroup->setHandlesChildEvents(false);
+        cliGroup->setPos(x2,y);
+
+        pi->setItemGroup(cliGroup);
+
+        x2+=(w+10);
     }
 }
 
@@ -426,10 +484,11 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         ui->castListWidget->addItem(actor);
     }
 
-    ui->directorlistWidget->clear();
+    ui->directorListWidget->clear();
     for (const QString& director : b.directors){
-        ui->directorlistWidget->addItem(director);
+        ui->directorListWidget->addItem(director);
     }
+
     /*ui->castToolButton->disconnect();
     QObject::connect(ui->castToolButton, &QPushButton::released, [=]()
     {
@@ -447,13 +506,13 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
         rebuildTemplate();
     });
 */
-    ui->directorToolButton->disconnect();
+    /*  ui->directorToolButton->disconnect();
     QObject::connect(ui->directorToolButton, &QPushButton::released, [=]()
     {
         setDirectors(b.directors);
         rebuildTemplate();
     });
-
+*/
     scene->clear();
 
     int x=0;
@@ -468,6 +527,8 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     //ui->graphicsViewPosters->setScene(scene);
 
     rebuildTemplate(true);
+
+
 }
 
 
@@ -619,7 +680,7 @@ void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPi
     }
     if (!same){
         currentSearch.texts[Template::Properties::backdrop]=backDrop;
-        ui->pushButtonBackDrop->setIcon(backDrop);
+        ui->chooseBackgroundButton->setIcon(backDrop);
         rebuildTemplate();
     }
 }
@@ -632,6 +693,7 @@ void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap
     }
     if (!same){
         currentSearch.texts[Template::Properties::poster]=poster;
+        ui->choosePosterButton->setIcon(poster);
         rebuildTemplate();
     }
 }
@@ -644,7 +706,7 @@ void PanelView::setThumbnailState(PanelView::NETRESOURCE thumbnailState, const Q
     }
     if (!same){
         currentSearch.texts[Template::Properties::thumbnail]=thumbnail;
-        ui->pushButtonThumbail->setIcon(thumbnail);
+        ui->chooseThumbailButton->setIcon(thumbnail);
         rebuildTemplate();
     }
 }
@@ -742,7 +804,7 @@ void PanelView::rescrap() {
 
 void PanelView::on_pushButtonBackDrop_pressed()
 {
-    QPushButton* button=ui->pushButtonBackDrop;
+    /*  QPushButton* button=ui->pushButtonBackDrop;
     QPoint p(0,0);
     QPoint p2=button->mapToGlobal(p);
     QSize menuSize = c->size();
@@ -752,12 +814,12 @@ void PanelView::on_pushButtonBackDrop_pressed()
     }
 
 
-    c->show();
+    c->show();*/
 }
 
 void PanelView::on_pushButtonThumbail_pressed()
 {
-    QPushButton* button=ui->pushButtonThumbail;
+    /* QPushButton* button=ui->pushButtonThumbail;
     QPoint p(0,0);
     QPoint p2=button->mapToGlobal(p);
     QSize menuSize = c->size();
@@ -767,5 +829,5 @@ void PanelView::on_pushButtonThumbail_pressed()
     }
 
 
-    c->show();
+    c->show();*/
 }

@@ -156,9 +156,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-204</y>
+                <y>-139</y>
                 <width>917</width>
-                <height>598</height>
+                <height>533</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -254,9 +254,21 @@ QCheckBox::indicator:indeterminate:pressed {
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBoxLockCast">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
+                <widget class="QWidget" name="widget_12" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <item>
+                   <widget class="QWidget" name="widget_14" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_12">
+                     <item>
+                      <widget class="QCheckBox" name="checkBoxLockCast">
+                       <property name="styleSheet">
+                        <string notr="true">QCheckBox {
     spacing: 5px;
 }
 
@@ -299,144 +311,156 @@ QCheckBox::indicator:indeterminate:pressed {
 }
 
 </string>
-                 </property>
-                 <property name="text">
-                  <string>Cast</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <property name="tristate">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_2" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <item>
-                   <widget class="QListWidget" name="castListWidget">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_3" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_5">
-                     <item>
-                      <widget class="QToolButton" name="toolButton_3">
-                       <property name="text">
-                        <string>...</string>
-                       </property>
-                       <property name="icon">
-                        <iconset theme="list-add">
-                         <normaloff/>
-                        </iconset>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QToolButton" name="actionCastRemove">
-                       <property name="enabled">
-                        <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>...</string>
-                       </property>
-                       <property name="icon">
-                        <iconset theme="list-remove">
-                         <normaloff/>
-                        </iconset>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_3">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                 </property>
-                 <property name="text">
-                  <string>CheckBox</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_8" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
-                  <item>
-                   <widget class="QListWidget" name="directorlistWidget">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_9" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_10">
-                     <item>
-                      <widget class="QToolButton" name="directorToolButton">
-                       <property name="text">
-                        <string>...</string>
-                       </property>
-                       <property name="icon">
-                        <iconset resource="../resources/resources.qrc">
-                         <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+                        <string>Cast</string>
                        </property>
                        <property name="checkable">
                         <bool>true</bool>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                       <property name="tristate">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_2" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <item>
+                         <widget class="QListWidget" name="castListWidget">
+                          <property name="enabled">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QWidget" name="widget_3" native="true">
+                          <layout class="QVBoxLayout" name="verticalLayout_5">
+                           <item>
+                            <widget class="QToolButton" name="toolButton_3">
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                             <property name="icon">
+                              <iconset theme="list-add">
+                               <normaloff/>
+                              </iconset>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QToolButton" name="actionCastRemove">
+                             <property name="enabled">
+                              <bool>false</bool>
+                             </property>
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                             <property name="icon">
+                              <iconset theme="list-remove">
+                               <normaloff/>
+                              </iconset>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_13" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_13">
+                     <item>
+                      <widget class="QCheckBox" name="checkBoxLockDirectors">
+                       <property name="styleSheet">
+                        <string notr="true">QCheckBox {
+    spacing: 5px;
+}
+
+QCheckBox:focus,
+QCheckBox::indicator:focus
+{
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/resources/images/lock.png);
+}
+
+
+QCheckBox::indicator:checked {
+    image: url(:/resources/images/un_lock.png);
+}
+
+QCheckBox::indicator:unchecked:hover {
+}
+
+QCheckBox::indicator:unchecked:pressed {
+ }
+
+
+QCheckBox::indicator:checked:hover {
+}
+
+QCheckBox::indicator:checked:pressed {
+ }
+
+QCheckBox::indicator:indeterminate:hover {
+}
+
+QCheckBox::indicator:indeterminate:pressed {
+}
+
+</string>
+                       </property>
+                       <property name="text">
+                        <string>Director(s)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_8" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_5">
+                        <item>
+                         <widget class="QListWidget" name="directorListWidget">
+                          <property name="enabled">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QWidget" name="widget_9" native="true">
+                          <layout class="QVBoxLayout" name="verticalLayout_10">
+                           <item>
+                            <widget class="QToolButton" name="toolButton">
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QToolButton" name="actionDirectorRemove">
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                     </layout>
@@ -446,9 +470,21 @@ QCheckBox::indicator:indeterminate:pressed {
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_4">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
+                <widget class="QWidget" name="widget_15" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <item>
+                   <widget class="QWidget" name="widget_16" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_4">
+                       <property name="styleSheet">
+                        <string notr="true">QCheckBox {
     spacing: 5px;
 }
 
@@ -491,115 +527,133 @@ QCheckBox::indicator:indeterminate:pressed {
 }
 
 </string>
-                 </property>
-                 <property name="text">
-                  <string>Background</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_10" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                       </property>
+                       <property name="text">
+                        <string>Background</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="MyButton" name="chooseBackgroundButton" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>50</height>
+                        </size>
+                       </property>
+                       <zorder>widget_15</zorder>
+                       <zorder>frame</zorder>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                   <item>
-                   <widget class="QPushButton" name="pushButtonBackDrop">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <activeon>:/resources/templates/CryFibril/preview.jpg</activeon>
-                     </iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>80</width>
-                      <height>80</height>
-                     </size>
-                    </property>
-                    <property name="autoDefault">
-                     <bool>false</bool>
-                    </property>
-                    <property name="default">
-                     <bool>false</bool>
-                    </property>
-                    <property name="flat">
-                     <bool>true</bool>
-                    </property>
+                   <widget class="QWidget" name="widget_17" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_15">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox">
+                       <property name="styleSheet">
+                        <string notr="true">QCheckBox {
+    spacing: 5px;
+}
+
+QCheckBox:focus,
+QCheckBox::indicator:focus
+{
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/resources/images/lock.png);
+}
+
+
+QCheckBox::indicator:checked {
+    image: url(:/resources/images/un_lock.png);
+}
+
+QCheckBox::indicator:unchecked:hover {
+}
+
+QCheckBox::indicator:unchecked:pressed {
+ }
+
+
+QCheckBox::indicator:checked:hover {
+}
+
+QCheckBox::indicator:checked:pressed {
+ }
+
+QCheckBox::indicator:indeterminate:hover {
+}
+
+QCheckBox::indicator:indeterminate:pressed {
+}
+
+</string>
+                       </property>
+                       <property name="text">
+                        <string>Poster</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="MyButton" name="choosePosterButton" native="true">
+                       <layout class="QVBoxLayout" name="verticalLayout_11"/>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
+                <widget class="QWidget" name="widget_10" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
-                 <property name="text">
-                  <string>CheckBox</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_11" native="true">
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
                   <item>
-                   <widget class="QPushButton" name="pushButtonThumbail">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>80</width>
-                      <height>80</height>
-                     </size>
-                    </property>
-                    <property name="flat">
-                     <bool>true</bool>
-                    </property>
+                   <widget class="QWidget" name="widget_11" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_2">
+                       <property name="text">
+                        <string>CheckBox</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="MyButton" name="chooseThumbailButton" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>50</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_18" native="true"/>
                   </item>
                  </layout>
                 </widget>
@@ -627,6 +681,14 @@ QCheckBox::indicator:indeterminate:pressed {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyButton</class>
+   <extends>QWidget</extends>
+   <header location="global">mybutton.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>
@@ -664,30 +726,14 @@ QCheckBox::indicator:indeterminate:pressed {
    </hints>
   </connection>
   <connection>
-   <sender>directorToolButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>directorlistWidget</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>881</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>811</x>
-     <y>501</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>toolButtonSysnopsis</sender>
    <signal>toggled(bool)</signal>
    <receiver>PanelView</receiver>
    <slot>enableSynopsis(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>881</x>
-     <y>219</y>
+     <x>891</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -702,8 +748,8 @@ QCheckBox::indicator:indeterminate:pressed {
    <slot>castRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>881</x>
-     <y>360</y>
+     <x>891</x>
+     <y>207</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -718,8 +764,40 @@ QCheckBox::indicator:indeterminate:pressed {
    <slot>enableCastRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>548</x>
-     <y>371</y>
+     <x>558</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>directorListWidget</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>PanelView</receiver>
+   <slot>enableDirectorRemove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>436</x>
+     <y>304</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDirectorRemove</sender>
+   <signal>pressed()</signal>
+   <receiver>PanelView</receiver>
+   <slot>directorRemove()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>879</x>
+     <y>320</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -734,5 +812,7 @@ QCheckBox::indicator:indeterminate:pressed {
   <slot>enableCastRemove()</slot>
   <slot>enableSynopsis(bool)</slot>
   <slot>castRemove()</slot>
+  <slot>enableDirectorRemove()</slot>
+  <slot>directorRemove()</slot>
  </slots>
 </ui>

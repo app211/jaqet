@@ -9,6 +9,7 @@ DEFINES += QUAZIP_STATIC
 include(src/third/quazip/quazip/quazip.pri)
 
 INCLUDEPATH += src/third/quazip/
+INCLUDEPATH += src
 
 QT       += core gui network xml widgets
 
@@ -46,8 +47,9 @@ SOURCES += src/main.cpp\
     src/engine/fileenginefilesystemwatcher.cpp \
     src/utils.cpp \
     src/scrapers/defaultscraper.cpp \
-    src/mediapanel.cpp \
-    src/mediachooserwidget.cpp
+    src/mediachooserwidget.cpp \
+    src/mybutton.cpp \
+    src/mygraphicsobject.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -77,8 +79,9 @@ HEADERS  += src/mainwindow.h \
     src/engine/fileenginefilesystemwatcher.h \
     src/utils.h \
     src/scrapers/defaultscraper.h \
-    src/mediapanel.h \
-    src/mediachooserwidget.h
+    src/mediachooserwidget.h \
+    src/mybutton.h \
+    src/mygraphicsobject.h
 
 
 FORMS    += src/mainwindow.ui \
@@ -86,7 +89,6 @@ FORMS    += src/mainwindow.ui \
     src/chooseitemdialog.ui \
     src/inprogressdialog.ui \
     src/panelview.ui \
-    src/mediapanel.ui \
     src/mediachooserwidget.ui
 
 RESOURCES += \
