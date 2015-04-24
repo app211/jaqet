@@ -7,23 +7,7 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
 }
 
 void TVIXEngine::init(const QString& path){
-#ifdef Q_OS_WIN32
-    b.loadTemplate("C:/Program Files (x86)/yaDISS/templates/Origins/template.xml");
-#else
-//    b.loadTemplate("/home/turmeaux/.wine/drive_c/Program Files (x86)/yaDIS/templates/Origins/template.xml");
-    b.loadTemplate(":/resources/templates/CryFibril/template.xml");
-
-   //  b.loadTemplate("/home/teddy/Developpement/POLAR/template.xml");
-   //  b.loadTemplate("/home/teddy/Developpement/CinemaView/template.xml");
-    // b.loadTemplate("/home/teddy/Developpement/Relax 2/template.xml");
-
-   //  b.loadTemplate("/home/teddy/Developpement/Maxx Shiny/template.xml");
-   // b.loadTemplate("/home/teddy/Developpement/Tribute Full/template.xml");
-
-   //  b.loadTemplate("/home/teddy/Developpement/Ciné Yadis 2.0/template.xml");
-
-  //  b.loadTemplate("/home/teddy/Developpement/templates/Origins/template.xml");
-#endif
+   b.loadTemplate(":/resources/templates/CryFibril/template.xml");
 
     visibleFileExtensions << "*.asf"
                               <<"*.avi"
