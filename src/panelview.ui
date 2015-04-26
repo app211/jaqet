@@ -156,9 +156,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-139</y>
-                <width>917</width>
-                <height>533</height>
+                <y>0</y>
+                <width>916</width>
+                <height>514</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -466,6 +466,48 @@ QCheckBox::indicator:indeterminate:pressed {
                     </layout>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QWidget" name="widget_19" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_16">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_3">
+                       <property name="text">
+                        <string>Genre</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_20" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <item>
+                         <widget class="QListWidget" name="genreListWidget"/>
+                        </item>
+                        <item>
+                         <widget class="QWidget" name="widget_21" native="true">
+                          <layout class="QVBoxLayout" name="verticalLayout_17">
+                           <item>
+                            <widget class="QToolButton" name="toolButton_2">
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QToolButton" name="toolButton_4">
+                             <property name="text">
+                              <string>...</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -547,8 +589,6 @@ QCheckBox::indicator:indeterminate:pressed {
                          <height>50</height>
                         </size>
                        </property>
-                       <zorder>widget_15</zorder>
-                       <zorder>frame</zorder>
                       </widget>
                      </item>
                     </layout>

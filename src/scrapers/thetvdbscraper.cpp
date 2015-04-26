@@ -115,7 +115,6 @@ void TheTVDBScraper::parseSeriesList( QNetworkAccessManager* manager, const QStr
                 }
             }
             if ( id > 0 && !name.isEmpty() && !langage.isEmpty() ) {
-                qDebug() << "found series Item:" << langage << id << name;
                 ShowPtr show(new Show());
                 show->code=QString::number(id);
                 show->title=name;
@@ -333,6 +332,7 @@ bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , c
     QString title;
     QString runtime;
     QString network;
+    QStringList genre;
 
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Series")) {
         if(xml.tokenType() == QXmlStreamReader::StartElement) {
@@ -344,6 +344,9 @@ bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , c
 
             } if ( xml.name() == QLatin1String( "Network" ) ) {
                 network=xml.readElementText();
+            }if ( xml.name() == QLatin1String( "Genre" ) ) {
+                genre =xml.readElementText().split('|',QString::SkipEmptyParts);
+
             }
         }
         xml.readNext();
@@ -352,6 +355,7 @@ bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , c
 
     result.title=title;
     result.network=network;
+    result.genre=genre;
 
     int runtimeAsInt=runtime.toInt()*60;
     if (runtimeAsInt>0){
@@ -567,7 +571,6 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
         QObject::connect(promise, &Promise::completed, [=]()
         {
             QByteArray data= promise->reply->readAll();
-            qDebug() << data;
             if (promise->reply->error() ==QNetworkReply::NoError){
                 if (parseLanguageList(data)){
                     retriveLanguages= false;

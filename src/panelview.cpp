@@ -260,13 +260,16 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         setCast(b.actors);
     }
 
-    ui->directorListWidget->clear();
-    ui->directorListWidget->addItems(b.directors);
-    if (currentSearch.texts[Template::Properties::director].isNull()){
+    if (ui->checkBoxLockDirectors->isChecked()){
+
+        ui->directorListWidget->clear();
+        ui->directorListWidget->addItems(b.directors);
         setDirectors(b.directors);
     }
 
     ui->labelEpisodeTitle->setText(b.title);
+
+    ui->genreListWidget->addItems(b.genre);
 
     scene->clear();
 
@@ -279,23 +282,23 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
     bool thumbnailSet = false;
 
     if (!this->currentSearch.fd.getPosterHref().isEmpty()){
-        addImages(  x,  y, w, h, scene, scraper,  manager, QStringList() << this->currentSearch.fd.getPosterHref(), QList<QSize>(),Scraper::ImageType::BACKDROP);
+        addImages(  x,  y, w, h, scene, scraper,  manager, QStringList() << this->currentSearch.fd.getPosterHref(), QList<QSize>(),Scraper::ImageType::POSTER);
         if (!backDropSet){
-            setBackdrop(this->currentSearch.fd.getPosterHref(),QSize(),scraper);
+            //     setBackdrop(this->currentSearch.fd.getPosterHref(),QSize(),scraper);
             backDropSet=true;
         }
     }
 
     addImages(  x,  y, w, h, scene, scraper,  manager, b.postersHref, b.postersSize,Scraper::ImageType::THUMBNAIL);
     if (!thumbnailSet && b.postersHref.size()>0){
-        this->setThumbnail(b.postersHref.at(0),b.postersSize.size()>0? b.postersSize.at(0) : QSize(),scraper);
+        //  this->setThumbnail(b.postersHref.at(0),b.postersSize.size()>0? b.postersSize.at(0) : QSize(),scraper);
         thumbnailSet=true;
     }
 
     addImages(  x,  y, w, h, scene, scraper,  manager, b.backdropsHref, b.backdropsSize,Scraper::ImageType::BACKDROP);
 
     if (!backDropSet && b.backdropsHref.size()>0){
-        setBackdrop(b.backdropsHref.at(0),b.backdropsSize.size()>0? b.backdropsSize.at(0) : QSize(),scraper);
+        // setBackdrop(b.backdropsHref.at(0),b.backdropsSize.size()>0? b.backdropsSize.at(0) : QSize(),scraper);
         backDropSet=true;
     }
 

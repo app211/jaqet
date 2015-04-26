@@ -85,7 +85,7 @@ public:
     QStringList directors;
     QString network;
     QDateTime aired;
-
+    QStringList genre;
 };
 
 class Scraper;
