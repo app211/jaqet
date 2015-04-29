@@ -5,7 +5,7 @@
 
 class TheTVDBScraper : public Scraper
 {
-       static const QString API_KEY;
+    static const QString API_KEY;
     static const uchar icon_png[];
 
 private:
@@ -16,8 +16,6 @@ private:
     QString getBannerURL() const ;
 
     bool parseActors(const QByteArray &data, SearchEpisodeInfo& result);
-
-    QMap<QString,QString> genreTranslator;
 
 protected:
     void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;

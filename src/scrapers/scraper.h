@@ -98,8 +98,7 @@ struct FoundResult {
     FoundResult(Scraper *scraper, const FilmPtr& filmPtr)
         :
           scraper(scraper),
-          filmPtr(filmPtr), season(-1)
-        ,episode(-1)
+          filmPtr(filmPtr)
     {
     }
 
@@ -181,7 +180,7 @@ public:
 
     Scraper(QObject *parent=0);
 
-    virtual bool haveCapability(const SearchCapabilities ) const{
+    virtual bool haveCapability(const SearchCapabilities capability) const{
         return true;
     }
 
@@ -219,7 +218,7 @@ Q_SIGNALS:
     void found(const Scraper* scraper,SearchMovieInfo films) const;
     void found(const Scraper* scraper,SearchEpisodeInfo films) const;
     void progress(const QString& progressInfo) const;
-};
+ };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Scraper::SearchFor)
 

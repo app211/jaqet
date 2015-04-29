@@ -7,7 +7,6 @@
 #include <QByteArray>
 #include <QNetworkReply>
 #include <QBuffer>
-#include <QCoreApplication>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -29,42 +28,6 @@ const QString TheTVDBScraper::API_KEY="C526A71D6E158EF0";
 TheTVDBScraper::TheTVDBScraper(QObject *parent)
     : Scraper(parent)
 {
-    static const char *genres[] = {
-        QT_TR_NOOP("All"),
-        QT_TR_NOOP("Action"),
-        QT_TR_NOOP("Adventure"),
-        QT_TR_NOOP("Animation"),
-        QT_TR_NOOP("Children"),
-        QT_TR_NOOP("Comedy"),
-        QT_TR_NOOP("Crime"),
-        QT_TR_NOOP("Documentary"),
-        QT_TR_NOOP("Drama"),
-        QT_TR_NOOP("Family"),
-        QT_TR_NOOP("Fantasy"),
-        QT_TR_NOOP("Food"),
-        QT_TR_NOOP("Game Show"),
-        QT_TR_NOOP("Home and Garden"),
-        QT_TR_NOOP("Horror"),
-        QT_TR_NOOP("Mini-Series"),
-        QT_TR_NOOP("Mystery"),
-        QT_TR_NOOP("News"),
-        QT_TR_NOOP("Reality"),
-        QT_TR_NOOP("Romance"),
-        QT_TR_NOOP("Science-Fiction"),
-        QT_TR_NOOP("Soap"),
-        QT_TR_NOOP("Special Interest"),
-        QT_TR_NOOP("Sport"),
-        QT_TR_NOOP("Suspense"),
-        QT_TR_NOOP("Talk Show"),
-        QT_TR_NOOP("Thriller"),
-        QT_TR_NOOP("Travel"),
-        QT_TR_NOOP("Western")
-    };
-
-    for ( const char * genre: genres) {
-        genreTranslator[genre]=tr(genre);
-    }
-
 }
 
 QString TheTVDBScraper::getXMLURL() const {
@@ -322,7 +285,7 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
             } else if ( xml.name() == QLatin1String( "EpisodeName" ) ) {
                 episodeTitle=xml.readElementText();
             } else if ( xml.name() == QLatin1String( "Director" ) ) {
-                directors =xml.readElementText().split('|',QString::SkipEmptyParts);
+               directors =xml.readElementText().split('|',QString::SkipEmptyParts);
             } else if ( xml.name() == QLatin1String( "FirstAired" ) ) {
                 QDate date = QDate::fromString(xml.readElementText(), "yyyy-MM-dd");
                 if (date.isValid() ){

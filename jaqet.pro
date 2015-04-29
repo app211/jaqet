@@ -96,5 +96,3 @@ RESOURCES += \
 
 OTHER_FILES += \
     attribution.txt
-
-TRANSLATIONS = jaqet_fr.ts

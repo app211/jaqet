@@ -8,7 +8,7 @@
 #include <QUrl>
 #include <QNetworkReply>
 #include <QApplication>
-#include <QFile>
+#include <qfile>
 
 #include "../promise.h"
 #include "../utils.h"
