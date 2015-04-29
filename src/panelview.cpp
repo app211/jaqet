@@ -269,7 +269,10 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
 
     ui->labelEpisodeTitle->setText(b.title);
 
-    ui->genreListWidget->addItems(b.genre);
+    if (ui->checkBoxLockGenre->isChecked()){
+        ui->genreListWidget->clear();
+        ui->genreListWidget->addItems(b.genre);
+    }
 
     scene->clear();
 

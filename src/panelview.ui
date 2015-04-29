@@ -158,57 +158,56 @@
                 <x>0</x>
                 <y>0</y>
                 <width>916</width>
-                <height>514</height>
+                <height>601</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
-                <widget class="QCheckBox" name="checkBoxLockSynopsis">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                 </property>
+                <widget class="QWidget" name="widget_22" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <item>
+                   <widget class="QWidget" name="widget_23" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <item>
+                      <widget class="CheckLock" name="checkBox_3">
+                       <property name="text">
+                        <string>Year</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_24" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_19">
+                     <item>
+                      <widget class="CheckLock" name="checkBox_5">
+                       <property name="text">
+                        <string>CheckBox</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit_2"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="CheckLock" name="checkBoxLockSynopsis">
                  <property name="text">
                   <string>Synopsis</string>
                  </property>
@@ -266,52 +265,7 @@ QCheckBox::indicator:indeterminate:pressed {
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_12">
                      <item>
-                      <widget class="QCheckBox" name="checkBoxLockCast">
-                       <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                       </property>
+                      <widget class="CheckLock" name="checkBoxLockCast">
                        <property name="text">
                         <string>Cast</string>
                        </property>
@@ -379,52 +333,7 @@ QCheckBox::indicator:indeterminate:pressed {
                    <widget class="QWidget" name="widget_13" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_13">
                      <item>
-                      <widget class="QCheckBox" name="checkBoxLockDirectors">
-                       <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                       </property>
+                      <widget class="CheckLock" name="checkBoxLockDirectors">
                        <property name="text">
                         <string>Director(s)</string>
                        </property>
@@ -470,7 +379,7 @@ QCheckBox::indicator:indeterminate:pressed {
                    <widget class="QWidget" name="widget_19" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_16">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_3">
+                      <widget class="CheckLock" name="checkBoxLockGenre">
                        <property name="text">
                         <string>Genre</string>
                        </property>
@@ -524,52 +433,7 @@ QCheckBox::indicator:indeterminate:pressed {
                    <widget class="QWidget" name="widget_16" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_14">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_4">
-                       <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                       </property>
+                      <widget class="CheckLock" name="checkBox_4">
                        <property name="text">
                         <string>Background</string>
                        </property>
@@ -598,52 +462,7 @@ QCheckBox::indicator:indeterminate:pressed {
                    <widget class="QWidget" name="widget_17" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_15">
                      <item>
-                      <widget class="QCheckBox" name="checkBox">
-                       <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-    spacing: 5px;
-}
-
-QCheckBox:focus,
-QCheckBox::indicator:focus
-{
-}
-
-QCheckBox::indicator {
-    width: 16px;
-    height: 16px;
-}
-
-QCheckBox::indicator:unchecked {
-    image: url(:/resources/images/lock.png);
-}
-
-
-QCheckBox::indicator:checked {
-    image: url(:/resources/images/un_lock.png);
-}
-
-QCheckBox::indicator:unchecked:hover {
-}
-
-QCheckBox::indicator:unchecked:pressed {
- }
-
-
-QCheckBox::indicator:checked:hover {
-}
-
-QCheckBox::indicator:checked:pressed {
- }
-
-QCheckBox::indicator:indeterminate:hover {
-}
-
-QCheckBox::indicator:indeterminate:pressed {
-}
-
-</string>
-                       </property>
+                      <widget class="CheckLock" name="checkBox">
                        <property name="text">
                         <string>Poster</string>
                        </property>
@@ -727,6 +546,11 @@ QCheckBox::indicator:indeterminate:pressed {
    <extends>QWidget</extends>
    <header location="global">mybutton.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CheckLock</class>
+   <extends>QCheckBox</extends>
+   <header location="global">checklock.h</header>
   </customwidget>
  </customwidgets>
  <resources>

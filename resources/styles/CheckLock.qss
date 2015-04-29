@@ -1,0 +1,76 @@
+    QCheckBox[CheckLock="true"] {
+        spacing: 5px;
+    }
+    
+    QCheckBox[CheckLock="true"]:focus,
+    QCheckBox[CheckLock="true"]::indicator:focus
+    {
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator {
+        width: 16px;
+        height: 16px;
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator:unchecked {
+        image: url(:/resources/images/lock.png);
+    }
+    
+    
+    QCheckBox[CheckLock="true"]::indicator:checked {
+        image: url(:/resources/images/un_lock.png);
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator:unchecked:hover {
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator:unchecked:pressed {
+     }
+    
+    
+    QCheckBox[CheckLock="true"]::indicator:checked:hover {
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator:checked:pressed {
+     }
+    
+    QCheckBox[CheckLock="true"]::indicator:indeterminate:hover {
+    }
+    
+    QCheckBox[CheckLock="true"]::indicator:indeterminate:pressed {
+    }
+
+
+
+QRadioButton#radioTV::indicator,
+QRadioButton#radioMovie::indicator
+ {
+width: 29px;
+height: 30px;
+}
+
+QRadioButton#radioTV::indicator::unchecked {
+background-image: url(:/resources/images/view-toggle-inactive-right.png);
+image: url(:/resources/images/tv.png);
+}
+QRadioButton#radioTV::indicator::checked {
+background-image: url(:/resources/images/view-toggle-active-right.png);
+image: url(:/resources/images/tv.png);
+}
+QRadioButton#radioTV::indicator::pressed {
+background-image: url(:/resources/images/view-toggle-pressed-right.png);
+image: url(:/resources/images/tv.png);
+}
+
+QRadioButton#radioMovie::indicator::unchecked {
+  background-image: url(:/resources/images/view-toggle-inactive-left.png);
+image: url(:/resources/images/movie.png);
+}
+QRadioButton#radioMovie::indicator::checked {
+ background-image: url(:/resources/images/view-toggle-active-left.png);
+image: url(:/resources/images/movie.png);
+}
+QRadioButton#radioMovie::indicator::pressed {
+  background-image: url(:/resources/images/view-toggle-pressed-left.png);
+ image: url(:/resources/images/movie.png);
+}

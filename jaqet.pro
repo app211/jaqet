@@ -49,7 +49,8 @@ SOURCES += src/main.cpp\
     src/scrapers/defaultscraper.cpp \
     src/mediachooserwidget.cpp \
     src/mybutton.cpp \
-    src/mygraphicsobject.cpp
+    src/mygraphicsobject.cpp \
+    src/checklock.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -81,7 +82,8 @@ HEADERS  += src/mainwindow.h \
     src/scrapers/defaultscraper.h \
     src/mediachooserwidget.h \
     src/mybutton.h \
-    src/mygraphicsobject.h
+    src/mygraphicsobject.h \
+    src/checklock.h
 
 
 FORMS    += src/mainwindow.ui \

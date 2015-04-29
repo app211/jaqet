@@ -105,5 +105,6 @@
         <file>templates/CryFibril/wma.png</file>
         <file>templates/CryFibril/wmv.png</file>
         <file>templates/CryFibril/xvid.png</file>
+        <file>styles/CheckLock.qss</file>
     </qresource>
 </RCC>

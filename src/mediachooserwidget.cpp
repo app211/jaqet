@@ -33,6 +33,8 @@ void MediaChooserWidget::closeEvent(QCloseEvent *event)
 
 void MediaChooserWidget::popup(Scraper::ImageType filter){
 
+    if (ui->graphicsView->scene()){
+
     int x=0;
     foreach (QGraphicsItem *item, ui->graphicsView->scene()->items(Qt::AscendingOrder))
     {
@@ -48,6 +50,7 @@ void MediaChooserWidget::popup(Scraper::ImageType filter){
                 }
             }
         }
+    }
     }
     show();
 }
