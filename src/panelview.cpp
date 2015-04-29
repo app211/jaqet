@@ -803,34 +803,3 @@ void PanelView::rescrap() {
 }
 
 
-
-
-void PanelView::on_pushButtonBackDrop_pressed()
-{
-    /*  QPushButton* button=ui->pushButtonBackDrop;
-    QPoint p(0,0);
-    QPoint p2=button->mapToGlobal(p);
-    QSize menuSize = c->size();
-    if (p2.y()-menuSize.height() > 0){
-        c->move(QPoint(p2.x(),p2.y()-menuSize.height()));
-
-    }
-
-
-    c->show();*/
-}
-
-void PanelView::on_pushButtonThumbail_pressed()
-{
-    /* QPushButton* button=ui->pushButtonThumbail;
-    QPoint p(0,0);
-    QPoint p2=button->mapToGlobal(p);
-    QSize menuSize = c->size();
-    if (p2.y()-menuSize.height() > 0){
-        c->move(QPoint(p2.x(),p2.y()-menuSize.height()));
-
-    }
-
-
-    c->show();*/
-}
