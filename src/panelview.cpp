@@ -17,6 +17,7 @@
 #include "scanner/mediainfoscanner.h"
 #include "engine/engine.h"
 #include "./inprogressdialog.h"
+#include "mediachooserpopup.h"
 
 static QPixmap createDefaultPoster(int w, int h){
     QPixmap result(w,h);
@@ -32,9 +33,7 @@ static QPixmap createDefaultPoster(int w, int h){
 }
 
 
-#include "mediachooserwidget.h"
-
-MediaChooserWidget* c;
+MediaChooserPopup* c;
 
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
@@ -94,12 +93,12 @@ PanelView::PanelView(QWidget *parent) :
 
     setDir();
 
-    c=new MediaChooserWidget(this);
+    c=new MediaChooserPopup(this);
     c->hide();
 
-    ui->chooseBackgroundButton->setPopup(c,Scraper::ImageType::BACKDROP);
-    ui->choosePosterButton->setPopup(c,Scraper::ImageType::POSTER);
-    ui->chooseThumbailButton->setPopup(c,Scraper::ImageType::THUMBNAIL);
+    ui->chooseBackgroundButton->setPopup(c,ImageType::Backdrop);
+    ui->choosePosterButton->setPopup(c,ImageType::Poster);
+    ui->chooseThumbailButton->setPopup(c,ImageType::Thumbnail);
 }
 
 PanelView::~PanelView()

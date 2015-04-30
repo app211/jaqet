@@ -156,9 +156,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>0</y>
-                <width>916</width>
-                <height>601</height>
+                <y>-219</y>
+                <width>917</width>
+                <height>645</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -440,7 +440,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="MyButton" name="chooseBackgroundButton" native="true">
+                      <widget class="MediaChooserButton" name="chooseBackgroundButton" native="true">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                          <horstretch>0</horstretch>
@@ -469,7 +469,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="MyButton" name="choosePosterButton" native="true">
+                      <widget class="MediaChooserButton" name="choosePosterButton" native="true">
                        <layout class="QVBoxLayout" name="verticalLayout_11"/>
                       </widget>
                      </item>
@@ -499,7 +499,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="MyButton" name="chooseThumbailButton" native="true">
+                      <widget class="MediaChooserButton" name="chooseThumbailButton" native="true">
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
@@ -542,15 +542,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MyButton</class>
-   <extends>QWidget</extends>
-   <header location="global">mybutton.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>CheckLock</class>
    <extends>QCheckBox</extends>
    <header location="global">checklock.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MediaChooserButton</class>
+   <extends>QWidget</extends>
+   <header location="global">mediachooserbutton.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

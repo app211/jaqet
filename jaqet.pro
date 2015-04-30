@@ -47,10 +47,10 @@ SOURCES += src/main.cpp\
     src/engine/fileenginefilesystemwatcher.cpp \
     src/utils.cpp \
     src/scrapers/defaultscraper.cpp \
-    src/mediachooserwidget.cpp \
-    src/mybutton.cpp \
     src/mygraphicsobject.cpp \
-    src/checklock.cpp
+    src/checklock.cpp \
+    src/mediachooserbutton.cpp \
+    src/mediachooserpopup.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -80,10 +80,11 @@ HEADERS  += src/mainwindow.h \
     src/engine/fileenginefilesystemwatcher.h \
     src/utils.h \
     src/scrapers/defaultscraper.h \
-    src/mediachooserwidget.h \
-    src/mybutton.h \
     src/mygraphicsobject.h \
-    src/checklock.h
+    src/checklock.h \
+    src/mediachooserbutton.h \
+    src/mediachoosermediatype.h \
+    src/mediachooserpopup.h
 
 
 FORMS    += src/mainwindow.ui \
@@ -91,7 +92,7 @@ FORMS    += src/mainwindow.ui \
     src/chooseitemdialog.ui \
     src/inprogressdialog.ui \
     src/panelview.ui \
-    src/mediachooserwidget.ui
+    src/mediachooserpopup.ui
 
 RESOURCES += \
     resources/resources.qrc
@@ -102,3 +103,6 @@ OTHER_FILES += \
 TRANSLATIONS = jaqet_fr.ts
 
 DEFINES += LOGRULES=\\\"ui.*.debug=true\\\"
+
+DISTFILES += \
+    jaqet_fr.ts
