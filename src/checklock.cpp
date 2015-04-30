@@ -12,3 +12,6 @@ CheckLock::~CheckLock()
 
 }
 
+ bool CheckLock::isLock() const {
+     return !isChecked();
+ }

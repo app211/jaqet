@@ -12,7 +12,7 @@
 #include "scanner/scanner.h"
 #include "engine/template/template.h"
 #include "promise.h"
-#include "mygraphicsobject.h"
+#include "mediachoosermediatype.h"
 
 class MyProxyModel;
 class Engine;
@@ -67,20 +67,7 @@ private:
     QList<Scraper*> scrapes;
     MediaSearch currentSearch;
 
-    QGraphicsScene* scene;
 
-    struct M_M {
-        QString url;
-        QPointer<MyGraphicsObject> itemToUpdate;
-        QPointer<QGraphicsProxyWidget> busyIndicator;
-        int x;
-        int y;
-        int w;
-        int h;
-    };
-
-    static QList<M_M> urls;
-    static Promise* currentPromise;
 
     void setBackdropState(NETRESOURCE fa, const QPixmap &backDrop=QPixmap());
     void setPosterState(NETRESOURCE posterState, const QPixmap& poster=QPixmap());
@@ -90,23 +77,15 @@ private:
     void setSynopsis(const QString& synopsis);
     void setCast(const QStringList& actors);
     void setDirectors(const QStringList& directors);
-    void addImages( int& x, int& y, int& w, int& h, QGraphicsScene* scene, const Scraper* scraper, QNetworkAccessManager& manager, const QStringList&  hrefs, const QList<QSize>& sizes, const Scraper::ImageType type);
-
-    void addRequest(QNetworkAccessManager & manager, const QString& url,  QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h, QPointer<QGraphicsProxyWidget> busyIndicator);
-    void startPromise( QNetworkAccessManager* manager);
+    void addImages(const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes, QFlags<ImageType> type);
 
 private slots:
 
     void search(Engine *engine, const QModelIndex &index);
 
-    // From Scrapper
     void foundMovie(const Scraper *scraper, SearchMovieInfo b);
     void foundEpisode(const Scraper *scraper, SearchEpisodeInfo b);
 
-    // From Internet
-    void setImageFromInternet(QByteArray& qb, QPointer<MyGraphicsObject> itemToUpdate, int x, int y, int w, int h);
-
-    // From UI
     void setPoster (const QString& url, const QSize &originalSize, const Scraper *scrape );
     void setThumbnail (const QString& url, const QSize &originalSize, const Scraper *scrape );
     void setBackdrop(const QString& url, const QSize& originalSize, const Scraper *scrape);
@@ -123,6 +102,11 @@ private slots:
 
     // From Engine
     void previewOK(QGraphicsScene*);
+
+
+    void backgroundSelected(const MediaChoosed& mediaChoosed);
+    void posterSelected(const MediaChoosed& mediaChoosed);
+    void thumbnailSelected(const MediaChoosed& mediaChoosed);
 
 
 };

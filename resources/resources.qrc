@@ -107,5 +107,7 @@
         <file>templates/CryFibril/xvid.png</file>
         <file>styles/default.qss</file>
         <file>styles/gtk+.qss</file>
+        <file>images/erase.png</file>
+        <file>images/menu_indicator.png</file>
     </qresource>
 </RCC>

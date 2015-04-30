@@ -44,8 +44,10 @@ void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const 
     QObject::connect(promise, &Promise::completed, [=]()
     {
         if (promise->reply->error() ==QNetworkReply::NoError){
+            QByteArray data=promise->reply->readAll();
+            qDebug() << data;
             QJsonParseError e;
-            QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 if (!parseConfiguration(doc)){
                     emit scraperError();
@@ -169,9 +171,11 @@ void TheMovieDBScraper::searchTVConfigurationOk(QNetworkAccessManager* manager, 
     QObject::connect(promise, &Promise::completed, [=]()
     {
         if (promise->reply->error() ==QNetworkReply::NoError){
+            QByteArray data=promise->reply->readAll();
+            qDebug() << data;
 
             QJsonParseError e;
-            QJsonDocument doc=  QJsonDocument::fromJson(promise->reply->readAll(),&e);
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 emit found(parseTVResultset(doc));
             }  else {
@@ -305,7 +309,7 @@ FilmPrtList TheMovieDBScraper::parseResultset(const QJsonDocument& resultset) co
         }
         film->productionYear =QDate::fromString(obj["release_date"].toString(), "yyyy-MM-dd").toString("yyyy");
         film->code= QString::number(obj["id"].toDouble());
-        film->posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
+        film->posterHref = obj["poster_path"].toString();
 
         films.append(film);
     }
@@ -340,7 +344,7 @@ ShowPtrList TheMovieDBScraper::parseTVResultset(const QJsonDocument& resultset) 
         show->title= obj["name"].toString();
         show->productionYear =QDate::fromString(obj["first_air_date"].toString(), "yyyy-MM-dd").toString("yyyy");
         show->code= QString::number(obj["id"].toDouble());
-        show->posterHref = QString().append(baseUrl).append("original").append(obj["poster_path"].toString());
+        show->posterHref = obj["poster_path"].toString();
 
         shows.append(show);
     }
@@ -444,6 +448,7 @@ void TheMovieDBScraper::findEpisodeInfoGetImage(QNetworkAccessManager* manager, 
             QJsonParseError e;
             SearchEpisodeInfo newResult=result;
             QByteArray data=promise->reply->readAll();
+            qDebug() << " TheMovieDBScraper::findEpisodeInfoGetImage" << data;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 if(parseImageInfo(doc,SearchOption::All,newResult)){
@@ -603,6 +608,11 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const Sea
 
 
 QString TheMovieDBScraper::getBestImageUrl(const QString& filePath,const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, ImageType imageType) const {
+    qDebug() << baseUrl;
+    qDebug() << filePath;
+    qDebug() << posterSizes;
+    qDebug() << findBestSize(posterSizes,size.width());
+
     return QString().append(baseUrl).append(findBestSize(posterSizes,size.width())).append(filePath);
 }
 

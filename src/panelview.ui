@@ -156,9 +156,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-219</y>
+                <y>0</y>
                 <width>917</width>
-                <height>645</height>
+                <height>549</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -179,6 +179,9 @@
                        <property name="text">
                         <string>Year</string>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -194,6 +197,9 @@
                       <widget class="CheckLock" name="checkBox_5">
                        <property name="text">
                         <string>CheckBox</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -337,6 +343,9 @@
                        <property name="text">
                         <string>Director(s)</string>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -382,6 +391,9 @@
                       <widget class="CheckLock" name="checkBoxLockGenre">
                        <property name="text">
                         <string>Genre</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -437,6 +449,9 @@
                        <property name="text">
                         <string>Background</string>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -466,11 +481,40 @@
                        <property name="text">
                         <string>Poster</string>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="MediaChooserButton" name="choosePosterButton" native="true">
                        <layout class="QVBoxLayout" name="verticalLayout_11"/>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_11" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <item>
+                      <widget class="QCheckBox" name="Thumbnail">
+                       <property name="text">
+                        <string>CheckBox</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="MediaChooserButton" name="chooseThumbailButton" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>50</height>
+                        </size>
+                       </property>
                       </widget>
                      </item>
                     </layout>
@@ -488,29 +532,6 @@
                   </size>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_8">
-                  <item>
-                   <widget class="QWidget" name="widget_11" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_6">
-                     <item>
-                      <widget class="QCheckBox" name="checkBox_2">
-                       <property name="text">
-                        <string>CheckBox</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="MediaChooserButton" name="chooseThumbailButton" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>50</height>
-                        </size>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
                   <item>
                    <widget class="QWidget" name="widget_18" native="true"/>
                   </item>
@@ -551,6 +572,10 @@
    <extends>QWidget</extends>
    <header location="global">mediachooserbutton.h</header>
    <container>1</container>
+   <slots>
+    <signal>mediaSelected(MediaChoosed)</signal>
+    <signal>mediaSelected2(MediaChoosed)</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -669,6 +694,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chooseBackgroundButton</sender>
+   <signal>mediaSelected2(MediaChoosed)</signal>
+   <receiver>PanelView</receiver>
+   <slot>backgroundSelected(MediaChoosed)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>238</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>choosePosterButton</sender>
+   <signal>mediaSelected2(MediaChoosed)</signal>
+   <receiver>PanelView</receiver>
+   <slot>posterSelected(MediaChoosed)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>460</x>
+     <y>406</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chooseThumbailButton</sender>
+   <signal>mediaSelected2(MediaChoosed)</signal>
+   <receiver>PanelView</receiver>
+   <slot>thumbnailSelected(MediaChoosed)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>755</x>
+     <y>406</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>proceed()</slot>
@@ -678,5 +751,8 @@
   <slot>castRemove()</slot>
   <slot>enableDirectorRemove()</slot>
   <slot>directorRemove()</slot>
+  <slot>backgroundSelected(MediaChoosed)</slot>
+  <slot>posterSelected(MediaChoosed)</slot>
+  <slot>thumbnailSelected(MediaChoosed)</slot>
  </slots>
 </ui>

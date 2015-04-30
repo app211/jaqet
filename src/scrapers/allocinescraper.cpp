@@ -141,12 +141,7 @@ void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, co
     {
         if (promise->reply->error() ==QNetworkReply::NoError){
             const QByteArray data=promise->reply->readAll();
-            QFile file("c:/temp/0.txt");
-            if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate	))
-                return;
-
-            file.write(data);
-            file.close();
+            qDebug() << data;
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -266,14 +261,8 @@ void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager,const 
     QObject::connect(promise, &Promise::completed, [=]()
     {
         if (promise->reply->error() ==QNetworkReply::NoError){
-            const QByteArray data=promise->reply->readAll();
-            QFile file("c:/temp/1.txt");
-            if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate	))
-                return;
-
-            file.write(data);
-            file.close();
-            qDebug() << "*****" << data;
+            const QByteArray data=promise->reply->readAll();          
+            qDebug() <<  data;
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){

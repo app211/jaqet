@@ -6,6 +6,17 @@
 
 #include "mediachooserpopup.h"
 
+MediaChooserButton::MediaChooserButton(QWidget *parent) :
+    QAbstractButton(parent),
+    m_State  (STATE_NORMAL),
+    m_erase(QPixmap(":/resources/images/erase.png")),
+    m_indicator(QPixmap(":/resources/images/menu_indicator.png"))
+
+{
+    setContentsMargins(3,3,3,3);
+    setMediaSize(QSize(50,50));
+}
+
 void MediaChooserButton::initStyleOption(QStyleOptionButton &option) const
 {
     option.initFrom(this);
@@ -19,15 +30,6 @@ void MediaChooserButton::initStyleOption(QStyleOptionButton &option) const
 
 }
 
-MediaChooserButton::MediaChooserButton(QWidget *parent) :
-    QAbstractButton(parent),
-    m_State  (STATE_NORMAL),
-    m_erase(QPixmap(":/ressources/erase.png")),
-    m_indicator(QPixmap(":/ressources/menu_indicator.png"))
-
-{
-    setContentsMargins(3,3,3,3);
-}
 
 void MediaChooserButton::enterEvent(QEvent *)
 { 
@@ -159,9 +161,11 @@ void MediaChooserButton::showPopup(){
     }
 }
 
-void MediaChooserButton::mediaSelected(const QUrl& url){
+void MediaChooserButton::mediaSelected(const MediaChoosed &mediaChoosed){
     Q_ASSERT(sender()==_popup);
-    qDebug() << url.toDisplayString();
+
+
+    emit mediaSelected2(mediaChoosed);
 }
 
 void MediaChooserButton::mousePressEvent(QMouseEvent *e)
@@ -170,7 +174,7 @@ void MediaChooserButton::mousePressEvent(QMouseEvent *e)
         e->accept();
         _mediaScaled = QPixmap();
         update();
-        mediaSelected(QUrl());
+      //  mediaSelected(QUrl());
         return;
     }
 
@@ -206,6 +210,44 @@ void  MediaChooserButton::setMediaSize(const QSize& mediaSize){
 
 void  MediaChooserButton::setMedia(const QPixmap& media){
     this->_media = media;
-    this->_mediaScaled=media.isNull()?QPixmap():media.scaled(_mediaSize, Qt::KeepAspectRatio);
+    this->_mediaScaled=media.isNull()?QPixmap():media.scaled(_mediaSize, Qt::KeepAspectRatio,Qt::SmoothTransformation);
+}
+
+MediaChoosed::MediaChoosed(const QUrl& url) : _url(url){
+
+}
+
+MediaChoosed::MediaChoosed(const QString& localFilePath) : _localFilePath(localFilePath){
+}
+
+MediaChoosed::MediaChoosed(const Scraper *scraper, const QString& scraperResourceId): _scraper(scraper), _scraperResourceId(scraperResourceId){
+}
+
+QUrl MediaChoosed::url()  const{
+    return _url;
+}
+
+QString MediaChoosed::localFilePath() const{
+    return _localFilePath;
+}
+
+const Scraper *MediaChoosed::scraper() const{
+    return _scraper;
+}
+
+QString MediaChoosed::scraperResourceId() const{
+    return _scraperResourceId;
+}
+
+bool MediaChoosed::isMediaUrl() const{
+    return !_url.isEmpty();
+}
+
+bool MediaChoosed::isMediaLocalFilePath() const{
+    return !_localFilePath.isEmpty();
+}
+
+bool MediaChoosed::isMediaScraper() const{
+    return _scraper && !_scraperResourceId.isEmpty();
 }
 

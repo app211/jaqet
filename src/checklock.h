@@ -10,6 +10,7 @@ public:
     explicit CheckLock(QWidget *parent = 0);
     ~CheckLock();
 
+    bool isLock() const;
 signals:
 
 public slots:

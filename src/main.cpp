@@ -46,14 +46,14 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[])
 {
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-
-    textStream.setDevice(&outFile);
 
     oldHandler=qInstallMessageHandler(customMessageHandler);
 
     QApplication app(argc, argv);
 
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    textStream.setDevice(&outFile);
 
     qsrand(QTime::currentTime().msec()) ;
 

@@ -55,10 +55,13 @@ private:
     bool hitEraseButton(const QPoint &pos) const;
 
 public slots:
-    void mediaSelected(const QUrl& url);
+    void mediaSelected(const MediaChoosed& mediaChoosed);
     void buttonPressed();
     void popupClosed();
 
+signals:
+    void mediaSelected2(const MediaChoosed& mediaChoosed);
+  //  void mediaSelected(MediaChoosed mediaChoosed);
 
 
 };
