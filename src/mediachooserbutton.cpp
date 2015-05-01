@@ -220,7 +220,7 @@ MediaChoosed::MediaChoosed(const QUrl& url) : _url(url){
 MediaChoosed::MediaChoosed(const QString& localFilePath) : _localFilePath(localFilePath){
 }
 
-MediaChoosed::MediaChoosed(const Scraper *scraper, const QString& scraperResourceId): _scraper(scraper), _scraperResourceId(scraperResourceId){
+MediaChoosed::MediaChoosed(const ScraperResource &scraperResource): _scraperResource(scraperResource){
 }
 
 QUrl MediaChoosed::url()  const{
@@ -231,12 +231,8 @@ QString MediaChoosed::localFilePath() const{
     return _localFilePath;
 }
 
-const Scraper *MediaChoosed::scraper() const{
-    return _scraper;
-}
-
-QString MediaChoosed::scraperResourceId() const{
-    return _scraperResourceId;
+ScraperResource MediaChoosed::scraperResource() const{
+    return _scraperResource;
 }
 
 bool MediaChoosed::isMediaUrl() const{
@@ -248,6 +244,6 @@ bool MediaChoosed::isMediaLocalFilePath() const{
 }
 
 bool MediaChoosed::isMediaScraper() const{
-    return _scraper && !_scraperResourceId.isEmpty();
+    return !_scraperResource.isNull();
 }
 

@@ -386,11 +386,11 @@ void  PanelView::enableSynopsis(bool enable){
 void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
     currentSearch._banner=ScraperResource(url,QSize(),_currentScrape);
 
-    if (!currentSearch._banner.resources.isEmpty()){
+    if (!currentSearch._banner.resources().isEmpty()){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._banner.scraper->getBestImageUrl(currentSearch._banner.resources,QSize(),currentSearch.engine->getPosterSize(), Qt::KeepAspectRatio,Scraper::ImageType::BANNER);
+        QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),QSize(),currentSearch.engine->getPosterSize(), Qt::KeepAspectRatio,Scraper::ImageType::BANNER);
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -426,11 +426,11 @@ void PanelView::setThumbnail (const QString& url, const QSize& originalSize, con
 
     currentSearch._thumbnail=ScraperResource(url,originalSize,_currentScrape);
 
-    if (!currentSearch._thumbnail.resources.isEmpty()){
+    if (!currentSearch._thumbnail.resources().isEmpty()){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._thumbnail.scraper->getBestImageUrl(currentSearch._thumbnail.resources,originalSize,currentSearch.engine->getPosterSize());
+        QString url=currentSearch._thumbnail.scraper()->getBestImageUrl(currentSearch._thumbnail.resources(),originalSize,currentSearch.engine->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
 
@@ -464,11 +464,11 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
 
     currentSearch._poster=ScraperResource(url,originalSize,_currentScrape);
 
-    if (!currentSearch._poster.resources.isEmpty()){
+    if (!currentSearch._poster.resources().isEmpty()){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._poster.scraper->getBestImageUrl(currentSearch._poster.resources,originalSize,currentSearch.engine->getPosterSize());
+        QString url=currentSearch._poster.scraper()->getBestImageUrl(currentSearch._poster.resources(),originalSize,currentSearch.engine->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
 
@@ -551,8 +551,8 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
 
     currentSearch._backdrop=ScraperResource(url,originalSize,_currentScrape);
 
-    if (!currentSearch._backdrop.resources.isEmpty()){
-        QString url=currentSearch._backdrop.scraper->getBestImageUrl(currentSearch._backdrop.resources,originalSize,currentSearch.engine->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
+    if (!currentSearch._backdrop.resources().isEmpty()){
+        QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
 
         InProgressDialog* p=InProgressDialog::create();
 
@@ -634,8 +634,8 @@ void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
         qDebug() << mediaChoosed.localFilePath();
 
     } else if (mediaChoosed.isMediaScraper()){
-        setBackdrop(mediaChoosed.scraperResourceId(),QSize(),mediaChoosed.scraper());
-        qDebug() << mediaChoosed.scraperResourceId();
+        setBackdrop(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
+        qDebug() << mediaChoosed.scraperResource().resources();
     }
 }
 
@@ -647,9 +647,9 @@ void PanelView::posterSelected(const MediaChoosed& mediaChoosed){
         qDebug() << mediaChoosed.localFilePath();
 
     } else if (mediaChoosed.isMediaScraper()){
-        this->setPoster(mediaChoosed.scraperResourceId(),QSize(),mediaChoosed.scraper());
-        qDebug() << mediaChoosed.scraperResourceId();
-    }
+        this->setPoster(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
+        qDebug() << mediaChoosed.scraperResource().resources();
+     }
 }
 
 void PanelView::thumbnailSelected(const MediaChoosed& mediaChoosed){
@@ -660,7 +660,7 @@ void PanelView::thumbnailSelected(const MediaChoosed& mediaChoosed){
         qDebug() << mediaChoosed.localFilePath();
 
     } else if (mediaChoosed.isMediaScraper()){
-        this->setThumbnail(mediaChoosed.scraperResourceId(),QSize(),mediaChoosed.scraper());
-        qDebug() << mediaChoosed.scraperResourceId();
+        this->setThumbnail(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
+        qDebug() << mediaChoosed.scraperResource().resources();
     }
 }

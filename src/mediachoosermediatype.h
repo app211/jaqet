@@ -17,18 +17,15 @@ enum class ImageType {
 class MediaChoosed {
     const QUrl _url;
     const QString _localFilePath;
-    const Scraper * const _scraper=nullptr;
-    const QString _scraperResourceId;
-
+    const ScraperResource _scraperResource;
 public:
     MediaChoosed(const QUrl& url);
     MediaChoosed(const QString& localFilePath);
-    MediaChoosed(const Scraper *scraper, const QString& scraperResourceId);
+    MediaChoosed(const ScraperResource& scraperResource);
 
     QUrl url() const;
     QString localFilePath()  const;
-    const Scraper *scraper()  const;
-    QString scraperResourceId()  const;
+    ScraperResource scraperResource()  const;
 
     bool isMediaUrl()  const;
     bool isMediaLocalFilePath()  const;

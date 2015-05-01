@@ -225,21 +225,40 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Scraper::SearchFor)
 
 
 class ScraperResource {
+     QString _resources;
+     QSize _originalSize;
+     const Scraper* _scraper;
+
 public:
-    QString resources;
-    QSize originalSize;
-    const Scraper* scraper;
-    ScraperResource(const QString& resources, const QSize& originalSize, const Scraper* scraper){
-        this->resources=resources;
-        this->scraper=scraper;
-        this->originalSize=originalSize;
-    }
-
-    ScraperResource(){
+     ScraperResource(const QString& resources, const QSize& originalSize, const Scraper* scraper)
+        : _resources(resources),
+          _originalSize(originalSize),
+          _scraper(scraper){
 
     }
+
+    ScraperResource():_scraper(nullptr){
+    }
+
+    const QString resources() const {
+      return _resources;
+
+  }
+  const QSize originalSize() const {
+      return _originalSize;
+
+  }
+
+  const Scraper* scraper() const{
+      return _scraper;
+  }
+
+
+   bool isNull() const{
+       return _resources.isEmpty() || _scraper==nullptr;
+   }
 };
 
-Q_DECLARE_METATYPE(ScraperResource);
+Q_DECLARE_METATYPE(ScraperResource)
 
 #endif // SCRAPER_H

@@ -256,7 +256,7 @@ void MediaChooserPopup::addImageFromScraper( const Scraper* scraper, const QStri
 
     qCDebug(fcIo) << "addImageFromScraper " << imageRef << realUrl;
 
-    addImage(QUrl(realUrl),MediaChoosed(scraper,imageRef), type);
+    addImage(QUrl(realUrl),MediaChoosed(ScraperResource(imageRef,originalSize, scraper)), type);
 }
 
 void MediaChooserPopup::addImageFromUrl(const QUrl& url, QFlags<ImageType> type){
