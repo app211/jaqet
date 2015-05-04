@@ -524,7 +524,9 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
 }
 
 
-QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, ImageType imageType) const{
+QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize,const QSize& size, Qt::AspectRatioMode mode, QFlags<ImageType> imageType) const{
+    Q_UNUSED(mode);
+    Q_UNUSED(imageType);
 
     if (!originalSize.isNull() && size.expandedTo(originalSize)==size){
         return filePath;

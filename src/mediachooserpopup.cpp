@@ -252,7 +252,7 @@ void MediaChooserPopup::addError(const QString& errorMessage,  QPointer<MediaCho
 void MediaChooserPopup::addImageFromScraper( const Scraper* scraper, const QString& imageRef, const QSize& originalSize, QFlags<ImageType> type ){
     QLoggingCategory fcIo("ui.mediaChooser");
 
-    QString realUrl=scraper->getBestImageUrl(imageRef,originalSize,QSize(200,200),Qt::KeepAspectRatio);
+    QString realUrl=scraper->getBestImageUrl(imageRef,originalSize,QSize(200,200),Qt::KeepAspectRatio,type);
 
     qCDebug(fcIo) << "addImageFromScraper " << imageRef << realUrl;
 

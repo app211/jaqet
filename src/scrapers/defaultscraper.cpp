@@ -70,16 +70,16 @@ void DefaultScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
     m_bannerScraper->searchTV(manager,toSearch);
 }
 
-QString DefaultScraper::getBestImageUrl(const QString& url, const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, ImageType imageType) const {
+QString DefaultScraper::getBestImageUrl(const QString& url, const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, QFlags<ImageType> imageType) const {
     for ( QPair<Scraper*,SearchFor> pair : scrapers2){
         Scraper* scraper    = pair.first;
         SearchFor searchFor = pair.second;
 
-        if (imageType==ImageType::BANNER && (searchFor & SearchOption::Banner)){
+        if (imageType & ImageType::Banner && (searchFor & SearchOption::Banner)){
             return scraper->getBestImageUrl(url,originalSize,size,mode,imageType);
-        } else if (imageType==ImageType::POSTER && (searchFor & SearchOption::Poster)){
+        } else if (imageType & ImageType::Poster && (searchFor & SearchOption::Poster)){
             return scraper->getBestImageUrl(url,originalSize,size,mode,imageType);
-        } else if (imageType==ImageType::BACKDROP && (searchFor & SearchOption::BackDrop)){
+        } else if (imageType & ImageType::Backdrop && (searchFor & SearchOption::BackDrop)){
             return scraper->getBestImageUrl(url,originalSize,size,mode,imageType);
         }
     }

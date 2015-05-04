@@ -17,6 +17,14 @@
 
 class QNetworkAccessManager;
 
+enum class ImageType {
+    Banner = 1,
+    Poster = 2,
+    Backdrop = 4,
+    Thumbnail = 8,
+    All=Banner | Poster | Backdrop | Thumbnail
+};
+
 class Film {
 public:
     QString code;
@@ -72,6 +80,9 @@ public:
     QList<QSize> postersSize;
     QStringList postersHref;
     QStringList bannersHref;
+    QList<QSize> bannersSize;
+    QStringList thumbailHref;
+    QList<QSize> thumbailSize;
     QString linkName;
     QString linkHref;
     int season=-1;
@@ -195,11 +206,7 @@ public:
     void findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor) ;
     void findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor) ;
 
-    enum class ImageType {
-        UNKNOWN, BANNER, POSTER,BACKDROP,THUMBNAIL
-    };
-
-    virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,ImageType imageType=ImageType::UNKNOWN) const=0;
+    virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,QFlags<ImageType> imageType=ImageType::All) const=0;
 
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;

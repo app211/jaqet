@@ -5,14 +5,7 @@
 #include <QUrl>
 #include "scrapers/scraper.h"
 
-enum class ImageType {
-    None = 0,
-    Banner = 1,
-    Poster = 2,
-    Backdrop = 4,
-    Thumbnail = 8,
-    All=Banner | Poster | Backdrop | Thumbnail
-};
+
 
 class MediaChoosed {
     const QUrl _url;

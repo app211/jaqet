@@ -270,7 +270,7 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         }
     }
 
-    addImages(  scraper,   b.postersHref, b.postersSize,ImageType::Thumbnail);
+    addImages(  scraper,   b.postersHref, b.postersSize,ImageType::Poster);
     if (!thumbnailSet && b.postersHref.size()>0){
         //  this->setThumbnail(b.postersHref.at(0),b.postersSize.size()>0? b.postersSize.at(0) : QSize(),scraper);
         thumbnailSet=true;
@@ -283,7 +283,9 @@ void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
         backDropSet=true;
     }
 
-    addImages(  scraper,  b.bannersHref, QList<QSize> (),ImageType::Banner);
+    addImages(  scraper,  b.bannersHref, b.bannersSize,ImageType::Banner);
+
+    addImages(  scraper,  b.thumbailHref, b.thumbailSize,ImageType::Thumbnail);
 
 
 
@@ -390,7 +392,7 @@ void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),QSize(),currentSearch.engine->getPosterSize(), Qt::KeepAspectRatio,Scraper::ImageType::BANNER);
+        QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),QSize(),currentSearch.engine->getPosterSize(), Qt::KeepAspectRatio,ImageType::Banner);
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
