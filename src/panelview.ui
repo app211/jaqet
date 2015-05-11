@@ -593,7 +593,7 @@
   <customwidget>
    <class>CheckLock</class>
    <extends>QCheckBox</extends>
-   <header location="global">checklock.h</header>
+   <header location="global">widgets/checklock.h</header>
   </customwidget>
   <customwidget>
    <class>MediaChooserButton</class>

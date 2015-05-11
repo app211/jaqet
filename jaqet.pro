@@ -47,9 +47,9 @@ SOURCES += src/main.cpp\
     src/engine/fileenginefilesystemwatcher.cpp \
     src/utils.cpp \
     src/scrapers/defaultscraper.cpp \
-    src/checklock.cpp \
     src/mediachooserbutton.cpp \
-    src/mediachooserpopup.cpp
+    src/mediachooserpopup.cpp \
+    src/widgets/checklock.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -79,10 +79,10 @@ HEADERS  += src/mainwindow.h \
     src/engine/fileenginefilesystemwatcher.h \
     src/utils.h \
     src/scrapers/defaultscraper.h \
-    src/checklock.h \
     src/mediachooserbutton.h \
     src/mediachoosermediatype.h \
-    src/mediachooserpopup.h
+    src/mediachooserpopup.h \
+    src/widgets/checklock.h
 
 
 FORMS    += src/mainwindow.ui \
