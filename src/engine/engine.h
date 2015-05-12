@@ -34,7 +34,7 @@ public :
      virtual void preview(const QModelIndex & index)=0;
     virtual void preview(const CurrentItemData& data)=0;
 
-    virtual void proceed()=0;
+    virtual void proceed(const CurrentItemData& data)=0;
 
     virtual QSize getBackdropSize() const=0;
     virtual QSize getPosterSize() const =0;

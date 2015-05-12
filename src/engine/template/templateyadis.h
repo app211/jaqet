@@ -35,7 +35,7 @@ public:
     bool loadTemplate(const QString& fileName);
     QSize getSize();
     void internalCreate(const CurrentItemData &data);
-    void proceed();
+    void proceed(const CurrentItemData& data);
 
     QSize getBackdropSize() const;
     QSize getPosterSize() const;
@@ -49,7 +49,6 @@ private:
     QString getAbsoluteFilePath(const QString& fileName);
 
     QPixmap buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame  );
-    void  proceed(const QFileInfo& f);
     QPixmap createBackdrop(const CurrentItemData &data);
 
 

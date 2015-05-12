@@ -207,6 +207,8 @@ void PanelView::updateUI(){
 
     ui->stackedWidget->setCurrentIndex(1);
 
+    ui->titleEdit->setText(currentSearch.title());
+
     ui->chooseBackgroundButton->setMedia(currentSearch.currentBackdrop);
     ui->choosePosterButton->setMedia(currentSearch.currentPoster);
 
@@ -226,7 +228,7 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
 
     Q_UNUSED(scraper);
 
-    CurrentItemData newData(mediaTVSearchPtr->engine(),true, mediaTVSearchPtr->mediaInfo());
+    CurrentItemData newData(mediaTVSearchPtr->engine(),true, mediaTVSearchPtr->mediaInfo(),mediaTVSearchPtr->fileInfo() );
 
     if (!ui->checkBoxLockSynopsis->isLock()){
         newData.setSynopsis(mediaTVSearchPtr->synopsis());
@@ -327,7 +329,7 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
 
   Q_UNUSED(scraper);
 
-  CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo());
+  CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo(),mediaMovieSearchPtr->fileInfo());
 
   if (!ui->checkBoxLockSynopsis->isLock()){
       newData.setSynopsis(mediaMovieSearchPtr->synopsis());
@@ -622,7 +624,7 @@ void PanelView::previewOK(QGraphicsScene* s){
 }
 
 void PanelView::proceed(){
-    currentSearch.engine()->proceed();
+    currentSearch.engine()->proceed(currentSearch);
 }
 
 void PanelView::rescrap() {

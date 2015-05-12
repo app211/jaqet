@@ -236,6 +236,10 @@ public:
         return d->mediaInfo;
     }
 
+    QFileInfo fileInfo() const{
+        return d->fileInfo;
+    }
+
 public:
     QSharedDataPointer< P > d;
 };
@@ -525,7 +529,8 @@ private:
               alanguages(other.alanguages),
               tv(other.tv),
               tlanguages(other.tlanguages),
-              engine(other.engine)
+              engine(other.engine),
+            fileInfo(other.fileInfo)
         { }
 
         ~CurrentItemDataPrivate() { }
@@ -563,7 +568,7 @@ private:
         double showRating=-1.;
         double seasonRating=-1.;
         double episodeRating=-1.;
-
+        QFileInfo fileInfo;
         Engine* engine=nullptr;
 
     };
@@ -576,11 +581,12 @@ public:
 
     }
 
-    CurrentItemData(Engine* engine, bool tv, const MediaInfo& mediaInfo)
+    CurrentItemData(Engine* engine, bool tv, const MediaInfo& mediaInfo, const QFileInfo& fileInfo)
     {
         d = new CurrentItemDataPrivate;
         d->engine=engine;
         d->tv=tv;
+        d->fileInfo=fileInfo;
 
         if (!mediaInfo.isEmpty()){
             setVDurationSecs(mediaInfo.durationSecs());
@@ -628,6 +634,10 @@ public:
     CurrentItemData(const CurrentItemData &other)
         : d (other.d)
     {
+    }
+
+    QFileInfo fileInfo() const{
+        return d->fileInfo;
     }
 
     ScraperResource _poster;

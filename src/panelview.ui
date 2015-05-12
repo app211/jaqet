@@ -628,7 +628,7 @@
  <connections>
   <connection>
    <sender>ProceedToolButton</sender>
-   <signal>toggled(bool)</signal>
+   <signal>clicked()</signal>
    <receiver>PanelView</receiver>
    <slot>proceed()</slot>
    <hints>

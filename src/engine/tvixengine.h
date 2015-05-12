@@ -12,7 +12,7 @@ class TVIXEngine : public FileEngine
 public:
     TVIXEngine(QObject *parent = 0, const QString& path="");
     virtual QStringList getVisibleFileExtensions() const;
-    void proceed();
+    void proceed(const CurrentItemData& data);
     QSize getBackdropSize() const;
     QSize getPosterSize() const;
     QSize getBannerSize() const;

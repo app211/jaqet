@@ -103,8 +103,8 @@ void TVIXEngine::preview(const QModelIndex & index){
 }
 
 
-void TVIXEngine::proceed(){
-    b.proceed();
+void TVIXEngine::proceed(const CurrentItemData& data){
+    b.proceed(data);
     populate();
 }
 

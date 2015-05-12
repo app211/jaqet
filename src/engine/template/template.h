@@ -17,7 +17,7 @@ public:
     explicit Template(QObject *parent = 0);
 
     void create(const CurrentItemData &data);
-    virtual void proceed()=0;
+    virtual void proceed(const CurrentItemData& data)=0;
     virtual QSize getBackdropSize() const=0;
     virtual QSize getPosterSize() const=0;
     virtual QSize getBannerSize() const=0;

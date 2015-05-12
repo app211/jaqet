@@ -113,44 +113,44 @@ QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSi
 
 
 
-void  TemplateYadis::proceed(const QFileInfo& f){
-    /*   QString title=getProperty<QString>(properties,Properties::title,"jaqet");
-    QString suffixe="";
-    int counter=0;
-    while (QFileInfo(f.absoluteDir(),title+suffixe).exists()){
-        suffixe=QString::number(counter++);
-    }
 
-    QDir d;
-
-    if (!d.mkpath( QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath())){
-        return;
-    }
-
-    d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
-
-    QFile file(f.absoluteFilePath());
-    if (!file.rename(QFileInfo(d,title+"."+f.completeSuffix()).absoluteFilePath())){
-        return;
-    }
-
-
-    QPixmap back=createBackdrop();
-    back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
-
-    QPixmap poster=getProperty<QPixmap>(properties,Properties::poster);
-    if (!poster.isNull()){
-        poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
-    }*/
-}
-
-void TemplateYadis::proceed(){
-    /*if (properties.contains(Template::Properties::fileinfo) && properties[Template::Properties::fileinfo].canConvert<QFileInfo>()){
-        QFileInfo f= properties[Template::Properties::fileinfo].value<QFileInfo>();
-        if (f.exists()){
-            return proceed(f);
+void TemplateYadis::proceed(const CurrentItemData& data){
+       QFileInfo f= data.fileInfo();
+        if (!f.exists()){
+            return;
         }
-    }*/
+
+       QString title=data.title();
+       if (data.isTV()){
+         title= QString("%1.s%2e%3").arg(data.title()).arg(data.season(),2, 10, QChar('0')).arg(data.episode(),2, 10, QChar('0'));
+       }
+        QString suffixe="";
+        int counter=0;
+        while (QFileInfo(f.absoluteDir(),title+suffixe).exists()){
+            suffixe=QString::number(counter++);
+        }
+
+        QDir d;
+
+        if (!d.mkpath( QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath())){
+            return;
+        }
+
+        d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
+
+        QFile file(f.absoluteFilePath());
+        if (!file.rename(QFileInfo(d,f.completeBaseName()).absoluteFilePath())){
+            return;
+        }
+
+
+        QPixmap back=createBackdrop(data);
+        back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
+
+        QPixmap poster=data.getPoster();
+        if (!poster.isNull()){
+            poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
+        }
 }
 
 void TemplateYadis::internalCreate(const CurrentItemData& data){
