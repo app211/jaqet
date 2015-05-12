@@ -287,11 +287,16 @@ bool parseLanguageList( const QByteArray& data)
 }
 
 
-void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager* , const QString&, const SearchFor&, const QString&)  {
+void TheTVDBScraper::internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language)  {
+    Q_UNUSED(manager);
+    Q_UNUSED(mediaMovieSearchPtr);
+    Q_UNUSED(searchFor);
+    Q_UNUSED(language);
+
     emit scraperError("Unsupported Operation");
 }
 
-bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int season, const int episode, bool& foundEpisode){
+bool TheTVDBScraper::parseEpisode(QXmlStreamReader& xml, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode, bool& foundEpisode){
 
     //
     // Cf. http://thetvdb.com/wiki/index.php?title=API:Base_Episode_Record
@@ -344,22 +349,15 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
 
     }
 
-
     if (episodeNumber==episode&&season==seasonNumber){
-        result.synopsis=overview;
-        result.rating=rating.isEmpty()?-1:rating.toDouble();
-        result.episodeTitle=episodeTitle;
-        result.season=season;
-        result.episode=episode;
-        result.directors.append(directors);
-        result.aired=firstAired;
-
-        if (!filename.isEmpty()){
-            result.thumbailHref.append(filename);
-            int w=thumb_width.toInt();
-            int h=thumb_height.toInt();
-            result.thumbailSize.append(QSize(w,h));
-        }
+        mediaTVSearchPtr->setSynopsis(overview);
+        mediaTVSearchPtr->setEpisodeRating(rating.isEmpty()?-1:rating.toDouble());
+        mediaTVSearchPtr->setEpisodeTitle(episodeTitle);
+        mediaTVSearchPtr->setSeason(season);
+        mediaTVSearchPtr->setEpisode(episode);
+        mediaTVSearchPtr->setDirectors(directors);
+        mediaTVSearchPtr->setAired(firstAired);
+        mediaTVSearchPtr->addThumbail(filename,QSize(thumb_width.toInt(),thumb_height.toInt()));
 
         foundEpisode= true;
     } else {
@@ -370,48 +368,46 @@ bool parseEpisode(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int se
 }
 
 
-bool parseSeries(QXmlStreamReader& xml, SearchEpisodeInfo& result, const int , const int ){
+bool TheTVDBScraper::parseSeries(QXmlStreamReader& xml, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode ){
+    Q_UNUSED(season);
+    Q_UNUSED(episode);
+
     if(xml.tokenType() != QXmlStreamReader::StartElement && xml.name() == "Series") {
         return false;
     }
 
-    QString title;
     QString runtime;
-    QString network;
     QStringList genre;
 
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "Series")) {
         if(xml.tokenType() == QXmlStreamReader::StartElement) {
-            qDebug() <<  xml.name();
-            if ( xml.name() == QLatin1String( "SeriesName" ) ) {
-                title=xml.readElementText();
-            }  if ( xml.name() == QLatin1String( "Runtime" ) ) {
+             if ( xml.name() == QLatin1String( "SeriesName" ) ) {
+                mediaTVSearchPtr->setTitle(xml.readElementText());
+            } else if ( xml.name() == QLatin1String( "Runtime" ) ) {
                 runtime=xml.readElementText();
-
-            } if ( xml.name() == QLatin1String( "Network" ) ) {
-                network=xml.readElementText();
-            }if ( xml.name() == QLatin1String( "Genre" ) ) {
+            } else if ( xml.name() == QLatin1String( "Network" ) ) {
+                mediaTVSearchPtr->addNetwork(xml.readElementText());
+            } else if ( xml.name() == QLatin1String( "Genre" ) ) {
                 genre =xml.readElementText().split('|',QString::SkipEmptyParts);
-
+            } else if ( xml.name() == QLatin1String( "Rating" ) ) {
+                mediaTVSearchPtr->setShowRating(xml.readElementText().toDouble());
             }
         }
         xml.readNext();
     }
 
 
-    result.title=title;
-    result.network=network;
-    result.genre=genre;
+     mediaTVSearchPtr->setGenre(genre);
 
     int runtimeAsInt=runtime.toInt()*60;
     if (runtimeAsInt>0){
-        result.runtimeInSec=runtimeAsInt;
+        mediaTVSearchPtr->setRuntimeInSec(runtimeAsInt);
     }
 
     return true;
 }
 
-bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int season, const int episode){
+bool TheTVDBScraper::parseInfo(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode){
     qDebug() << data;
     QXmlStreamReader xml( data );
     bool episodeFound=false;
@@ -427,11 +423,11 @@ bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int seas
             if(xml.name() == "Data") {
                 continue;
             } else  if(xml.name() == "Series") {
-                if (!parseSeries(xml,result, season, episode)){
+                if (!parseSeries(xml,mediaTVSearchPtr, season, episode)){
                     return false;
                 }
             } else if(xml.name() == "Episode" && !episodeFound) {
-                if (!parseEpisode(xml,result, season, episode,episodeFound)){
+                if (!parseEpisode(xml,mediaTVSearchPtr, season, episode,episodeFound)){
                     return false;
                 }
             }
@@ -443,8 +439,9 @@ bool parseInfo(const QByteArray &data, SearchEpisodeInfo& result, const int seas
 
 
 
-bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
+bool TheTVDBScraper::parseBanner(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr){
     QXmlStreamReader xml( data );
+
     if ( xml.readNextStartElement() && xml.name()==QLatin1String("Banners")){
         while ( xml.readNextStartElement()) {
             if (xml.name() == QLatin1String( "Banner" ) ) {
@@ -479,35 +476,41 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
 
                 if (!bannerPath.isEmpty()){
                     if (bannerType==QLatin1String( "series" ) && bannerType2==QLatin1String( "graphical")){
-                        result.bannersHref.append(bannerPath);
-                        // Cf. http://www.thetvdb.com/wiki/index.php?title=Series_Banners
-                        result.bannersSize.append(QSize(758,140));
+                         // Cf. http://www.thetvdb.com/wiki/index.php?title=Series_Banners
+                        mediaTVSearchPtr->addBanner(bannerPath,QSize(758,140));
                     } else if (bannerType==QLatin1String( "fanart" ))  {
-                        result.backdropsHref.append(bannerPath);
 
                         QRegularExpression re("(\\d+)x(\\w+)");
                         QRegularExpressionMatch match = re.match(bannerType2);
+                         QSize backdropSize;
                         if (match.hasMatch()) {
                             int w = match.captured(1).toInt();
                             int h = match.captured(2).toInt();
-                            result.backdropsSize.append(QSize(w,h));
+                            backdropSize=QSize(w,h);
                         } else {
-                            result.backdropsSize.append(QSize());
+                            // todo
+                            backdropSize=QSize();
                         }
 
-                     } else if (bannerType==QLatin1String( "poster" ))  {
-                        result.postersHref.append(bannerPath);
+                        mediaTVSearchPtr->addBackdrop(bannerPath,backdropSize);
+
+
+                    } else if (bannerType==QLatin1String( "poster" ))  {
 
                         QRegularExpression re("(\\d+)x(\\w+)");
                         QRegularExpressionMatch match = re.match(bannerType2);
+                        QSize posterSize;
                         if (match.hasMatch()) {
                             int w = match.captured(1).toInt();
                             int h = match.captured(2).toInt();
-                            result.postersSize.append(QSize(w,h));
+                            posterSize=QSize(w,h);
                         } else {
                             // Cf. http://www.thetvdb.com/wiki/index.php?title=Posters
-                            result.postersSize.append(QSize( 680,1000 ));
+                            posterSize=QSize( 680,1000 );
                         }
+
+                        mediaTVSearchPtr->addPoster(bannerPath,posterSize);
+
                     }
 
                 }
@@ -515,6 +518,8 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
                 return false;
             }
         }
+
+
         return true;
     } else {
         return false;
@@ -522,7 +527,7 @@ bool parseBanner(const QByteArray &data, SearchEpisodeInfo& result){
 }
 
 
-bool TheTVDBScraper::parseActors(const QByteArray &data, SearchEpisodeInfo& result){
+bool TheTVDBScraper::parseActors(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr){
     //
     // Cf. http://thetvdb.com/wiki/index.php?title=API:actors.xml
     //
@@ -557,10 +562,7 @@ bool TheTVDBScraper::parseActors(const QByteArray &data, SearchEpisodeInfo& resu
 
         }
 
-        result.actors << actors[0];
-        result.actors << actors[1];
-        result.actors << actors[2];
-        result.actors << actors[3];
+        mediaTVSearchPtr->setActors(mediaTVSearchPtr->actors() << actors[0] << actors[1] << actors[2] << actors[3]);
 
         return true;
     } else {
@@ -569,9 +571,15 @@ bool TheTVDBScraper::parseActors(const QByteArray &data, SearchEpisodeInfo& resu
 }
 
 
-void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor, const QString& language) {
+void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) {
 
-    QString lang="fr";
+    Q_UNUSED(searchFor);
+
+    QString showCode= mediaTVSearchPtr->foundResult().getCode();
+    int season=mediaTVSearchPtr->foundResult().getSeason();
+    int episode=mediaTVSearchPtr->foundResult().getEpisode();
+
+    QString lang=language;
     QString command=QString::fromLatin1( "%1/series/%2/all/%3.zip" ).arg(API_KEY).arg( showCode ).arg( lang ) ;
 
     QMap<QString,QString> params;
@@ -579,9 +587,8 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, con
     Promise* promise=Promise::loadAsync(*manager,url,false);
     QObject::connect(promise, &Promise::completed, [=]()
     {
-        if (promise->reply->error() ==QNetworkReply::NoError){
-            QByteArray data= promise->reply->readAll();
-            SearchEpisodeInfo result;
+        if (promise->replyError() ==QNetworkReply::NoError){
+            QByteArray data= promise->replyData();
             QBuffer buffer(&data);
             QuaZip replyZip(&buffer);
             replyZip.open(QuaZip::mdUnzip);
@@ -595,16 +602,16 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, con
                 if (currentFileName.endsWith("banners.xml",Qt::CaseInsensitive)){
                     QByteArray bannersArray=zFile.readAll();
                     qDebug() << bannersArray;
-                    parseBanner( bannersArray, result);
+                    parseBanner( bannersArray, mediaTVSearchPtr);
                 }else if (currentFileName.endsWith("actors.xml",Qt::CaseInsensitive)){
                     QByteArray actorsArray=zFile.readAll();
                     qDebug() << actorsArray;
-                    parseActors( actorsArray, result);
+                    parseActors( actorsArray, mediaTVSearchPtr);
                 } else if (currentFileName.endsWith(QString("%1.xml").arg(lang),Qt::CaseInsensitive)){
                     QByteArray infoArray=zFile.readAll();
                     qDebug() << infoArray;
 
-                    parseInfo( infoArray, result,season, episode);
+                    parseInfo( infoArray, mediaTVSearchPtr,season, episode);
                 }
 
                 zFile.close();
@@ -613,9 +620,9 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, con
 
             replyZip.close();
 
-            emit found(this,result);
+            emit found(this,mediaTVSearchPtr);
         } else {
-            emit scraperError(promise->reply->errorString());
+            emit scraperError(promise->replyErrorString());
         }
     });
 }
@@ -631,8 +638,8 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
         Promise* promise=Promise::loadAsync(*manager,url,false);
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            QByteArray data= promise->reply->readAll();
-            if (promise->reply->error() ==QNetworkReply::NoError){
+            if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray data= promise->replyData();
                 if (parseMirrorList(data)){
                     retrieveMirror= false;
                     internalSearchTV(manager,toSearch,language);
@@ -648,8 +655,8 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
         Promise* promise=Promise::loadAsync(*manager,url,false);
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            QByteArray data= promise->reply->readAll();
-            if (promise->reply->error() ==QNetworkReply::NoError){
+             if (promise->replyError() ==QNetworkReply::NoError){
+                 QByteArray data= promise->replyData();
                 if (parseLanguageList(data)){
                     retriveLanguages= false;
                     internalSearchTV(manager,toSearch,language);
@@ -670,12 +677,12 @@ void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QStr
         Promise* promise=Promise::loadAsync(*manager,url,false);
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            QByteArray data= promise->reply->readAll();
-            qDebug() << data;
-            if (promise->reply->error() ==QNetworkReply::NoError){
+              if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray data= promise->replyData();
+                qDebug() << data;
                 parseSeriesList(manager,toSearch, data,language);
             }else {
-                emit scraperError(promise->reply->errorString());
+                emit scraperError(promise->replyErrorString());
             }
         });
     }
@@ -697,7 +704,7 @@ QString TheTVDBScraper::getBestImageUrl(const QString& url, const QSize& origina
     QSize cachedSize;
 
     if (imageType & ImageType::Banner){
-       cachedSize = cachedBanner;
+        cachedSize = cachedBanner;
     } else if (imageType & ImageType::Poster){
         cachedSize = cachedPoster;
     } else if (imageType & ImageType::Backdrop){

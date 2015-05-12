@@ -7,6 +7,7 @@
 DefaultScraper::DefaultScraper(QObject *parent)
     : Scraper(parent)
 {
+#if 0
     m_bannerScraper = new TheTVDBScraper(this);
     m_bannerScraper2 = new AlloCineScraper(this);
 
@@ -25,7 +26,7 @@ DefaultScraper::DefaultScraper(QObject *parent)
 
     scrapers.append(QPair<Scraper*,SearchFor>(m_bannerScraper,SearchOption::AllMedia));
     scrapers.append(QPair<Scraper*,SearchFor>(m_bannerScraper2,SearchOption::Information));
-
+#endif
     scrapers2 = QList<QPair<Scraper*,SearchFor>>(scrapers);
 }
 
@@ -39,7 +40,7 @@ void DefaultScraper::internalFindMovieInfo(QNetworkAccessManager* , const QStrin
 }
 
 void DefaultScraper::doFindEpisodeInfo() {
-
+#if 0
     if (scrapers.isEmpty()){
         emit found(this,this->searchEpisodeInfo);
     } else {
@@ -48,6 +49,8 @@ void DefaultScraper::doFindEpisodeInfo() {
         currentSearchFor = pair.second;
         currentScraper->findEpisodeInfo(manager, showCode,  season,  episode, currentSearchFor);
     }
+
+#endif
 }
 
 void DefaultScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor, const QString& language)  {
@@ -57,7 +60,7 @@ void DefaultScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, con
     this->searchFor=searchFor;
     this->language=language;
     this->manager=manager;
-    this->searchEpisodeInfo=SearchEpisodeInfo();
+    //this->searchEpisodeInfo=SearchEpisodeInfo();
 
     doFindEpisodeInfo();
 }
@@ -103,13 +106,13 @@ void DefaultScraper::_found(ShowPtrList shows){
     emit found(shows);
 }
 
-void DefaultScraper::_found(const Scraper* scraper,SearchMovieInfo films) {
+void DefaultScraper::_found(const Scraper* scraper, MediaMovieSearchPtr films) {
 
 
 }
 
-void DefaultScraper::_found(const Scraper* scraper,SearchEpisodeInfo shows) {
-    if (this->currentSearchFor & SearchOption::Poster){
+void DefaultScraper::_found(const Scraper* scraper, MediaTVSearchPtr shows) {
+  /*  if (this->currentSearchFor & SearchOption::Poster){
         this->searchEpisodeInfo.postersHref=shows.postersHref;
         this->searchEpisodeInfo.postersSize=shows.postersSize;
     }
@@ -126,7 +129,7 @@ void DefaultScraper::_found(const Scraper* scraper,SearchEpisodeInfo shows) {
     if (this->currentSearchFor & SearchOption::Information){
         this->searchEpisodeInfo.actors=shows.actors;
     }
-
+*/
     doFindEpisodeInfo();
 }
 

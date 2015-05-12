@@ -34,7 +34,7 @@ public:
     TemplateYadis();
     bool loadTemplate(const QString& fileName);
     QSize getSize();
-    void internalCreate();
+    void internalCreate(const CurrentItemData &data);
     void proceed();
 
     QSize getBackdropSize() const;
@@ -44,25 +44,23 @@ public:
     enum class Context {movie_synopsis,tv_synopsis_common,tv_synopsis_episode,tv_synopsis_episode_episodeicon};
 
 private:
-    QMap<QString, QString> texts;
-
-void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) const;
+    void searchSizeForTag(QDomElement docElem, const QString& tagName, QSize& size) const;
 
     QString getAbsoluteFilePath(const QString& fileName);
 
     QPixmap buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame  );
     void  proceed(const QFileInfo& f);
-    QPixmap createBackdrop();
+    QPixmap createBackdrop(const CurrentItemData &data);
 
 
-    bool exec(QPainter &result);
-    bool execTV(QDomElement e,QPainter &result);
-    bool execMovie(const QDomElement& e, QPainter &result);
-    bool execImage(const QDomElement& imageElement, QPainter &result);
-    bool execNode(QDomElement e, QPainter &result, Context context);
-    bool execText(const QDomElement& textElement, QPainter &pixPaint, Context context);
-    bool execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context);
-    bool execPoster(const QDomElement& e);
+    bool exec(QPainter &result,const CurrentItemData &data);
+    bool execTV(QDomElement e,QPainter &result,const CurrentItemData &data);
+    bool execMovie(const QDomElement& e, QPainter &result,const CurrentItemData &data);
+    bool execImage(const QDomElement& imageElement, QPainter &result,const CurrentItemData &data);
+    bool execNode(QDomElement e, QPainter &result, Context context,const CurrentItemData &data);
+    bool execText(const QDomElement& textElement, QPainter &pixPaint, Context context,const CurrentItemData &data);
+    bool execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context,const CurrentItemData &data);
+    bool execPoster(const QDomElement& e,const CurrentItemData &data);
     int getX( int x );
     int getY( int y );
 

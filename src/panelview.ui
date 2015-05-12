@@ -156,7 +156,7 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>0</y>
+                <y>-43</y>
                 <width>917</width>
                 <height>646</height>
                </rect>
@@ -185,7 +185,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit"/>
+                      <widget class="QLineEdit" name="titleEdit"/>
                      </item>
                     </layout>
                    </widget>
@@ -204,7 +204,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_2"/>
+                      <widget class="QLineEdit" name="originalTitleEdit"/>
                      </item>
                     </layout>
                    </widget>
@@ -473,7 +473,7 @@
                    <widget class="QWidget" name="widget_16" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_14">
                      <item>
-                      <widget class="CheckLock" name="checkBox_4">
+                      <widget class="CheckLock" name="checkBoxLockBackground">
                        <property name="text">
                         <string>Background</string>
                        </property>
@@ -505,7 +505,7 @@
                    <widget class="QWidget" name="widget_17" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_15">
                      <item>
-                      <widget class="CheckLock" name="checkBox">
+                      <widget class="CheckLock" name="checkBoxLockPoster">
                        <property name="text">
                         <string>Poster</string>
                        </property>
@@ -526,9 +526,9 @@
                    <widget class="QWidget" name="widget_11" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_6">
                      <item>
-                      <widget class="QCheckBox" name="Thumbnail">
+                      <widget class="CheckLock" name="checkBoxLockThumbail">
                        <property name="text">
-                        <string>CheckBox</string>
+                        <string>Thumbnail</string>
                        </property>
                        <property name="checked">
                         <bool>true</bool>
@@ -544,6 +544,22 @@
                         </size>
                        </property>
                       </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="panelBanner" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_21">
+                     <item>
+                      <widget class="CheckLock" name="checkBoxLockBanner">
+                       <property name="text">
+                        <string>Banner</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="MediaChooserButton" name="chooseBannerButton" native="true"/>
                      </item>
                     </layout>
                    </widget>
@@ -593,7 +609,7 @@
   <customwidget>
    <class>CheckLock</class>
    <extends>QCheckBox</extends>
-   <header location="global">widgets/checklock.h</header>
+   <header>widgets/checklock.h</header>
   </customwidget>
   <customwidget>
    <class>MediaChooserButton</class>
@@ -770,6 +786,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chooseBannerButton</sender>
+   <signal>mediaSelected2(MediaChoosed)</signal>
+   <receiver>PanelView</receiver>
+   <slot>bannerSelected(MediaChoosed)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>792</x>
+     <y>406</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>proceed()</slot>
@@ -782,5 +814,6 @@
   <slot>backgroundSelected(MediaChoosed)</slot>
   <slot>posterSelected(MediaChoosed)</slot>
   <slot>thumbnailSelected(MediaChoosed)</slot>
+  <slot>bannerSelected(MediaChoosed)</slot>
  </slots>
 </ui>

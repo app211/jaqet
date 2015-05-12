@@ -7,7 +7,9 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
 }
 
 void TVIXEngine::init(const QString& path){
-   b.loadTemplate(":/resources/templates/CryFibril/template.xml");
+   //b.loadTemplate(":/resources/templates/CryFibril/template.xml");
+
+   b.loadTemplate("/home/teddy/developpement/POLAR/template.xml");
 
     visibleFileExtensions << "*.asf"
                               <<"*.avi"
@@ -32,7 +34,6 @@ void TVIXEngine::init(const QString& path){
     FileEngine::init(path);
 
 }
-
 
 Engine::TypeItem TVIXEngine::getTypeItem( const QFileInfo & f) const {
     if (f.exists())
@@ -59,13 +60,12 @@ QStringList TVIXEngine::getVisibleFileExtensions() const {
     return visibleFileExtensions;
 }
 
-void TVIXEngine::preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset){
+void TVIXEngine::preview(const CurrentItemData &data){
     connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(previewOk(QPixmap )));
-    create(newproperties,reset);
+    b.create(data);
 }
 
 void TVIXEngine::previewOk(QPixmap pimap){
-
     result.clear();
     result.addPixmap(pimap);
     emit previewOK(&result);
@@ -102,9 +102,6 @@ void TVIXEngine::preview(const QModelIndex & index){
    emit previewOK(&result);
 }
 
-void TVIXEngine::create(const QMap<Template::Properties, QVariant> &newproperties, bool reset){
-     b.create(newproperties,reset);
-}
 
 void TVIXEngine::proceed(){
     b.proceed();

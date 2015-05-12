@@ -22,10 +22,9 @@
 
 MediaInfoScanner::MediaInfoScanner()
 {
-    MediaInfoLib::MediaInfo MI;
+ /*   MediaInfoLib::MediaInfo MI;
     QString mediaInfoLibVersion=QString::fromStdWString(MI.Option(__T("Info_Version"), __T("0.7.13;MediaInfoDLL_Example_MSVC;0.7.13")));
-    qDebug() << 	mediaInfoLibVersion.remove("MediaInfoLib - v");
-
+*/
     // Voir https://github.com/tkrotoff/QuarkPlayer/blob/3acf656b1127606ca2d3d46f4c72c0a604d89623/libs/MediaInfoFetcher/MediaInfoFetcher.cpp
 }
 
@@ -122,7 +121,7 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
     int textStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Text);
     for (int textStreamId = 0; textStreamId < textStreamCount; textStreamId++) {
         _mediaInfo.insertTextStream(textStreamId, MediaInfo::TextFormat, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Text, textStreamId,__T("Format"))).trimmed());
-        _mediaInfo.insertTextStream(textStreamId, MediaInfo::TextLanguage, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Text, textStreamId,__T("Language/String"))).trimmed());
+        _mediaInfo.insertTextStream(textStreamId, MediaInfo::TextLanguage, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Text, textStreamId,__T("Language/String2"))).trimmed());
     }
 
     AnalysisResult result;

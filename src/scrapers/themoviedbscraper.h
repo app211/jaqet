@@ -13,17 +13,17 @@ class TheMovieDBScraper: public Scraper
     ShowPtrList parseTVResultset(const QJsonDocument&) const;
     bool parseConfiguration(const QJsonDocument& );
     QString  baseUrl;
-    bool parseMovieInfo(const QJsonDocument& resultset, SearchMovieInfo& info) const;
-    bool parseEpisodeInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info, const int season, const int episode) const;
+    bool parseMovieInfo(const QJsonDocument& resultset,  MediaMovieSearchPtr mediaMovieSearchPtr) const;
+    bool parseEpisodeInfo(const QJsonDocument& resultset, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode) const;
 
-    void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode, const SearchFor &searchFor,  SearchMovieInfo &result) const;
-    void findEpisodeInfoGetImage(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
-    void findEpisodeInfoGetCredit(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  SearchEpisodeInfo& result) const;
+    void findMovieInfoGetImage(QNetworkAccessManager* manager, const QString& movieCode, const SearchFor &searchFor,  MediaMovieSearchPtr mediaMovieSearchPtr) const;
+    void findEpisodeInfoGetImage(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  MediaTVSearchPtr mediaTVSearchPtr) const;
+    void findEpisodeInfoGetCredit(QNetworkAccessManager* manager, const QString& showCode, const int season, const int episode,  MediaTVSearchPtr mediaTVSearchPtr) const;
 
 
-    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, SearchMovieInfo& info) const;
-    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, SearchEpisodeInfo& info) const;
-    bool parseCreditInfo(const QJsonDocument& resultset, SearchEpisodeInfo& info) const;
+    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const;
+    bool parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, MediaTVSearchPtr mediaTVSearchPtr) const;
+    bool parseCreditInfo(const QJsonDocument& resultset, MediaTVSearchPtr mediaTVSearchPtr) const;
 
     QStringList posterSizes;
     QStringList backdropSizes;
@@ -34,8 +34,8 @@ class TheMovieDBScraper: public Scraper
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor, const QString& language) ;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor &searchFor, const QString& language)  ;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor, const QString& language) ;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor &searchFor, const QString& language)  ;
 
 public:
     TheMovieDBScraper(QObject *parent=0);

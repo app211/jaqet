@@ -16,12 +16,14 @@ class MediaChooserButton : public QAbstractButton
     Q_OBJECT
 
 public:
-    explicit MediaChooserButton(QWidget *parent = 0);
+    MediaChooserButton(QWidget *parent = 0);
     void showPopup();
     void setPopup(MediaChooserPopup *popup, QFlags<ImageType> filter);
-
     void setMediaSize(const QSize& mediaSize);
     void setMedia(const QPixmap& media);
+    void reset();
+
+protected:
     enum ButtonState
     {
         STATE_NORMAL, STATE_HOVERED, STATE_CLICKED
@@ -30,8 +32,6 @@ public:
 
     ButtonState m_State;
 
-
-protected:
     virtual void paintEvent(QPaintEvent *e);
     virtual  void enterEvent(QEvent *event);
     virtual void leaveEvent(QEvent *event);

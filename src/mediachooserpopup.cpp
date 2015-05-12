@@ -135,7 +135,7 @@ struct M_M {
 };
 
 static QList<M_M> urls;
-static Promise* currentPromise;
+static Promise* currentPromise= nullptr;
 
 void MediaChooserPopup::startPromise( QNetworkAccessManager* manager){
 
@@ -145,22 +145,25 @@ void MediaChooserPopup::startPromise( QNetworkAccessManager* manager){
 
     M_M url=urls.takeFirst();
 
-    currentPromise=Promise::loadAsync(*manager,url.url,false,false,QNetworkRequest::LowPriority);
+    currentPromise=Promise::loadAsync(*manager,url.url,false,false,QNetworkRequest::NormalPriority);
 
     QObject::connect(currentPromise, &Promise::completed, [=]()
     {
         if (!url.busyIndicator.isNull()){
             url.busyIndicator->setVisible(false);
         }
-        if (currentPromise->reply->error() ==QNetworkReply::NoError){
-            QByteArray qb=currentPromise->reply->readAll();
+        if (currentPromise->replyError() ==QNetworkReply::NoError){
+            QByteArray qb=currentPromise->replyData();
             QPixmap px;
             if (px.loadFromData(qb)){
                 setImageFromInternet(px,url.itemToUpdate,url.x,url.y,url.w,url.h);
+            } else {
+                addError(QString(tr("Unable to load %1")).arg(url.url),url.itemToUpdate,url.busyIndicator,url.x,url.y,url.w,url.h);
             }
 
         } else {
-            qDebug() << currentPromise->reply->errorString();
+            addError(currentPromise->replyErrorString(),url.itemToUpdate,url.busyIndicator,url.x,url.y,url.w,url.h);
+
         }
 
         currentPromise=nullptr;

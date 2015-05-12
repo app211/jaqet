@@ -27,9 +27,7 @@ PanelView::PanelView(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    Scraper* defaultScraper=new DefaultScraper(this);
-    QAction* tmdbActionDefault = new QAction(defaultScraper->getIcon(),defaultScraper->getName(), this);
-    tmdbActionDefault->setData(qVariantFromValue((void*)defaultScraper));
+    /*Scraper* defaultScraper=new DefaultScraper(this);
 
     connect(defaultScraper, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
             SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
@@ -38,40 +36,33 @@ PanelView::PanelView(QWidget *parent) :
             SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
 
     this->scrapes.append(defaultScraper);
-
+*/
     Scraper* s=new TheMovieDBScraper(this);
-    QAction* tmdbAction = new QAction(s->getIcon(),s->getName(), this);
-    tmdbAction->setData(qVariantFromValue((void*)s));
+    connect(s, SIGNAL(found(const Scraper*, MediaMovieSearchPtr)), this,
+            SLOT(foundMovie(const Scraper*,MediaMovieSearchPtr)));
 
-    connect(s, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
-            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
-
-    connect(s, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
-            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+    connect(s, SIGNAL(found(const Scraper*, MediaTVSearchPtr)), this,
+            SLOT(foundEpisode(const Scraper*,MediaTVSearchPtr)));
 
     this->scrapes.append(s);
 
     Scraper* allocine=new AlloCineScraper(this);
-    QAction* tmdbActionAllocine = new QAction(s->getIcon(),s->getName(), this);
-    tmdbActionAllocine->setData(qVariantFromValue((void*)s));
 
-    connect(allocine, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
-            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+    connect(allocine, SIGNAL(found(const Scraper*, MediaMovieSearchPtr)), this,
+            SLOT(foundMovie(const Scraper*,MediaMovieSearchPtr)));
 
-    connect(allocine, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
-            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+    connect(allocine, SIGNAL(found(const Scraper*, MediaTVSearchPtr )), this,
+            SLOT(foundEpisode(const Scraper*,MediaTVSearchPtr )));
 
     this->scrapes.append(allocine);
 
     Scraper* tvdb=new TheTVDBScraper(this);
-    QAction* tvdbAction = new QAction(tvdb->getIcon(),tvdb->getName(), this);
-    tvdbAction->setData(qVariantFromValue((void*)s));
 
-    connect(tvdb, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
-            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+    connect(tvdb, SIGNAL(found(const Scraper*, MediaMovieSearchPtr)), this,
+            SLOT(foundMovie(const Scraper*,MediaMovieSearchPtr)));
 
-    connect(tvdb, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
-            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+    connect(tvdb, SIGNAL(found(const Scraper*, MediaTVSearchPtr)), this,
+            SLOT(foundEpisode(const Scraper*,MediaTVSearchPtr)));
 
     this->scrapes.append(tvdb);
 
@@ -82,11 +73,26 @@ PanelView::PanelView(QWidget *parent) :
     ui->chooseBackgroundButton->setPopup(c,ImageType::Backdrop);
     ui->choosePosterButton->setPopup(c,ImageType::Poster);
     ui->chooseThumbailButton->setPopup(c,ImageType::Thumbnail);
+    ui->chooseBannerButton->setPopup(c,ImageType::Banner);
 }
 
 PanelView::~PanelView()
 {
     delete ui;
+}
+
+static QStringList getItemsListWidget(QListWidget *listWidget, bool onlyNotSelectedItem=false)
+{
+    QStringList listeItems;
+
+    for(int i = 0 ; i < listWidget->count() ; i++){
+        QListWidgetItem *item = listWidget->item(i);
+        if (item && ((!onlyNotSelectedItem) || (!item->isSelected()))){
+            listeItems << item->text();
+        }
+    }
+
+    return listeItems;
 }
 
 void PanelView::enableCastRemove(){
@@ -105,19 +111,10 @@ void PanelView::enableDirectorRemove(){
 }
 
 void PanelView::castRemove(){
-    qDeleteAll(ui->castListWidget->selectedItems());
 
-    QStringList castList;
-    for(int i = 0 ; i < ui->castListWidget->count() ; i++)
-    {
-        QListWidgetItem *item = ui->castListWidget->item(i);
-        if (item){
-            castList << item->text();
-        }
-    }
+    this->currentSearch.setActors(getItemsListWidget(ui->castListWidget,true));
 
-    setCast(castList);
-    rebuildTemplate();
+    updateUI();
 }
 
 void PanelView::directorRemove(){
@@ -132,8 +129,8 @@ void PanelView::directorRemove(){
         }
     }
 
-    this->setDirectors(directorsList);
-    rebuildTemplate();
+    // this->setDirectors(directorsList);
+    //rebuildTemplate();
 }
 
 void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
@@ -167,130 +164,142 @@ void PanelView::setProceedable(Engine* engine, const QModelIndex &index){
 
 void PanelView::search(Engine* engine, const QModelIndex &index){
 
-    currentSearch = MediaSearch();
+    connect(engine, SIGNAL(previewOK(QGraphicsScene* )), this, SLOT(previewOK(QGraphicsScene*  )), Qt::UniqueConnection);
 
-    currentSearch.engine=engine;
 
     if (engine->canGiveFileInfo()){
-        QFileInfo f=engine->getFileInfo(index);
-        currentSearch.fileInfo=f;
-        QVariant fileInfo;
-        fileInfo.setValue(f);
-        currentSearch.texts[Template::Properties::fileinfo]=fileInfo;
+        QFileInfo fileInfo=engine->getFileInfo(index);
 
         MediaInfoScanner ff;
-        Scanner::AnalysisResult r=ff.analyze(f);
+        Scanner::AnalysisResult r=ff.analyze(fileInfo);
 
-        QVariant mediaInfo;
-        mediaInfo.setValue(r.mediaInfo);
-        currentSearch.texts[Template::Properties::mediainfo]=mediaInfo;
-
-
-        SearchScraperDialog fd(this, f , this->scrapes, &this->manager);
+        SearchScraperDialog fd(this, fileInfo , this->scrapes, &this->manager);
         if (fd.exec()==QDialog::Accepted){
             if (!fd.getResult().isNull()){
-                currentSearch.fd=fd.getResult();
                 if (!fd.getResult().isTV()){
-                    fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::All);
+
+                    fd.getResult().getScraper()->findMovieInfo(&this->manager,MediaMovieSearchPtr(new MediaMovieSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All);
                 } else {
-                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode(), Scraper::SearchOption::All);
+                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,MediaTVSearchPtr(new MediaTVSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All);
                 }
             }
         }
     }
 }
 
-void PanelView::foundEpisode(const Scraper* scraper,SearchEpisodeInfo b){
+void PanelView::updateFrom(const CurrentItemData& newData){
+    this->currentSearch=newData;
+    updateUI();
+}
 
+void PanelView::updateUI(){
 
-    currentSearch.texts[Template::Properties::title]=b.title;
-    currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
-    currentSearch.texts[Template::Properties::tv]=QVariant(true);
-    currentSearch.texts[Template::Properties::season]=QVariant(b.season);
-    currentSearch.texts[Template::Properties::episode]=QVariant(b.episode);
-    currentSearch.texts[Template::Properties::episodetitle]=b.episodeTitle;
-    currentSearch.texts[Template::Properties::network]=b.network;
-    currentSearch.texts[Template::Properties::aired]=b.aired;
+    ui->synopsis->setText(currentSearch.synopsis());
 
-    if (b.productionYear>1900){
-        currentSearch.texts[Template::Properties::year]=QString::number(b.productionYear);
-    }
+    ui->castListWidget->clear();
+    ui->castListWidget->addItems(currentSearch.actors());
 
-    if (b.runtimeInSec>0){
-        currentSearch.texts[Template::Properties::runtime]=b.runtimeInSec;
-    }
+    ui->directorListWidget->clear();
+    ui->directorListWidget->addItems(currentSearch.directors());
 
-    if (b.rating>0. && b.rating<=10.){
-        currentSearch.texts[Template::Properties::rating]=QString::number(b.rating,'f',1);
-    }
-
-    ui->toolButtonRescrap->setIcon(scraper->getIcon());
-
-    ui->labelEpisodeTitle->setVisible(true);
-    ui->labelSeasonEpisode->setVisible(true);
+    ui->genreListWidget->clear();
+    ui->genreListWidget->addItems(currentSearch.genre());
 
     ui->stackedWidget->setCurrentIndex(1);
 
-    if (!ui->checkBoxLockSynopsis->isLock() /*&& currentSearch.texts[Template::Properties::synopsis].isNull()*/){
-        ui->synopsis->setText(b.synopsis);
-        setSynopsis(b.synopsis);
+    ui->chooseBackgroundButton->setMedia(currentSearch.currentBackdrop);
+    ui->choosePosterButton->setMedia(currentSearch.currentPoster);
+
+    if (currentSearch.isTV()){
+        ui->chooseBannerButton->setMedia(currentSearch.currentBanner);
+        ui->panelBanner->setVisible(true);
+    } else {
+        ui->panelBanner->setVisible(false);
+    }
+
+    ui->chooseThumbailButton->setMedia(currentSearch.currentThumbail);
+
+    currentSearch.engine()->preview(currentSearch);
+}
+
+void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSearchPtr){
+
+    Q_UNUSED(scraper);
+
+    CurrentItemData newData(mediaTVSearchPtr->engine(),true, mediaTVSearchPtr->mediaInfo());
+
+    if (!ui->checkBoxLockSynopsis->isLock()){
+        newData.setSynopsis(mediaTVSearchPtr->synopsis());
+    } else {
+        newData.setSynopsis(ui->synopsis->toPlainText());
     }
 
     if (!ui->checkBoxLockCast->isLock()){
-        ui->castListWidget->clear();
-        ui->castListWidget->addItems(b.actors);
-        setCast(b.actors);
+        newData.setActors(mediaTVSearchPtr->actors());
+    } else {
+        newData.setActors( getItemsListWidget(ui->castListWidget));
     }
 
     if (!ui->checkBoxLockDirectors->isLock()){
-
-        ui->directorListWidget->clear();
-        ui->directorListWidget->addItems(b.directors);
-        setDirectors(b.directors);
+        newData.setDirectors(mediaTVSearchPtr->directors());
+    } else {
+        newData.setDirectors( getItemsListWidget(ui->directorListWidget));
     }
-
-    ui->labelEpisodeTitle->setText(b.title);
 
     if (!ui->checkBoxLockGenre->isLock()){
-        ui->genreListWidget->clear();
-        ui->genreListWidget->addItems(b.genre);
+        newData.setGenre(mediaTVSearchPtr->genre());
+    } else {
+        newData.setGenre(getItemsListWidget(ui->genreListWidget));
     }
 
+    if (ui->checkBoxLockBackground->isLock()){
+        newData._backdrop=currentSearch._backdrop;
+        newData.backdropState=currentSearch.backdropState;
+        newData.currentBackdrop=currentSearch.currentBackdrop;
+    }
 
+    if (ui->checkBoxLockBanner->isLock()){
+        newData._banner=currentSearch._banner;
+        newData.bannerState=currentSearch.bannerState;
+        newData.currentBanner=currentSearch.currentBanner;
+    }
+
+    if (ui->checkBoxLockPoster->isLock()){
+        newData._poster=currentSearch._poster;
+        newData.posterState=currentSearch.posterState;
+        newData.currentPoster=currentSearch.currentPoster;
+    }
+
+    if (ui->checkBoxLockThumbail->isLock()){
+        newData._thumbnail=currentSearch._thumbnail;
+        newData.thumbnailState=currentSearch.thumbnailState;
+        newData.currentThumbail=currentSearch.currentThumbail;
+    }
+
+    newData.setRuntimeInSec(mediaTVSearchPtr->runtimeInSec());
+    newData.setYear(mediaTVSearchPtr->productionYear());
+    newData.setTitle(mediaTVSearchPtr->title());
+    newData.setEpisodeRating(mediaTVSearchPtr->episodeRating());
+    newData.setShowRating(mediaTVSearchPtr->showRating());
+    newData.setSeasonRating(mediaTVSearchPtr->seasonRating());
+    newData.setAired(mediaTVSearchPtr->aired());
+    newData.setNetworks(mediaTVSearchPtr->networks());
+    newData.setSeason(mediaTVSearchPtr->season());
+    newData.setEpisode(mediaTVSearchPtr->episode());
+    newData.setEpisodeTitle(mediaTVSearchPtr->episodeTitle());
     c->clear();
 
-    bool backDropSet = false;
-    bool thumbnailSet = false;
+    addImages(  scraper,  QStringList() << mediaTVSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
 
-    if (!this->currentSearch.fd.getPosterHref().isEmpty()){
-        addImages(  scraper,  QStringList() << this->currentSearch.fd.getPosterHref(), QList<QSize>(), ImageType::Poster);
-        if (!backDropSet){
-            //     setBackdrop(this->currentSearch.fd.getPosterHref(),QSize(),scraper);
-            backDropSet=true;
-        }
-    }
+    addImages(  scraper,   mediaTVSearchPtr->postersHref(), mediaTVSearchPtr->postersSize(),ImageType::Poster);
 
-    addImages(  scraper,   b.postersHref, b.postersSize,ImageType::Poster);
-    if (!thumbnailSet && b.postersHref.size()>0){
-        //  this->setThumbnail(b.postersHref.at(0),b.postersSize.size()>0? b.postersSize.at(0) : QSize(),scraper);
-        thumbnailSet=true;
-    }
+    addImages(  scraper, mediaTVSearchPtr->backdropsHref(), mediaTVSearchPtr->backdropsSize(), ImageType::Backdrop);
 
-    addImages(  scraper,  b.backdropsHref, b.backdropsSize, ImageType::Backdrop);
+    addImages(  scraper,  mediaTVSearchPtr->bannersHref(), mediaTVSearchPtr->bannersSize(),ImageType::Banner);
 
-    if (!backDropSet && b.backdropsHref.size()>0){
-        // setBackdrop(b.backdropsHref.at(0),b.backdropsSize.size()>0? b.backdropsSize.at(0) : QSize(),scraper);
-        backDropSet=true;
-    }
+    addImages(  scraper, mediaTVSearchPtr->thumbailHref(), mediaTVSearchPtr->thumbailSize(),ImageType::Thumbnail);
 
-    addImages(  scraper,  b.bannersHref, b.bannersSize,ImageType::Banner);
-
-    addImages(  scraper,  b.thumbailHref, b.thumbailSize,ImageType::Thumbnail);
-
-
-
-
-    rebuildTemplate(true);
+    updateFrom(newData);
 }
 
 
@@ -299,13 +308,14 @@ void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, co
     for (int i=0; i<hrefs.size(); i++){
 
         QString url= hrefs[i];
+        if (!url.isEmpty()){
+            QSize posterSize;
+            if (sizes.size()>i){
+                posterSize=sizes[i];
+            }
 
-        QSize posterSize;
-        if (sizes.size()>i){
-            posterSize=sizes[i];
+            c->addImageFromScraper(scraper,url,posterSize,type);
         }
-
-        c->addImageFromScraper(scraper,url,posterSize,type);
     }
 }
 
@@ -313,8 +323,31 @@ void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, co
 
 
 
-void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
+void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovieSearchPtr){
 
+  Q_UNUSED(scraper);
+
+  CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo());
+
+  if (!ui->checkBoxLockSynopsis->isLock()){
+      newData.setSynopsis(mediaMovieSearchPtr->synopsis());
+  } else {
+      newData.setSynopsis(ui->synopsis->toPlainText());
+  }
+
+  c->clear();
+
+  addImages(  scraper,  QStringList() << mediaMovieSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
+
+  addImages(  scraper,   mediaMovieSearchPtr->postersHref(), mediaMovieSearchPtr->postersSize(),ImageType::Poster);
+
+  addImages(  scraper, mediaMovieSearchPtr->backdropsHref(), mediaMovieSearchPtr->backdropsSize(), ImageType::Backdrop);
+
+  addImages(  scraper, mediaMovieSearchPtr->thumbailHref(), mediaMovieSearchPtr->thumbailSize(),ImageType::Thumbnail);
+
+  updateFrom(newData);
+
+#if 0
     currentSearch.texts[Template::Properties::title]=b.title;
     currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
     currentSearch.texts[Template::Properties::tv]=QVariant(false);
@@ -371,6 +404,7 @@ void PanelView::foundMovie(const Scraper* scraper,SearchMovieInfo b){
     addImages(   scraper,  b.backdropsHref, b.backdropsSize,ImageType::Backdrop);
 
     rebuildTemplate(true);
+#endif
 }
 
 
@@ -378,21 +412,21 @@ void  PanelView::enableSynopsis(bool enable){
     this->ui->synopsis->setReadOnly(!enable);
 
     if (!enable){
-        setSynopsis(this->ui->synopsis->toPlainText());
-        rebuildTemplate();
+        //setSynopsis(this->ui->synopsis->toPlainText());
+        //rebuildTemplate();
     }
 }
 
 
 
-void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
-    currentSearch._banner=ScraperResource(url,QSize(),_currentScrape);
+void PanelView::setBanner(const QString& url, const QSize& originalSize, const Scraper *_currentScrape ){
+    currentSearch._banner=ScraperResource(url,originalSize,_currentScrape);
 
     if (!currentSearch._banner.resources().isEmpty()){
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),QSize(),currentSearch.engine->getPosterSize(), Qt::KeepAspectRatio,ImageType::Banner);
+        QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),originalSize,currentSearch.engine()->getPosterSize(), Qt::KeepAspectRatio,ImageType::Banner);
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -400,15 +434,15 @@ void PanelView::setBanner(const QString& url, const Scraper *_currentScrape ){
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
+            if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray qb=promise->replyData();
                 QPixmap bannerPixmap;
                 if (bannerPixmap.loadFromData(qb)){
                     setBannerState(NETRESOURCE::OK, bannerPixmap);
                 }else {
                     setBannerState(NETRESOURCE::ERROR);
                 }
-            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+            } else if (promise->replyError() ==QNetworkReply::OperationCanceledError){
                 setBannerState(NETRESOURCE::CANCELED);
             } else {
                 setBannerState(NETRESOURCE::ERROR);
@@ -432,21 +466,21 @@ void PanelView::setThumbnail (const QString& url, const QSize& originalSize, con
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._thumbnail.scraper()->getBestImageUrl(currentSearch._thumbnail.resources(),originalSize,currentSearch.engine->getPosterSize());
+        QString url=currentSearch._thumbnail.scraper()->getBestImageUrl(currentSearch._thumbnail.resources(),originalSize,currentSearch.engine()->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
+            if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray qb=promise->replyData();
                 QPixmap thumbnail;
                 if (thumbnail.loadFromData(qb)){
                     setThumbnailState(NETRESOURCE::OK, thumbnail);
                 }else {
                     setThumbnailState(NETRESOURCE::ERROR);
                 }
-            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+            } else if (promise->replyError() ==QNetworkReply::OperationCanceledError){
                 setThumbnailState(NETRESOURCE::CANCELED);
             } else {
                 setThumbnailState(NETRESOURCE::ERROR);
@@ -470,21 +504,21 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
 
         InProgressDialog* p=InProgressDialog::create();
 
-        QString url=currentSearch._poster.scraper()->getBestImageUrl(currentSearch._poster.resources(),originalSize,currentSearch.engine->getPosterSize());
+        QString url=currentSearch._poster.scraper()->getBestImageUrl(currentSearch._poster.resources(),originalSize,currentSearch.engine()->getPosterSize());
 
         Promise* promise=Promise::loadAsync(manager,url,false,QNetworkRequest::Priority::HighPriority);
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
+            if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray qb=promise->replyData();
                 QPixmap fanArtPixmap;
                 if (fanArtPixmap.loadFromData(qb)){
                     setPosterState(NETRESOURCE::OK, fanArtPixmap);
                 }else {
                     setPosterState(NETRESOURCE::ERROR);
                 }
-            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+            } else if (promise->replyError() ==QNetworkReply::OperationCanceledError){
                 setPosterState(NETRESOURCE::CANCELED);
             } else {
                 setPosterState(NETRESOURCE::ERROR);
@@ -499,54 +533,47 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
 
 }
 
-void PanelView::setBackdropState(PanelView::NETRESOURCE backdropState, const QPixmap& backDrop){
-
-    bool same=currentSearch.backdropState == backdropState;
+bool setMediaState(NETRESOURCE mediaState, const QPixmap& media, NETRESOURCE& currentMediaState, QPixmap& currentMedia) {
+    bool same=(mediaState == currentMediaState);
     if (same){
-        QPixmap currentBackdrop=currentSearch.texts[Template::Properties::backdrop].value<QPixmap>();
-        same = backDrop.toImage()==currentBackdrop.toImage();
+        same = media.toImage()==currentMedia.toImage();
     }
     if (!same){
-        currentSearch.texts[Template::Properties::backdrop]=backDrop;
+        currentMedia        = media;
+        currentMediaState   = mediaState;
+        return true;
+    }
+
+    return false;
+
+}
+
+void PanelView::setBackdropState(NETRESOURCE backdropState, const QPixmap& backDrop){
+    if (setMediaState(backdropState, backDrop,currentSearch.backdropState, currentSearch.currentBackdrop)){
         ui->chooseBackgroundButton->setMedia(backDrop);
-        rebuildTemplate();
+        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
     }
 }
 
-void PanelView::setPosterState(PanelView::NETRESOURCE posterState, const QPixmap& poster){
-    bool same=currentSearch.posterState != posterState;
-    if (same){
-        QPixmap currentPoster=currentSearch.texts[Template::Properties::poster].value<QPixmap>();
-        same = poster.toImage()==currentPoster.toImage();
-    }
-    if (!same){
-        currentSearch.texts[Template::Properties::poster]=poster;
+void PanelView::setPosterState(NETRESOURCE posterState, const QPixmap& poster){
+    if (setMediaState(posterState, poster,currentSearch.posterState, currentSearch.currentPoster)){
         ui->choosePosterButton->setMedia(poster);
-        rebuildTemplate();
+        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
     }
 }
 
-void PanelView::setThumbnailState(PanelView::NETRESOURCE thumbnailState, const QPixmap& thumbnail){
-    bool same=currentSearch.thumbnailState != thumbnailState;
-    if (same){
-        QPixmap currentThumbnail=currentSearch.texts[Template::Properties::thumbnail].value<QPixmap>();
-        same = thumbnail.toImage()==currentThumbnail.toImage();
-    }
-    if (!same){
-        currentSearch.texts[Template::Properties::thumbnail]=thumbnail;
+void PanelView::setThumbnailState(NETRESOURCE thumbnailState, const QPixmap& thumbnail){
+    if (setMediaState(thumbnailState, thumbnail,currentSearch.thumbnailState, currentSearch.currentThumbail)){
         ui->chooseThumbailButton->setMedia(thumbnail);
-        rebuildTemplate();
+        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
     }
 }
-void PanelView::setBannerState(PanelView::NETRESOURCE bannerState, const QPixmap& banner){
-    bool same=currentSearch.bannerState != bannerState;
-    if (same){
-        QPixmap currentBanner=currentSearch.texts[Template::Properties::banner].value<QPixmap>();
-        same = banner.toImage()==currentBanner.toImage();
-    }
-    if (!same){
-        currentSearch.texts[Template::Properties::banner]=banner;
-        rebuildTemplate();
+
+void PanelView::setBannerState(NETRESOURCE bannerState, const QPixmap& banner){
+
+    if (setMediaState(bannerState, banner,currentSearch.bannerState, currentSearch.currentBanner)){
+        ui->chooseBannerButton->setMedia(banner);
+        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
     }
 }
 void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const Scraper *_currentScrape){
@@ -554,7 +581,7 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
     currentSearch._backdrop=ScraperResource(url,originalSize,_currentScrape);
 
     if (!currentSearch._backdrop.resources().isEmpty()){
-        QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
+        QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine()->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
 
         InProgressDialog* p=InProgressDialog::create();
 
@@ -564,15 +591,15 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
 
         QObject::connect(promise, &Promise::completed, [=]()
         {
-            if (promise->reply->error() ==QNetworkReply::NoError){
-                QByteArray qb=promise->reply->readAll();
+            if (promise->replyError() ==QNetworkReply::NoError){
+                QByteArray qb=promise->replyData();
                 QPixmap fanArtPixmap;
                 if (fanArtPixmap.loadFromData(qb)){
                     setBackdropState(NETRESOURCE::OK, fanArtPixmap);
                 }else {
                     setBackdropState(NETRESOURCE::ERROR);
                 }
-            } else if (promise->reply->error() ==QNetworkReply::OperationCanceledError){
+            } else if (promise->replyError() ==QNetworkReply::OperationCanceledError){
                 setBackdropState(NETRESOURCE::CANCELED);
             } else {
                 setBackdropState(NETRESOURCE::ERROR);
@@ -587,34 +614,19 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
 
 }
 
-void PanelView::rebuildTemplate(bool reset) {
-    disconnect(SIGNAL(previewOK(QGraphicsScene* )));
-    connect(currentSearch.engine, SIGNAL(previewOK(QGraphicsScene* )), this, SLOT(previewOK(QGraphicsScene*  )));
-    currentSearch.engine->preview(currentSearch.texts,reset);
-}
+
+
 
 void PanelView::previewOK(QGraphicsScene* s){
     ui->graphicsView->setScene(s);
 }
 
-void PanelView::setSynopsis(const QString& synopsis){
-    currentSearch.texts[Template::Properties::synopsis]=synopsis;
-}
-
-void PanelView::setCast(const QStringList& actors){
-    currentSearch.texts[Template::Properties::actors]=actors;
-}
-
-void PanelView::setDirectors(const QStringList& directors){
-    currentSearch.texts[Template::Properties::director]=directors;
-}
-
 void PanelView::proceed(){
-    currentSearch.engine->proceed();
+    currentSearch.engine()->proceed();
 }
 
 void PanelView::rescrap() {
-
+#if 0
     SearchScraperDialog fd(this, currentSearch.fd , this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
         if (!fd.getResult().isNull()){
@@ -625,12 +637,16 @@ void PanelView::rescrap() {
             }
         }
     }
+#endif
+
 }
 
 
 void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
 
-    if (mediaChoosed.isMediaUrl()){
+    if (mediaChoosed.isEmpty()){
+          setBackdropState(NETRESOURCE::NONE);
+    } else if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
         qDebug() << mediaChoosed.localFilePath();
@@ -642,8 +658,9 @@ void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
 }
 
 void PanelView::posterSelected(const MediaChoosed& mediaChoosed){
-
-    if (mediaChoosed.isMediaUrl()){
+    if (mediaChoosed.isEmpty()){
+          setPosterState(NETRESOURCE::NONE);
+    } else if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
         qDebug() << mediaChoosed.localFilePath();
@@ -651,18 +668,33 @@ void PanelView::posterSelected(const MediaChoosed& mediaChoosed){
     } else if (mediaChoosed.isMediaScraper()){
         this->setPoster(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
         qDebug() << mediaChoosed.scraperResource().resources();
-     }
+    }
 }
 
 void PanelView::thumbnailSelected(const MediaChoosed& mediaChoosed){
-
-    if (mediaChoosed.isMediaUrl()){
+    if (mediaChoosed.isEmpty()){
+         setThumbnailState(NETRESOURCE::NONE);
+    } else   if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
         qDebug() << mediaChoosed.localFilePath();
 
     } else if (mediaChoosed.isMediaScraper()){
         this->setThumbnail(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
+        qDebug() << mediaChoosed.scraperResource().resources();
+    }
+}
+
+void PanelView::bannerSelected(const MediaChoosed& mediaChoosed){
+    if (mediaChoosed.isEmpty()){
+         setBannerState(NETRESOURCE::NONE);
+    } else if (mediaChoosed.isMediaUrl()){
+        qDebug() << mediaChoosed.url().toDisplayString();
+    } else if (mediaChoosed.isMediaLocalFilePath()){
+        qDebug() << mediaChoosed.localFilePath();
+
+    } else if (mediaChoosed.isMediaScraper()){
+        this->setBanner(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
         qDebug() << mediaChoosed.scraperResource().resources();
     }
 }

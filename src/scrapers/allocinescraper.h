@@ -11,13 +11,18 @@ class AlloCineScraper : public Scraper
     FilmPrtList parseResultset(const QJsonDocument& ) const;
     ShowPtrList parseTVResultset(const QJsonDocument& resultset) const;
 
-    bool parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor &searchFor, SearchMovieInfo &info) const;
+    bool parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor &searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const;
+    bool parseEpisodeTVSerieInfo(const QJsonDocument& resultset, MediaTVSearchPtr mediaTVSearchPtr  ) const;
+    bool parseMedia(const QJsonArray& mediaArray,const Scraper::SearchFor& searchFor,  MediaTVSearchPtr mediaTVSearchPtr ) const ;
+    bool parseMedia(const QJsonArray& mediaArray,const Scraper::SearchFor& searchFor,  MediaMovieSearchPtr mediaMovieSearchPtr ) const ;
 
-    bool extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument& resultset, const int seasonToFind, QString &seasonCode, SearchEpisodeInfo& result) const;
-    bool extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode, SearchEpisodeInfo& result) const;
-    void findSeasonInfoByCode(QNetworkAccessManager *manager, const QString seasonCode, const int episode, SearchEpisodeInfo result) const;
-    void findEpisodeInfoByCode(QNetworkAccessManager *manager, const QString epidodeCode, SearchEpisodeInfo result) const;
+    bool extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument& resultset, const int seasonToFind, QString &seasonCode, MediaTVSearchPtr mediaTVSearchPtr) const;
+    bool extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDocument& resultset, const int episodeToFind, QString& episodeCode, MediaTVSearchPtr mediaTVSearchPtr) const;
+    void findSeasonInfoByCode(QNetworkAccessManager *manager, const QString seasonCode, const int episode, MediaTVSearchPtr mediaTVSearchPtr) const;
+    void findEpisodeInfoByCode(QNetworkAccessManager *manager, const QString epidodeCode, MediaTVSearchPtr mediaTVSearchPtr) const;
     void findMediaInfo(QNetworkAccessManager *manager, const QString mediaCode) const;
+
+    bool getRatingFromStatistics(const QJsonObject& statisticsObject, double& rating) const;
 
     QIcon _icon;
     void initIcon();
@@ -25,8 +30,8 @@ class AlloCineScraper : public Scraper
 protected :
     void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor, const QString& language) ;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor &searchFor,  const QString& language) ;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor, const QString& language) ;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor &searchFor,  const QString& language)  ;
 
 public:
     AlloCineScraper(QObject *parent=0);

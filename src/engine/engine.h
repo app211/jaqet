@@ -7,6 +7,7 @@
 #include <QFileInfo>
 
 #include "template/template.h"
+#include "scrapers/scraper.h"
 
 
 class Engine : public QAbstractListModel {
@@ -30,8 +31,8 @@ public :
     virtual QFileInfo getFileInfo(const QModelIndex &){return QFileInfo();}
     virtual void internalDoubleClicked ( const QModelIndex & index )=0;
 
-    virtual void preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset=false)=0;
-    virtual void preview(const QModelIndex & index)=0;
+     virtual void preview(const QModelIndex & index)=0;
+    virtual void preview(const CurrentItemData& data)=0;
 
     virtual void proceed()=0;
 

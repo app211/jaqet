@@ -51,9 +51,11 @@ void Promise::complete(){
 }
 
 void Promise::cancel(){
-    if (reply!=nullptr){
+    if (!reply.isNull()){
         reply->abort();
     }
+
+     deleteLater();
 }
 
 Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
@@ -72,10 +74,7 @@ Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString&
 
     req.setPriority(priority);
 
-
-    qDebug() << url << priority;
-
-     QNetworkReply * reply = manager.get(req);
+    QNetworkReply * reply = manager.get(req);
 
     Promise * promise = new Promise;
     promise->reply=reply;
@@ -83,6 +82,30 @@ Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString&
     QObject::connect(reply, &QNetworkReply::finished, promise, &Promise::completed);
 
     return promise;
+}
+
+QNetworkReply::NetworkError Promise::replyError(){
+    if (!reply.isNull()){
+        return reply->error();
+    }
+
+    return QNetworkReply::UnknownServerError;
+}
+
+QString Promise::replyErrorString() {
+    if (!reply.isNull()){
+        return reply->errorString();
+    }
+
+    return tr("Unknown Error");
+}
+
+QByteArray Promise::replyData(){
+    if (!reply.isNull()){
+        return reply->readAll();
+    }
+
+    return QByteArray();
 }
 
 

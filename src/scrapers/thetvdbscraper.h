@@ -2,6 +2,7 @@
 #define THETVDBSCRAPER_H
 
 #include "scraper.h"
+#include <QXmlStreamReader>
 
 class TheTVDBScraper : public Scraper
 {
@@ -11,19 +12,23 @@ class TheTVDBScraper : public Scraper
 private:
     void parseSeriesList( QNetworkAccessManager* manager, const QString& toSearch, const QByteArray& data, const QString& language);
     bool parseMirrorList( const QByteArray& data);
+    bool parseEpisode(QXmlStreamReader& xml, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode, bool& foundEpisode);
+    bool parseSeries(QXmlStreamReader& xml, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode );
+    bool parseInfo(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr, const int season, const int episode);
+    bool parseBanner(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr);
+    bool parseActors(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr);
+
     QString getXMLURL() const ;
     QString getZIPURL() const ;
     QString getBannerURL() const ;
-
-    bool parseActors(const QByteArray &data, SearchEpisodeInfo& result);
 
     QMap<QString,QString> genreTranslator;
 
 protected:
     void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
     void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor& searchFor, const QString& language) ;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor, const QString& language) ;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) ;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) ;
 
     QString postMirrorCreateURL(const QString& , const QMap<QString, QString>& params) const;
 

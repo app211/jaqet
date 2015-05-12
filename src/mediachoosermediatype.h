@@ -12,6 +12,7 @@ class MediaChoosed {
     const QString _localFilePath;
     const ScraperResource _scraperResource;
 public:
+    MediaChoosed();
     MediaChoosed(const QUrl& url);
     MediaChoosed(const QString& localFilePath);
     MediaChoosed(const ScraperResource& scraperResource);
@@ -23,9 +24,13 @@ public:
     bool isMediaUrl()  const;
     bool isMediaLocalFilePath()  const;
     bool isMediaScraper() const;
+
+   bool isEmpty() const;
 };
 
+
 Q_DECLARE_LOGGING_CATEGORY(mediaChooser)
+
 
 #endif // MEDIACHOOSERMEDIATYPE
 

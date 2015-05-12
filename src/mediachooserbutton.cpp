@@ -164,17 +164,22 @@ void MediaChooserButton::showPopup(){
 void MediaChooserButton::mediaSelected(const MediaChoosed &mediaChoosed){
     Q_ASSERT(sender()==_popup);
 
-
     emit mediaSelected2(mediaChoosed);
+}
+
+void MediaChooserButton::reset(){
+    if (!_mediaScaled.isNull()){
+        _mediaScaled = QPixmap();
+        update();
+        emit mediaSelected2(MediaChoosed());
+    }
 }
 
 void MediaChooserButton::mousePressEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && hitEraseButton(e->pos())) {
         e->accept();
-        _mediaScaled = QPixmap();
-        update();
-      //  mediaSelected(QUrl());
+        reset();
         return;
     }
 
@@ -213,6 +218,9 @@ void  MediaChooserButton::setMedia(const QPixmap& media){
     this->_mediaScaled=media.isNull()?QPixmap():media.scaled(_mediaSize, Qt::KeepAspectRatio,Qt::SmoothTransformation);
 }
 
+MediaChoosed::MediaChoosed(){
+}
+
 MediaChoosed::MediaChoosed(const QUrl& url) : _url(url){
 
 }
@@ -245,5 +253,9 @@ bool MediaChoosed::isMediaLocalFilePath() const{
 
 bool MediaChoosed::isMediaScraper() const{
     return !_scraperResource.isNull();
+}
+
+bool MediaChoosed::isEmpty() const {
+    return !isMediaUrl() && !isMediaLocalFilePath() && !isMediaScraper();
 }
 

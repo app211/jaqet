@@ -10,6 +10,7 @@ include(src/third/quazip/quazip/quazip.pri)
 
 INCLUDEPATH += src/third/quazip/
 INCLUDEPATH += src
+INCLUDEPATH += src/widgets
 
 QT       += core gui network xml widgets
 

@@ -19,7 +19,7 @@ class DefaultScraper : public Scraper
     SearchFor searchFor;
     QString language;
     QNetworkAccessManager *manager;
-    SearchEpisodeInfo searchEpisodeInfo;
+    //SearchEpisodeInfo searchEpisodeInfo;
     Scraper* currentScraper;
     SearchFor currentSearchFor;
 
@@ -50,8 +50,8 @@ private slots:
     void _searchScraper();
     void _found(FilmPrtList result);
     void _found(ShowPtrList shows);
-    void _found(const Scraper* scraper,SearchMovieInfo films) ;
-    void _found(const Scraper* scraper, SearchEpisodeInfo shows) ;
+    void _found(const Scraper* scraper,MediaMovieSearchPtr films) ;
+    void _found(const Scraper* scraper, MediaTVSearchPtr shows) ;
 
 };
 

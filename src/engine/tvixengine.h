@@ -17,13 +17,12 @@ public:
     QSize getPosterSize() const;
     QSize getBannerSize() const;
 
-    void preview(const QMap<Template::Properties, QVariant> &newproperties, bool reset=false);
     void preview(const QModelIndex & index);
+    void preview(const CurrentItemData& data);
 
     void init(const QString& path);
 protected:
     virtual TypeItem getTypeItem(const QFileInfo &f) const;
-    void create(const QMap<Template::Properties, QVariant> &newproperties,bool reset);
 
 private slots:
     void previewOk(QPixmap result);

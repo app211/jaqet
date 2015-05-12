@@ -27,10 +27,10 @@ Scraper::Scraper(QObject *parent)
     connect(this, SIGNAL(scraperError(const QString&)), this,
             SLOT(showErrorDialog(const QString&)));
 
-    connect(this, SIGNAL(found(const Scraper* ,SearchMovieInfo )), this,
+    connect(this, SIGNAL(found(const Scraper* ,MediaMovieSearchPtr )), this,
             SLOT(closeDialog()));
 
-    connect(this, SIGNAL(found(const Scraper* ,SearchEpisodeInfo )), this,
+    connect(this, SIGNAL(found(const Scraper* ,MediaTVSearchPtr )), this,
             SLOT(closeDialog()));
 }
 
@@ -60,18 +60,18 @@ void Scraper::showErrorDialog(const QString& error){
     msgBox.exec();
 }
 
-void  Scraper::findMovieInfo(QNetworkAccessManager *manager, const QString& movieCode, const SearchFor &searchFor)  {
+void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor)  {
 
     p=(p==nullptr)?InProgressDialog::create():p;
 
-    internalFindMovieInfo(manager,  movieCode, searchFor, "fr");
+    internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, "fr");
 }
 
-void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, const QString& showCode, const int season, const int episode, const SearchFor& searchFor)  {
+void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor)  {
 
     p=(p==nullptr)?InProgressDialog::create():p;
 
-    internalFindEpisodeInfo(manager, showCode, season,  episode, searchFor, "fr");
+    internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, "fr");
 }
 
 
