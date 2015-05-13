@@ -134,18 +134,18 @@ struct M_M {
     int h;
 };
 
-static QList<M_M> urls;
-static Promise* currentPromise= nullptr;
+QList<M_M> urls;
+QPointer<Promise> currentPromise;
 
 void MediaChooserPopup::startPromise( QNetworkAccessManager* manager){
 
-    if (urls.isEmpty() || currentPromise != nullptr){
+    if (urls.isEmpty() || !currentPromise.isNull()){
         return;
     }
 
     M_M url=urls.takeFirst();
 
-    currentPromise=Promise::loadAsync(*manager,url.url,false,false,QNetworkRequest::NormalPriority);
+    currentPromise=Promise::loadAsync(*manager,url.url,true,true,QNetworkRequest::NormalPriority);
 
     QObject::connect(currentPromise, &Promise::completed, [=]()
     {
@@ -166,7 +166,7 @@ void MediaChooserPopup::startPromise( QNetworkAccessManager* manager){
 
         }
 
-        currentPromise=nullptr;
+        currentPromise.clear();
 
         startPromise(manager);
     });
@@ -430,9 +430,13 @@ void MediaChooserPopup::popup(MediaChooserButton *button, QFlags<ImageType> filt
 }
 
 void MediaChooserPopup::clear(){
+    urls.clear();
+
     if (ui->graphicsView->scene()){
         ui->graphicsView->scene()->clear();
     }
+
+
 }
 
 
