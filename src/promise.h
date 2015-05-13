@@ -14,6 +14,8 @@ class Promise : public QObject
 
     QPointer<QNetworkReply> reply;
 
+    void clear();
+
 public:
     Promise();
      static Promise* loadAsync( QNetworkAccessManager & manager, const QString& url, bool useRandomIP=true, bool useRandomUserAgent=true, QNetworkRequest::Priority priority=QNetworkRequest::NormalPriority);
@@ -23,10 +25,10 @@ public:
      QByteArray replyData();
 
 public slots:
-    void complete();
-    void cancel();
+    void clearCompleted();
+    void clearCanceled();
 
-Q_SIGNALS:
+signals:
     void completed();
     void canceled();
 

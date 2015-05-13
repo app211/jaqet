@@ -25,10 +25,10 @@ private:
     QMap<QString,QString> genreTranslator;
 
 protected:
-    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
-    void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) ;
-    void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) ;
+    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const override ;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const override;
+    void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) override;
+    void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) override ;
 
     QString postMirrorCreateURL(const QString& , const QMap<QString, QString>& params) const;
 

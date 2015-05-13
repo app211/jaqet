@@ -6,6 +6,8 @@
 #include <QNetworkReply>
 #include "utils.h"
 
+/* TODO make a Promise List */
+
 QString getRandomUserAgent()
 {
     QString v=QString("%1 %2").arg(Utils::randInt(1, 4)).arg(Utils::randInt(0, 9));
@@ -42,20 +44,27 @@ QString getRandomUserAgent()
 
 Promise::Promise()
 {
-    connect(this, &Promise::completed, this, &Promise::complete);
-    connect(this, &Promise::canceled, this, &Promise::cancel);
+    connect(this, &Promise::completed, this, &Promise::clearCompleted);
+    connect(this, &Promise::canceled, this, &Promise::clearCanceled);
 }
 
-void Promise::complete(){
-    deleteLater();
+void Promise::clearCompleted(){
+    clear();
 }
 
-void Promise::cancel(){
+void Promise::clearCanceled(){
     if (!reply.isNull()){
         reply->abort();
     }
 
-     deleteLater();
+    clear();
+}
+
+void Promise::clear(){
+    if (!reply.isNull()){
+        return reply->deleteLater();
+    }
+    deleteLater();
 }
 
 Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){

@@ -7,6 +7,7 @@
 #include <QGraphicsObject>
 #include <QPushButton>
 #include <QMovie>
+#include <QCompleter>
 
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
@@ -74,6 +75,23 @@ PanelView::PanelView(QWidget *parent) :
     ui->choosePosterButton->setPopup(c,ImageType::Poster);
     ui->chooseThumbailButton->setPopup(c,ImageType::Thumbnail);
     ui->chooseBannerButton->setPopup(c,ImageType::Banner);
+
+
+
+    ui->comboResolution->addItems({
+                                      QStringLiteral("480i") ,
+                                      QStringLiteral("480p"),
+                                      QStringLiteral("576i"),
+                                      QStringLiteral("576p"),
+                                      QStringLiteral("720p"),
+                                      QStringLiteral("1080i"),
+                                      QStringLiteral("1080p")
+                                  });
+    /*     QCompleter* resolutionCompleter= new QCompleter(l,this);
+         resolutionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+         resolutionCompleter->setCompletionMode(QCompleter::PopupCompletion);
+
+    ui->comboResolution->setCompleter(resolutionCompleter);*/
 }
 
 PanelView::~PanelView()
