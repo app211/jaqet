@@ -72,11 +72,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->listView, SIGNAL(doubleClicked ( const QModelIndex & )),
             modelB, SLOT(doubleClicked ( const QModelIndex & )));
 
-    //   ui->listView->setRootIndex(f->mapFromSource(ffdf->setRootPath(QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation).at(0))));
 
     connect(ui->listView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
             this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&)));
 
+
+    connect(f,SIGNAL(modelAboutToBeReset()), this, SLOT(modelAboutToBeReset()));
+    connect(f,SIGNAL(modelReset()), this, SLOT(modelReset()));
 
     scene = new QGraphicsScene(this);
    // ui->widget_3->setScene(scene);
@@ -93,6 +95,15 @@ void MainWindow::ctxMenu(const QPoint &pos) {
 
 
 
+void MainWindow::modelAboutToBeReset(){
+    qDebug() << "modelAboutToBeReset";
+}
+
+void MainWindow::modelReset(){
+    currentChanged(QModelIndex(),QModelIndex());
+      qDebug() << "modelReset";
+}
+
 
 void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex & ){
 
@@ -104,7 +115,9 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
         ui->widget_3->setDir();
     } else if (typeItem==Engine::TypeItem::PROCEEDED){
         ui->widget_3->setProceeded(modelB,current);
-     }
+     } else {
+        ui->widget_3->reset();
+    }
 }
 
 void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){

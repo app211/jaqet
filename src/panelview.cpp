@@ -168,6 +168,9 @@ void PanelView::setDir(){
     ui->stackedWidget->setCurrentIndex(2);
 }
 
+void PanelView::reset(){
+    ui->stackedWidget->setCurrentIndex(2);
+}
 void PanelView::setProceedable(Engine* engine, const QModelIndex &index){
 
     ui->stackedWidget->setCurrentIndex(0);

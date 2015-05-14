@@ -21,6 +21,7 @@ public:
         deleteLater();
     }
 
+
 private:
     Ui::InProgressDialog *ui;
     explicit InProgressDialog(QWidget *parent = 0);

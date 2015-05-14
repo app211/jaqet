@@ -302,7 +302,6 @@ class MediaMovieSearch : public MediaSearch< MediaMovieSearchPrivate > {
 
 public:
 
-
     void setOriginalTitle(const QString& originalTitle) { d->originalTitle = originalTitle; }
     QString originalTitle() const { return d->originalTitle; }
 
@@ -326,10 +325,10 @@ public :
     }
 
     MediaMovieSearch(const MediaMovieSearch &other)
-
     {
         d=other.d;
     }
+
 
 };
 
@@ -337,7 +336,25 @@ typedef QSharedPointer<MediaMovieSearch> MediaMovieSearchPtr;
 
 class MediaTVSearchPrivate  : public QSharedData {
 public:
-    MediaTVSearchPrivate()  { }
+    MediaTVSearchPrivate():
+        productionYear(0),
+        season(-1),
+        episode(-1),
+        runtimeInSec(0),
+        showRating(-1),
+        seasonRating(-1),
+        episodeRating(-1),
+        engine(nullptr)
+    { }
+
+    MediaTVSearchPrivate( const QFileInfo& fileInfo, const MediaInfo& mediaInfo, const FoundResult& fd, Engine* engine)
+    : MediaTVSearchPrivate(){
+        this->engine=engine;
+        this->fileInfo=fileInfo;
+        this->mediaInfo=mediaInfo;
+        this->fd=fd;
+    }
+
     MediaTVSearchPrivate(const MediaTVSearchPrivate &other)
         : QSharedData(other),
           code(other.code),
@@ -375,6 +392,7 @@ public:
           mediaInfo(other.mediaInfo),
           fd(other.fd)
     { }
+
     ~MediaTVSearchPrivate() { }
 
     QString code;
@@ -393,12 +411,12 @@ public:
     QList<QSize> thumbailSize;
     QString linkName;
     QString linkHref;
-    int season=-1;
-    int episode=-1;
     QString showTitle;
     QString originalShowTitle;
-    int productionYear=0;
     QStringList actors;
+    int productionYear=0;
+    int season=-1;
+    int episode=-1;
     int runtimeInSec=0;
     double showRating=-1.;
     double seasonRating=-1.;
@@ -471,11 +489,7 @@ public :
 
     MediaTVSearch( const QFileInfo& fileInfo, const MediaInfo& mediaInfo, const FoundResult& fd, Engine* engine)
     {
-        d = new MediaTVSearchPrivate;
-        d->engine=engine;
-        d->fileInfo=fileInfo;
-        d->mediaInfo=mediaInfo;
-        d->fd=fd;
+        d =new MediaTVSearchPrivate(fileInfo, mediaInfo, fd, engine);
     }
 
     MediaTVSearch(const MediaTVSearch &other)
@@ -494,6 +508,13 @@ private:
     class CurrentItemDataPrivate  : public QSharedData {
     public:
         CurrentItemDataPrivate()  { }
+
+        CurrentItemDataPrivate(Engine* engine, bool tv, const QFileInfo& fileInfo){
+            this->engine=engine;
+            this->tv=tv;
+            this->fileInfo=fileInfo;
+        }
+
         CurrentItemDataPrivate(const CurrentItemDataPrivate &other)
             : QSharedData(other),
               code(other.code),
@@ -582,12 +603,8 @@ public:
     }
 
     CurrentItemData(Engine* engine, bool tv, const MediaInfo& mediaInfo, const QFileInfo& fileInfo)
+        : d(new CurrentItemDataPrivate(engine,tv,fileInfo))
     {
-        d = new CurrentItemDataPrivate;
-        d->engine=engine;
-        d->tv=tv;
-        d->fileInfo=fileInfo;
-
         if (!mediaInfo.isEmpty()){
             setVDurationSecs(mediaInfo.durationSecs());
 

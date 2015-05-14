@@ -29,7 +29,7 @@
   <widget class="QLabel" name="Loadin">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>110</x>
      <y>40</y>
      <width>46</width>
      <height>13</height>
@@ -37,6 +37,19 @@
    </property>
    <property name="text">
     <string>Loading...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMovie">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>40</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
  </widget>

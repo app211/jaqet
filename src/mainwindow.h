@@ -39,6 +39,9 @@ private slots:
 
     void doubleClicked (const QModelIndex &);
 
+    void modelReset();
+    void modelAboutToBeReset();
+
  private:
     MyProxyModel* model;
     QAction* allocineAction;

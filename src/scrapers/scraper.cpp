@@ -9,6 +9,7 @@
 #include <QUrl>
 #include <QApplication>
 #include <QMessageBox>
+#include <QPointer>
 
 #include "../inprogressdialog.h"
 
@@ -35,18 +36,22 @@ Scraper::Scraper(QObject *parent)
 }
 
 
-InProgressDialog* p=nullptr;
+QPointer<InProgressDialog> p;
 
 void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year) const {
 
-    p=(p==nullptr)?InProgressDialog::create():p;
+    if (p.isNull()) {
+        p=InProgressDialog::create();
+    }
 
     internalSearchFilm( manager, toSearch,"fr", year);
 }
 
 void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {
 
-    p=(p==nullptr)?InProgressDialog::create():p;
+    if (p.isNull()) {
+        p=InProgressDialog::create();
+    }
 
     internalSearchTV( manager, toSearch,"fr");
 }
@@ -62,14 +67,18 @@ void Scraper::showErrorDialog(const QString& error){
 
 void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor)  {
 
-    p=(p==nullptr)?InProgressDialog::create():p;
+    if (p.isNull()) {
+        p=InProgressDialog::create();
+    }
 
     internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, "fr");
 }
 
 void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor)  {
 
-    p=(p==nullptr)?InProgressDialog::create():p;
+    if (p.isNull()) {
+        p=InProgressDialog::create();
+    }
 
     internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, "fr");
 }

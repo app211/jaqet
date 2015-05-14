@@ -109,5 +109,6 @@
         <file>styles/gtk+.qss</file>
         <file>images/erase.png</file>
         <file>images/menu_indicator.png</file>
+        <file>animations/ajax-loader.gif</file>
     </qresource>
 </RCC>

@@ -35,6 +35,8 @@ public:
     void setProceedable(Engine *engine, const QModelIndex &index);
     void setProceeded(Engine *engine, const QModelIndex &index);
     void setDir();
+    void reset();
+
 private:
 
 
