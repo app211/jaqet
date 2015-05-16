@@ -164,6 +164,11 @@ void MediaChooserButton::showPopup(){
 void MediaChooserButton::mediaSelected(const MediaChoosed &mediaChoosed){
     Q_ASSERT(sender()==_popup);
 
+    if (_popup && _popup->isVisible()){
+        _popup->hide();
+         setDown(false);
+    }
+
     emit mediaSelected2(mediaChoosed);
 }
 

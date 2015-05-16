@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QStyle>
+#include "src/widgets/jaqetmainwindow.h"
 
 static QtMessageHandler oldHandler = nullptr;
 static QFile outFile("LogFile.log");
@@ -79,8 +80,8 @@ int main(int argc, char *argv[])
     }
 
 
-    MainWindow w;
-    w.show();
+    QScopedPointer<JaqetMainWindow> mainWindow(JaqetMainWindow::getInstance());
+    mainWindow->show();
 
     int ret= app.exec();
 

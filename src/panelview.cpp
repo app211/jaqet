@@ -370,64 +370,6 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
 
   updateFrom(newData);
 
-#if 0
-    currentSearch.texts[Template::Properties::title]=b.title;
-    currentSearch.texts[Template::Properties::originaltitle]=b.originalTitle;
-    currentSearch.texts[Template::Properties::tv]=QVariant(false);
-
-    if (b.productionYear>1900){
-        currentSearch.texts[Template::Properties::year]=b.productionYear;
-    }
-
-    if (b.runtime>0){
-        currentSearch.texts[Template::Properties::runtime]=QDateTime::fromTime_t(b.runtime).toUTC().toString("h'H 'mm");
-    }
-
-    if (b.rating>0. && b.rating<=10.){
-        currentSearch.texts[Template::Properties::rating]=QString::number(b.rating,'f',1);
-    }
-
-    ui->toolButtonRescrap->setIcon(scraper->getIcon());
-
-    ui->labelEpisodeTitle->setVisible(false);
-    ui->labelSeasonEpisode->setVisible(false);
-
-    if (!b.linkHref.isEmpty()){
-        ui->labelMovieTitle->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
-        ui->labelMovieTitle->setTextFormat(Qt::RichText);
-        ui->labelMovieTitle->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        ui->labelMovieTitle->setOpenExternalLinks(true);
-    } else {
-        ui->labelMovieTitle->setText(b.title);
-    }
-
-    ui->stackedWidget->setCurrentIndex(1);
-    if (!b.linkHref.isEmpty()){
-        /*ui->labelUrl->setText(QString("<a href=\"").append(b.linkHref).append("\">").append(b.linkName).append("</a>"));
-        ui->labelUrl->setTextFormat(Qt::RichText);
-        ui->labelUrl->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        ui->labelUrl->setOpenExternalLinks(true);*/
-    }
-
-    ui->synopsis->setText(b.synopsis);
-
-    ui->castListWidget->clear();
-    for (const QString& actor : b.actors){
-        ui->castListWidget->addItem(actor);
-    }
-
-    ui->directorListWidget->clear();
-    for (const QString& director : b.directors){
-        ui->directorListWidget->addItem(director);
-    }
-
-    c->clear();
-
-    addImages(  scraper,  b.postersHref, b.postersSize,ImageType::Poster);
-    addImages(   scraper,  b.backdropsHref, b.backdropsSize,ImageType::Backdrop);
-
-    rebuildTemplate(true);
-#endif
 }
 
 
@@ -599,6 +541,11 @@ void PanelView::setBannerState(NETRESOURCE bannerState, const QPixmap& banner){
         if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
     }
 }
+
+#include "src/widgets/jaqetmainwindow.h"
+
+
+
 void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const Scraper *_currentScrape){
 
     currentSearch._backdrop=ScraperResource(url,originalSize,_currentScrape);
@@ -606,9 +553,11 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
     if (!currentSearch._backdrop.resources().isEmpty()){
         QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine()->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
 
-        InProgressDialog* p=InProgressDialog::create();
+     //   InProgressDialog* p=InProgressDialog::create();
 
         Promise* promise=Promise::loadAsync(manager,url,false);
+
+        JaqetMainWindow::getInstance()->showLightBox();
 
         //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
@@ -628,7 +577,9 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
                 setBackdropState(NETRESOURCE::ERROR);
             }
 
-            p->closeAndDeleteLater();
+            JaqetMainWindow::getInstance()->hideLightBox();
+
+          //  p->closeAndDeleteLater();
         });
 
     } else {

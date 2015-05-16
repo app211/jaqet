@@ -17,12 +17,7 @@
 #include <QInputDialog>
 #include <QStandardPaths>
 #include <QNetworkAccessManager>
-
-#include "scrapers/allocinescraper.h"
-#include "scrapers/themoviedbscraper.h"
-#include "scrapers/thetvdbscraper.h"
-
-
+#include <QProgressDialog>
 #include <QSortFilterProxyModel>
 #include <QStringListModel>
 #include <QCoreApplication>
@@ -31,12 +26,17 @@
 #include <QPen>
 #include <QBrush>
 
+#include "scrapers/allocinescraper.h"
+#include "scrapers/themoviedbscraper.h"
+#include "scrapers/thetvdbscraper.h"
+
+
+
 
 #include "engine/tvixengine.h"
 #include "promise.h"
 #include "searchscraperdialog.h"
 
-#include <QProgressDialog>
 
 
 
@@ -55,7 +55,7 @@ void MainWindow::doubleClicked ( const QModelIndex & ){
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QWidget(parent),
     ui(new Ui::MainWindow)
 {
     QTime time = QTime::currentTime();
@@ -84,13 +84,10 @@ MainWindow::MainWindow(QWidget *parent) :
    // ui->widget_3->setScene(scene);
 
     //ui->scrollAreaScrapResult->setVisible(false);
+
+
 }
 
-void MainWindow::ctxMenu(const QPoint &pos) {
-    QMenu *menu = new QMenu;
-    menu->addAction(tr("Test Item"), this, SLOT(test_slot()));
-    //menu->exec(ui->label->mapToGlobal(pos));
-}
 
 
 
@@ -120,34 +117,7 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
     }
 }
 
-void MainWindow::setImageFromInternet( QByteArray& qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h){
 
-    if (itemToUpdate==nullptr){
-        // Nothing to do
-        return;
-    } else {
-        bool itemSeemsToExistsAnymore=false;
-        QList<QGraphicsItem*> all = this->scene->items();
-        for (int i = 0; i < all.size(); i++)
-        {
-            if (itemToUpdate==all[i]){
-                itemSeemsToExistsAnymore=true;
-                break;
-            }
-        }
-
-        if (!itemSeemsToExistsAnymore){
-            // Nothing to do
-            return;
-        }
-    }
-
-    QPixmap pixmap;
-    pixmap.loadFromData(qb);
-    QPixmap scaled = (pixmap.width()>w || pixmap.height()>h) ? pixmap.scaled(w,h,Qt::KeepAspectRatio):pixmap;
-    itemToUpdate->setPixmap(scaled);
-    itemToUpdate->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
-}
 
 
 

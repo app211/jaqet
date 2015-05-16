@@ -22,7 +22,7 @@ class FileDownloader;
 
 #include "scrapers/scraper.h"
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -35,7 +35,6 @@ private slots:
 
     void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
     void chooseTizzBirdFolder();
-     void ctxMenu(const QPoint &pos) ;
 
     void doubleClicked (const QModelIndex &);
 
@@ -61,7 +60,6 @@ private slots:
 
     QList<Scraper*> scrapes;
 
-    void setImageFromInternet(QByteArray &qb, QGraphicsPixmapItem* itemToUpdate, int x, int y, int w, int h);
 
 };
 
