@@ -247,6 +247,7 @@ public:
 class MediaMovieSearchPrivate  : public QSharedData {
 public:
     MediaMovieSearchPrivate()  { }
+
     MediaMovieSearchPrivate(const MediaMovieSearchPrivate &other)
         : QSharedData(other),
           title(other.title),
@@ -269,7 +270,9 @@ public:
           engine(other.engine),
           fileInfo(other.fileInfo),
           mediaInfo(other.mediaInfo),
-          fd(other.fd)
+          fd(other.fd),
+          countries(other.countries),
+          tagLine(other.tagLine)
     { }
 
     ~MediaMovieSearchPrivate() { }
@@ -291,11 +294,13 @@ public:
     int runtimeInSec=0;
     double rating=-1.;
     QStringList directors;
+    QStringList countries;
     QStringList genre;
     QFileInfo fileInfo;
     MediaInfo mediaInfo;
     FoundResult fd;
     Engine* engine=nullptr;
+    QString tagLine;
 };
 
 class MediaMovieSearch : public MediaSearch< MediaMovieSearchPrivate > {
@@ -313,6 +318,12 @@ public:
 
     void setRating( double rating) { d->rating=rating; }
     double rating() const { return d->rating;}
+
+    void setCountries(const QStringList& countries) { d->countries = countries; }
+    QStringList countries() const { return d->countries; }
+
+    void setTagLine(const QString& tagLine) { d->tagLine = tagLine; }
+    QString tagLine() const { return d->tagLine; }
 
 public :
     MediaMovieSearch( const QFileInfo& fileInfo, const MediaInfo& mediaInfo, const FoundResult& fd, Engine* engine)
@@ -551,7 +562,9 @@ private:
               tv(other.tv),
               tlanguages(other.tlanguages),
               engine(other.engine),
-            fileInfo(other.fileInfo)
+            fileInfo(other.fileInfo),
+            countries(other.countries),
+            tagLine(other.tagLine)
         { }
 
         ~CurrentItemDataPrivate() { }
@@ -591,6 +604,8 @@ private:
         double episodeRating=-1.;
         QFileInfo fileInfo;
         Engine* engine=nullptr;
+        QStringList countries;
+        QString tagLine;
 
     };
 
@@ -730,6 +745,12 @@ public:
     void setTitle(const QString& title) { d->title = title; }
     QString title() const { return d->title; }
 
+    void setOriginalTitle(const QString& originalTitle) { d->originalTitle = originalTitle; }
+    QString originalTitle() const { return d->originalTitle; }
+
+    void setTagLine(const QString& tagLine) { d->tagLine = tagLine; }
+    QString tagLine() const { return d->tagLine; }
+
     void setEpisodeTitle(const QString& episodeTitle) { d->episodeTitle = episodeTitle; }
     QString episodeTitle() const { return d->episodeTitle; }
 
@@ -778,6 +799,10 @@ public:
 
     bool isTV() const { return d->tv; }
     Engine* engine() const { return d->engine; }
+
+    void setCountries(const QStringList& countries) { d->countries = countries; }
+    QStringList countries() const { return d->countries; }
+
 };
 
 class Scraper : public QObject
@@ -826,6 +851,9 @@ protected:
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
     virtual void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) =0;
     virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) =0;
+
+
+    QString language() const;
 
 public slots:
     void closeDialog();

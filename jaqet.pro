@@ -50,7 +50,9 @@ SOURCES += src/main.cpp\
     src/scrapers/defaultscraper.cpp \
     src/mediachooserbutton.cpp \
     src/mediachooserpopup.cpp \
-    src/widgets/checklock.cpp
+    src/widgets/checklock.cpp \
+    src/third/QLightBoxWidget/src/qlightboxwidget.cpp \
+    src/widgets/jaqetmainwindow.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -83,7 +85,9 @@ HEADERS  += src/mainwindow.h \
     src/mediachooserbutton.h \
     src/mediachoosermediatype.h \
     src/mediachooserpopup.h \
-    src/widgets/checklock.h
+    src/widgets/checklock.h \
+    src/third/QLightBoxWidget/src/qlightboxwidget.h \
+    src/widgets/jaqetmainwindow.h
 
 
 FORMS    += src/mainwindow.ui \

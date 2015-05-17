@@ -72,7 +72,9 @@ void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const
     {
         if (promise->replyError() ==QNetworkReply::NoError){
             QJsonParseError e;
-            QJsonDocument doc=  QJsonDocument::fromJson(promise->replyData(),&e);
+            QByteArray data=promise->replyData();
+            qDebug() << data;
+            QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 if (parseConfiguration(doc)){
                     searchFilmConfigurationOk(manager,toSearch, year, language);
@@ -104,6 +106,7 @@ void TheMovieDBScraper::internalFindMovieInfo( QNetworkAccessManager* manager, M
             if (promise->replyError() ==QNetworkReply::NoError){
                 QJsonParseError e;
                 QByteArray data=promise->replyData();
+                qDebug() << data;
                 QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
                 if (e.error== QJsonParseError::NoError){
                     if(parseMovieInfo(doc,mediaMovieSearchPtr)){
@@ -365,10 +368,36 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, MediaMovi
     QJsonObject movieObject = resultset.object();
 
     mediaMovieSearchPtr->setTitle(movieObject["title"].toString());
+    mediaMovieSearchPtr->setOriginalTitle(movieObject["original_title"].toString());
+    mediaMovieSearchPtr->setTagLine(movieObject["tagline"].toString());
     mediaMovieSearchPtr->setSynopsis(movieObject["overview"].toString());
 
     mediaMovieSearchPtr->addPoster(movieObject["poster_path"].toString());
     mediaMovieSearchPtr->addBackdrop(movieObject["backdrop_path"].toString());
+
+    QStringList genres;
+    if (movieObject["genres"].isArray()){
+        foreach (const QJsonValue & value, movieObject["genres"].toArray())
+        {
+            if (value.isObject() &&  value.toObject()["name"].isString()){
+                genres << value.toObject()["name"].toString();
+            }
+        }
+    }
+
+    mediaMovieSearchPtr->setGenre(genres);
+
+    QStringList countries;
+    if (movieObject["production_countries"].isArray()){
+        foreach (const QJsonValue & value, movieObject["production_countries"].toArray())
+        {
+            if (value.isObject() &&  value.toObject()["iso_3166_1"].isString()){
+                countries << value.toObject()["iso_3166_1"].toString();
+            }
+        }
+    }
+
+    mediaMovieSearchPtr->setCountries(countries);
 
     if (movieObject["credits"].isObject()){
         QJsonObject creditsObject=movieObject["credits"].toObject();
@@ -395,25 +424,21 @@ bool TheMovieDBScraper::parseMovieInfo(const QJsonDocument& resultset, MediaMovi
         }
     }
 
-#if 0
-    mediaMovieSearchPtr.productionYear=-1;
     if (movieObject["release_date"].isString() ){
         QDate releaseDate=QDate::fromString(movieObject["release_date"].toString(), "yyyy-MM-dd");
         if (releaseDate.isValid()){
-            mediaMovieSearchPtr.productionYear=releaseDate.year();
+            mediaMovieSearchPtr->setProductionYear(releaseDate.year());
         }
     }
 
-    mediaMovieSearchPtr.runtime=-1;
-    if (movieObject["runtime"].isDouble()){
-        mediaMovieSearchPtr.runtime=movieObject["runtime"].toInt()*60;
+     if (movieObject["runtime"].isDouble()){
+        mediaMovieSearchPtr->setRuntimeInSec(movieObject["runtime"].toInt()*60);
     }
 
-    mediaMovieSearchPtr.rating=-1;
     if (movieObject["vote_average"].isDouble()){
-        mediaMovieSearchPtr.rating=movieObject["vote_average"].toDouble();
+        mediaMovieSearchPtr->setRating(movieObject["vote_average"].toDouble());
     }
-#endif
+
     return true;
 }
 

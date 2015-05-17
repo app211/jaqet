@@ -517,6 +517,14 @@ bool AlloCineScraper::getRatingFromStatistics(const QJsonObject& statisticsObjec
 
 }
 
+bool extractNationality(const QJsonArray& nationalityArray, MediaMovieSearchPtr mediaMovieSearchPtr) {
+    foreach (const QJsonValue & value, nationalityArray){
+        qDebug() << value.toString();
+        qDebug() << value.toObject()["code"].toString();
+    }
+
+}
+
 bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor& searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const{
 
     Q_UNUSED(manager);
@@ -536,6 +544,9 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     mediaMovieSearchPtr->setOriginalTitle(movieObject["originalTitle"].toString());
     mediaMovieSearchPtr->setSynopsis(movieObject["synopsis"].toString());
     mediaMovieSearchPtr->setProductionYear(movieObject["productionYear"].toInt());
+
+    extractNationality(movieObject["nationality"].toArray(),mediaMovieSearchPtr);
+
     // mediaMovieSearchPtr.runtime = movieObject["runtime"].toInt();
 
     //    if(movieObject["poster"].isObject()){

@@ -245,6 +245,22 @@ void PanelView::updateUI(){
     currentSearch.engine()->preview(currentSearch);
 }
 
+void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
+
+    for (int i=0; i<hrefs.size(); i++){
+
+        QString url= hrefs[i];
+        if (!url.isEmpty()){
+            QSize posterSize;
+            if (sizes.size()>i){
+                posterSize=sizes[i];
+            }
+
+            c->addImageFromScraper(scraper,url,posterSize,type);
+        }
+    }
+}
+
 void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSearchPtr){
 
     Q_UNUSED(scraper);
@@ -275,6 +291,18 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
         newData.setGenre(getItemsListWidget(ui->genreListWidget));
     }
 
+    newData.setRuntimeInSec(mediaTVSearchPtr->runtimeInSec());
+    newData.setYear(mediaTVSearchPtr->productionYear());
+    newData.setTitle(mediaTVSearchPtr->title());
+    newData.setEpisodeRating(mediaTVSearchPtr->episodeRating());
+    newData.setShowRating(mediaTVSearchPtr->showRating());
+    newData.setSeasonRating(mediaTVSearchPtr->seasonRating());
+    newData.setAired(mediaTVSearchPtr->aired());
+    newData.setNetworks(mediaTVSearchPtr->networks());
+    newData.setSeason(mediaTVSearchPtr->season());
+    newData.setEpisode(mediaTVSearchPtr->episode());
+    newData.setEpisodeTitle(mediaTVSearchPtr->episodeTitle());
+
     if (ui->checkBoxLockBackground->isLock()){
         newData._backdrop=currentSearch._backdrop;
         newData.backdropState=currentSearch.backdropState;
@@ -299,17 +327,7 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
         newData.currentThumbail=currentSearch.currentThumbail;
     }
 
-    newData.setRuntimeInSec(mediaTVSearchPtr->runtimeInSec());
-    newData.setYear(mediaTVSearchPtr->productionYear());
-    newData.setTitle(mediaTVSearchPtr->title());
-    newData.setEpisodeRating(mediaTVSearchPtr->episodeRating());
-    newData.setShowRating(mediaTVSearchPtr->showRating());
-    newData.setSeasonRating(mediaTVSearchPtr->seasonRating());
-    newData.setAired(mediaTVSearchPtr->aired());
-    newData.setNetworks(mediaTVSearchPtr->networks());
-    newData.setSeason(mediaTVSearchPtr->season());
-    newData.setEpisode(mediaTVSearchPtr->episode());
-    newData.setEpisodeTitle(mediaTVSearchPtr->episodeTitle());
+
     c->clear();
 
     addImages(  scraper,  QStringList() << mediaTVSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
@@ -325,27 +343,6 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
     updateFrom(newData);
 }
 
-
-void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
-
-    for (int i=0; i<hrefs.size(); i++){
-
-        QString url= hrefs[i];
-        if (!url.isEmpty()){
-            QSize posterSize;
-            if (sizes.size()>i){
-                posterSize=sizes[i];
-            }
-
-            c->addImageFromScraper(scraper,url,posterSize,type);
-        }
-    }
-}
-
-
-
-
-
 void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovieSearchPtr){
 
   Q_UNUSED(scraper);
@@ -357,6 +354,30 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
   } else {
       newData.setSynopsis(ui->synopsis->toPlainText());
   }
+
+  if (!ui->checkBoxLockCast->isLock()){
+      newData.setActors(mediaMovieSearchPtr->actors());
+  } else {
+      newData.setActors( getItemsListWidget(ui->castListWidget));
+  }
+
+  if (!ui->checkBoxLockDirectors->isLock()){
+      newData.setDirectors(mediaMovieSearchPtr->directors());
+  } else {
+      newData.setDirectors( getItemsListWidget(ui->directorListWidget));
+  }
+
+  if (!ui->checkBoxLockGenre->isLock()){
+      newData.setGenre(mediaMovieSearchPtr->genre());
+  } else {
+      newData.setGenre(getItemsListWidget(ui->genreListWidget));
+  }
+
+  newData.setTitle(mediaMovieSearchPtr->title());
+  newData.setOriginalTitle(mediaMovieSearchPtr->originalTitle());
+  newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
+  newData.setCountries(mediaMovieSearchPtr->countries());
+  newData.setRating(mediaMovieSearchPtr->rating());
 
   c->clear();
 

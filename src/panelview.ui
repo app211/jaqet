@@ -225,7 +225,7 @@
                    <widget class="QWidget" name="widget_26" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_20">
                      <item>
-                      <widget class="CheckLock" name="checkBox_2">
+                      <widget class="CheckLock" name="checkBoxYear">
                        <property name="text">
                         <string>Year</string>
                        </property>
@@ -233,6 +233,25 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_3"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_28" native="true"/>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_29" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_22">
+                     <item>
+                      <widget class="QCheckBox" name="checkBoxRating">
+                       <property name="text">
+                        <string>Rating</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
                      </item>
                     </layout>
                    </widget>
@@ -604,6 +623,9 @@
                      </item>
                     </layout>
                    </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_27" native="true"/>
                   </item>
                  </layout>
                 </widget>

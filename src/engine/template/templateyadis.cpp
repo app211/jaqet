@@ -352,7 +352,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         if (airedDateTime.isValid()){
             textToDraw=airedDateTime.toUTC().toString("dd-MM-yyyy");
         }
-    } else if (type=="title") {
+    } else if (type==QStringLiteral("title")) {
 
         if ((context==Context::tv_synopsis_common || context==Context::movie_synopsis) ){
             textToDraw=data.title();
@@ -365,6 +365,8 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
             QString separator= textElement.hasAttribute("separator")? textElement.attribute("separator") : " ";
             textToDraw = QString::number(data.episode())+separator+textToDraw;
         }
+    }  else if (type==QStringLiteral("originaltitle")) {
+           textToDraw=data.originalTitle();
 
     } else if (type=="resolution"){
         if (!data.vresolution().isEmpty()){
@@ -459,6 +461,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
 
     QString value=imageElement.text();
 
+
     if (type=="fanart" ){
         QPixmap backdrop=data.getBackdrop();
         if (!backdrop.isNull()){
@@ -509,6 +512,31 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
 
         if (pstatic.load(getAbsoluteFilePath(value)) ){
             pixPaint.drawPixmap(x,y,w,h,pstatic);
+        }
+
+    } else if (type==QStringLiteral("country")){
+
+        QString direction=imageElement.attribute(QStringLiteral("direction"));
+
+        int spacing=imageElement.attribute(QStringLiteral("spacing")).toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
+
+        if (!data.countries().isEmpty()){
+            for (const QString& country:data.countries()){
+                QPixmap pstatic;
+                QString f=QString(":/resources/images/flags/flag_%1.png").arg(country.toLower());
+                if (pstatic.load(f) ){
+                    pixPaint.drawPixmap(x,y,w,h,pstatic);
+                }
+
+                if (direction==QStringLiteral("vertical")){
+                    y += spacing;
+                } else {
+                    x += spacing;
+                }
+            }
         }
     } else if (type=="vcodec"){
         if (!data.vcodec().isEmpty()){

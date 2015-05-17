@@ -35,6 +35,14 @@ Scraper::Scraper(QObject *parent)
             SLOT(closeDialog()));
 }
 
+QString Scraper::language() const
+{
+    // QLocale::name returns the locale in lang_COUNTRY format
+    // we only need the 2 letter lang code
+    QString lang = QLocale::system().name();
+    return lang.left(2);
+}
+
 
 QPointer<InProgressDialog> p;
 
@@ -44,7 +52,7 @@ void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearc
         p=InProgressDialog::create();
     }
 
-    internalSearchFilm( manager, toSearch,"fr", year);
+    internalSearchFilm( manager, toSearch, language(), year);
 }
 
 void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {
@@ -53,7 +61,7 @@ void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)
         p=InProgressDialog::create();
     }
 
-    internalSearchTV( manager, toSearch,"fr");
+    internalSearchTV( manager, toSearch, language());
 }
 
 void Scraper::showErrorDialog(const QString& error){
@@ -71,7 +79,7 @@ void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr
         p=InProgressDialog::create();
     }
 
-    internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, "fr");
+    internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, language());
 }
 
 void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor)  {
@@ -80,12 +88,12 @@ void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr 
         p=InProgressDialog::create();
     }
 
-    internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, "fr");
+    internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, language());
 }
 
 
 void Scraper::closeDialog(){
-    if (p!=nullptr){
+    if (!p.isNull()){
         p->close();
         p->deleteLater();
         p = nullptr;
