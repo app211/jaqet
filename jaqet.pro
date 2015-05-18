@@ -87,7 +87,8 @@ HEADERS  += src/mainwindow.h \
     src/mediachooserpopup.h \
     src/widgets/checklock.h \
     src/third/QLightBoxWidget/src/qlightboxwidget.h \
-    src/widgets/jaqetmainwindow.h
+    src/widgets/jaqetmainwindow.h \
+    src/blocker.h
 
 
 FORMS    += src/mainwindow.ui \

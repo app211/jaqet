@@ -157,8 +157,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>916</width>
-                <height>633</height>
+                <width>917</width>
+                <height>691</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -251,7 +251,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                      <widget class="QDoubleSpinBox" name="doubleSpinBoxRating"/>
                      </item>
                     </layout>
                    </widget>
@@ -469,6 +469,28 @@
                            </item>
                           </layout>
                          </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_30" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_23">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox">
+                       <property name="text">
+                        <string>CheckBox</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_31" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_12">
+                        <item>
+                         <widget class="QListWidget" name="countriesListWidget"/>
                         </item>
                        </layout>
                       </widget>

@@ -14,6 +14,7 @@
 #include "mediachooserbutton.h"
 #include "scrapers/scraper.h"
 #include "promise.h"
+#include "blocker.h"
 
 Q_LOGGING_CATEGORY(mediaChooser, "ui.mediaChooser")
 
@@ -402,14 +403,10 @@ void MediaChooserPopup::doFilter( QFlags<ImageType> filter){
 
     //ui->graphicsView->fitInView(ui->graphicsView->scene()->sceneRect(), Qt::KeepAspectRatio);
 
-    const QSignalBlocker blocker0(ui->checkBoxThumbail);
-    const QSignalBlocker blocker1(ui->checkBoxBackdrop);
-    const QSignalBlocker blocker2(ui->checkBoxBanner);
-    const QSignalBlocker blocker3(ui->checkBoxPoster);
-    ui->checkBoxThumbail->setChecked(filter & ImageType::Thumbnail);
-    ui->checkBoxBackdrop->setChecked(filter & ImageType::Backdrop);
-    ui->checkBoxBanner->setChecked(filter & ImageType::Banner);
-    ui->checkBoxPoster->setChecked(filter & ImageType::Poster);
+    whileBlocking(ui->checkBoxThumbail)->setChecked(filter & ImageType::Thumbnail);
+    whileBlocking(ui->checkBoxBackdrop)->setChecked(filter & ImageType::Backdrop);
+    whileBlocking(ui->checkBoxBanner)->setChecked(filter & ImageType::Banner);
+    whileBlocking(ui->checkBoxPoster)->setChecked(filter & ImageType::Poster);
 }
 
 QFlags<ImageType> MediaChooserPopup::currentFilter(){

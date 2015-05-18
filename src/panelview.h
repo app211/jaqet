@@ -5,7 +5,7 @@
 #include <QFileInfo>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-
+#include <QListWidgetItem>
 #include <QPointer>
 
 #include "scrapers/scraper.h"
@@ -90,6 +90,7 @@ private slots:
     void thumbnailSelected(const MediaChoosed& mediaChoosed);
     void bannerSelected(const MediaChoosed& mediaChoosed);
 
+    void on_countriesListWidget_itemChanged(QListWidgetItem *item);
 };
 
 #endif // PANELVIEW_H

@@ -8,6 +8,9 @@
 #include <QPushButton>
 #include <QMovie>
 #include <QCompleter>
+#include <QDir>
+
+#include <limits>
 
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
@@ -19,8 +22,34 @@
 #include "engine/engine.h"
 #include "./inprogressdialog.h"
 #include "mediachooserpopup.h"
+#include "blocker.h"
 
 MediaChooserPopup* c;
+
+class FlagWidgetItem: public QListWidgetItem {
+public:
+
+
+    FlagWidgetItem(const QString &text, QListWidget *view = 0, int type = Type):
+    QListWidgetItem(text,view,type){
+
+    }
+
+    bool operator<(const QListWidgetItem &other) const{
+        int d1=data(Qt::UserRole).toInt();
+        int d2=other.data(Qt::UserRole).toInt();
+
+        if (d1<d2){
+            return true;
+        } else if (d1==d2){
+            return QString::compare(this->text(),other.text())<0;
+
+        }
+
+        return false;
+    }
+
+};
 
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
@@ -76,7 +105,22 @@ PanelView::PanelView(QWidget *parent) :
     ui->chooseThumbailButton->setPopup(c,ImageType::Thumbnail);
     ui->chooseBannerButton->setPopup(c,ImageType::Banner);
 
+    whileBlocking(ui->countriesListWidget, [&](){
+        QDir flags(":/resources/images/flags");
+        QRegularExpression flagNamePattern("flag_([a-zA-Z][a-zA-Z]).png");
+        for (const QString& flag : flags.entryList()){
+            QRegularExpressionMatch match = flagNamePattern.match(flag);
+            if (match.hasMatch()) {
+                FlagWidgetItem* item = new FlagWidgetItem( match.captured(1), ui->countriesListWidget);
+                 item->setIcon(QIcon(QFileInfo(flags,flag).absoluteFilePath()));
+                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+                item->setCheckState(Qt::Unchecked);
+                item->setData(Qt::UserRole,std::numeric_limits<int>::max());
+            }
+        }
+    });
 
+    ui->countriesListWidget->setSortingEnabled(true);
 
     ui->comboResolution->addItems({
                                       QStringLiteral("480i") ,
@@ -242,6 +286,27 @@ void PanelView::updateUI(){
 
     ui->chooseThumbailButton->setMedia(currentSearch.currentThumbail);
 
+
+    whileBlocking(ui->countriesListWidget, [&](){
+     for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
+            QListWidgetItem *item = ui->countriesListWidget->item(i);
+           // qDebug() << item->text();
+            int index=currentSearch.countries().indexOf(item->text().toUpper());
+            if (index>=0){
+                item->setCheckState(Qt::Checked);
+                item->setData(Qt::UserRole, index);
+            } else {
+                item->setCheckState(Qt::Unchecked);
+                item->setData(Qt::UserRole, std::numeric_limits<int>::max());
+            }
+        }
+     });
+
+
+    if (!currentSearch.isTV()){
+        ui->doubleSpinBoxRating->setValue(currentSearch.rating());
+    }
+
     currentSearch.engine()->preview(currentSearch);
 }
 
@@ -345,51 +410,51 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
 
 void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovieSearchPtr){
 
-  Q_UNUSED(scraper);
+    Q_UNUSED(scraper);
 
-  CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo(),mediaMovieSearchPtr->fileInfo());
+    CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo(),mediaMovieSearchPtr->fileInfo());
 
-  if (!ui->checkBoxLockSynopsis->isLock()){
-      newData.setSynopsis(mediaMovieSearchPtr->synopsis());
-  } else {
-      newData.setSynopsis(ui->synopsis->toPlainText());
-  }
+    if (!ui->checkBoxLockSynopsis->isLock()){
+        newData.setSynopsis(mediaMovieSearchPtr->synopsis());
+    } else {
+        newData.setSynopsis(ui->synopsis->toPlainText());
+    }
 
-  if (!ui->checkBoxLockCast->isLock()){
-      newData.setActors(mediaMovieSearchPtr->actors());
-  } else {
-      newData.setActors( getItemsListWidget(ui->castListWidget));
-  }
+    if (!ui->checkBoxLockCast->isLock()){
+        newData.setActors(mediaMovieSearchPtr->actors());
+    } else {
+        newData.setActors( getItemsListWidget(ui->castListWidget));
+    }
 
-  if (!ui->checkBoxLockDirectors->isLock()){
-      newData.setDirectors(mediaMovieSearchPtr->directors());
-  } else {
-      newData.setDirectors( getItemsListWidget(ui->directorListWidget));
-  }
+    if (!ui->checkBoxLockDirectors->isLock()){
+        newData.setDirectors(mediaMovieSearchPtr->directors());
+    } else {
+        newData.setDirectors( getItemsListWidget(ui->directorListWidget));
+    }
 
-  if (!ui->checkBoxLockGenre->isLock()){
-      newData.setGenre(mediaMovieSearchPtr->genre());
-  } else {
-      newData.setGenre(getItemsListWidget(ui->genreListWidget));
-  }
+    if (!ui->checkBoxLockGenre->isLock()){
+        newData.setGenre(mediaMovieSearchPtr->genre());
+    } else {
+        newData.setGenre(getItemsListWidget(ui->genreListWidget));
+    }
 
-  newData.setTitle(mediaMovieSearchPtr->title());
-  newData.setOriginalTitle(mediaMovieSearchPtr->originalTitle());
-  newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
-  newData.setCountries(mediaMovieSearchPtr->countries());
-  newData.setRating(mediaMovieSearchPtr->rating());
+    newData.setTitle(mediaMovieSearchPtr->title());
+    newData.setOriginalTitle(mediaMovieSearchPtr->originalTitle());
+    newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
+    newData.setCountries(mediaMovieSearchPtr->countries());
+    newData.setRating(mediaMovieSearchPtr->rating());
 
-  c->clear();
+    c->clear();
 
-  addImages(  scraper,  QStringList() << mediaMovieSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
+    addImages(  scraper,  QStringList() << mediaMovieSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
 
-  addImages(  scraper,   mediaMovieSearchPtr->postersHref(), mediaMovieSearchPtr->postersSize(),ImageType::Poster);
+    addImages(  scraper,   mediaMovieSearchPtr->postersHref(), mediaMovieSearchPtr->postersSize(),ImageType::Poster);
 
-  addImages(  scraper, mediaMovieSearchPtr->backdropsHref(), mediaMovieSearchPtr->backdropsSize(), ImageType::Backdrop);
+    addImages(  scraper, mediaMovieSearchPtr->backdropsHref(), mediaMovieSearchPtr->backdropsSize(), ImageType::Backdrop);
 
-  addImages(  scraper, mediaMovieSearchPtr->thumbailHref(), mediaMovieSearchPtr->thumbailSize(),ImageType::Thumbnail);
+    addImages(  scraper, mediaMovieSearchPtr->thumbailHref(), mediaMovieSearchPtr->thumbailSize(),ImageType::Thumbnail);
 
-  updateFrom(newData);
+    updateFrom(newData);
 
 }
 
@@ -574,7 +639,7 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
     if (!currentSearch._backdrop.resources().isEmpty()){
         QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine()->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
 
-     //   InProgressDialog* p=InProgressDialog::create();
+        //   InProgressDialog* p=InProgressDialog::create();
 
         Promise* promise=Promise::loadAsync(manager,url,false);
 
@@ -600,7 +665,7 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
 
             JaqetMainWindow::getInstance()->hideLightBox();
 
-          //  p->closeAndDeleteLater();
+            //  p->closeAndDeleteLater();
         });
 
     } else {
@@ -640,7 +705,7 @@ void PanelView::rescrap() {
 void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
 
     if (mediaChoosed.isEmpty()){
-          setBackdropState(NETRESOURCE::NONE);
+        setBackdropState(NETRESOURCE::NONE);
     } else if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
@@ -654,7 +719,7 @@ void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
 
 void PanelView::posterSelected(const MediaChoosed& mediaChoosed){
     if (mediaChoosed.isEmpty()){
-          setPosterState(NETRESOURCE::NONE);
+        setPosterState(NETRESOURCE::NONE);
     } else if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
@@ -668,7 +733,7 @@ void PanelView::posterSelected(const MediaChoosed& mediaChoosed){
 
 void PanelView::thumbnailSelected(const MediaChoosed& mediaChoosed){
     if (mediaChoosed.isEmpty()){
-         setThumbnailState(NETRESOURCE::NONE);
+        setThumbnailState(NETRESOURCE::NONE);
     } else   if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
@@ -682,7 +747,7 @@ void PanelView::thumbnailSelected(const MediaChoosed& mediaChoosed){
 
 void PanelView::bannerSelected(const MediaChoosed& mediaChoosed){
     if (mediaChoosed.isEmpty()){
-         setBannerState(NETRESOURCE::NONE);
+        setBannerState(NETRESOURCE::NONE);
     } else if (mediaChoosed.isMediaUrl()){
         qDebug() << mediaChoosed.url().toDisplayString();
     } else if (mediaChoosed.isMediaLocalFilePath()){
@@ -692,4 +757,28 @@ void PanelView::bannerSelected(const MediaChoosed& mediaChoosed){
         this->setBanner(mediaChoosed.scraperResource().resources(),mediaChoosed.scraperResource().originalSize(),mediaChoosed.scraperResource().scraper());
         qDebug() << mediaChoosed.scraperResource().resources();
     }
+}
+
+void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
+{
+    QStringList countries;
+    QMap <int,QStringList> indexCountry;
+
+    for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
+        QListWidgetItem *item = ui->countriesListWidget->item(i);
+        if (item->checkState()==Qt::Checked){
+            indexCountry[item->data(Qt::UserRole).toInt()]<<item->text().toUpper();
+        }
+    }
+
+    for (int i : indexCountry.keys()){
+        countries << indexCountry[i];
+    }
+
+    currentSearch.setCountries(countries);
+
+    qDebug() << countries;
+
+    updateUI();
+   if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
 }
