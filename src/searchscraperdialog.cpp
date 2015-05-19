@@ -43,6 +43,18 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent,const QFileInfo& fileIn
     }
 }
 
+static QString language()
+{
+#ifdef QT_DEBUG
+    return "fr";
+#else
+    // QLocale::name returns the locale in lang_COUNTRY format
+    // we only need the 2 letter lang code
+
+    return  QLocale::system().name().left(2);
+#endif
+}
+
 void SearchScraperDialog::updateMenu(){
     if (this->findButton != nullptr){
         QMenu *menuFichier = this->findButton->menu();
@@ -52,9 +64,9 @@ void SearchScraperDialog::updateMenu(){
                 if(scraper != nullptr)
                 {
                     if (ui->radioMovie->isChecked()){
-                        action->setEnabled(scraper->haveCapability(Scraper::Movie));
+                        action->setEnabled(scraper->haveCapability(Scraper::Movie) && scraper->supportLanguage(language()));
                     } else {
-                        action->setEnabled(scraper->haveCapability(Scraper::TV));
+                        action->setEnabled(scraper->haveCapability(Scraper::TV) && scraper->supportLanguage(language()));
                     }
                 }
             }
@@ -96,7 +108,7 @@ void SearchScraperDialog::init(QList<Scraper*> scrapers){
     QMenu *menuFichier = new QMenu(this);
 
     foreach (Scraper* scraper,scrapers){
-        QAction* scraperAction = new QAction(scraper->getIcon(),scraper->getName(), this);
+        QAction* scraperAction = new QAction(scraper->icon(),scraper->name(), this);
         scraperAction->setData(qVariantFromValue((void*)scraper));
         menuFichier->addAction(scraperAction);
 
@@ -137,9 +149,9 @@ void SearchScraperDialog::searchScraper(){
     int year=ui->checkBoxUseYear->isChecked()?ui->dateEdit->date().year():-1;
 
     if (ui->radioTV->isChecked()){
-        scraper->searchTV(m_manager,ui->lineEditTitle->text());
+        scraper->searchTV(m_manager,ui->lineEditTitle->text(),language());
     } else {
-        scraper->searchFilm(m_manager,ui->lineEditTitle->text(), year);
+        scraper->searchFilm(m_manager,ui->lineEditTitle->text(), year,language());
     }
 }
 
@@ -182,14 +194,14 @@ void SearchScraperDialog::found(FilmPrtList result){
 
 void SearchScraperDialog::accept(Scraper *scraper, const FilmPtr& filmPtr) {
     if (!filmPtr.isNull()){
-        result= FoundResult(scraper, filmPtr);
+        result= FoundResult(scraper, filmPtr,language());
         done(QDialog::Accepted);
     }
 }
 
 void SearchScraperDialog::accept(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode) {
     if (!showPtr.isNull()){
-        result= FoundResult(scraper, showPtr,season,episode);
+        result= FoundResult(scraper, showPtr,season,episode,language());
         done(QDialog::Accepted);
     }
 }

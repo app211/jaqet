@@ -59,19 +59,19 @@ struct FoundResult {
     FoundResult() {
     }
 
-    FoundResult(Scraper *scraper, const FilmPtr& filmPtr)
+    FoundResult(Scraper *scraper, const FilmPtr& filmPtr, const QString& language)
         :
           scraper(scraper),
           filmPtr(filmPtr), season(-1)
-        ,episode(-1)
+        ,episode(-1),m_language(language)
     {
     }
 
-    FoundResult(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode)
+    FoundResult(Scraper *scraper, const ShowPtr& showPtr, const int season, const int episode, const QString& language)
         : scraper(scraper),
           showPtr( showPtr)
         , season(season)
-        ,episode(episode)
+        ,episode(episode),m_language(language)
     {
     }
 
@@ -112,11 +112,16 @@ struct FoundResult {
         return isNull()?QString::null:(isTV()?showPtr->posterHref:filmPtr->posterHref);
     }
 
+    QString language() const{
+        return m_language;
+    }
+
     Scraper *scraper;
     int season;
     int episode;
     ShowPtr showPtr;
     FilmPtr filmPtr;
+    QString m_language;
 };
 
 
@@ -272,7 +277,8 @@ public:
           mediaInfo(other.mediaInfo),
           fd(other.fd),
           countries(other.countries),
-          tagLine(other.tagLine)
+          tagLine(other.tagLine),
+          certificate(other.certificate)
     { }
 
     ~MediaMovieSearchPrivate() { }
@@ -301,6 +307,7 @@ public:
     FoundResult fd;
     Engine* engine=nullptr;
     QString tagLine;
+    QString certificate;
 };
 
 class MediaMovieSearch : public MediaSearch< MediaMovieSearchPrivate > {
@@ -324,6 +331,9 @@ public:
 
     void setTagLine(const QString& tagLine) { d->tagLine = tagLine; }
     QString tagLine() const { return d->tagLine; }
+
+    void setCertificate(const QString& certificate) { d->certificate = certificate; }
+    QString certificate() const { return d->certificate; }
 
 public :
     MediaMovieSearch( const QFileInfo& fileInfo, const MediaInfo& mediaInfo, const FoundResult& fd, Engine* engine)
@@ -359,7 +369,7 @@ public:
     { }
 
     MediaTVSearchPrivate( const QFileInfo& fileInfo, const MediaInfo& mediaInfo, const FoundResult& fd, Engine* engine)
-    : MediaTVSearchPrivate(){
+        : MediaTVSearchPrivate(){
         this->engine=engine;
         this->fileInfo=fileInfo;
         this->mediaInfo=mediaInfo;
@@ -562,9 +572,11 @@ private:
               tv(other.tv),
               tlanguages(other.tlanguages),
               engine(other.engine),
-            fileInfo(other.fileInfo),
-            countries(other.countries),
-            tagLine(other.tagLine)
+              fileInfo(other.fileInfo),
+              countries(other.countries),
+              tagLine(other.tagLine),
+              certificate(other.certificate)
+
         { }
 
         ~CurrentItemDataPrivate() { }
@@ -606,6 +618,7 @@ private:
         Engine* engine=nullptr;
         QStringList countries;
         QString tagLine;
+        QString certificate;
 
     };
 
@@ -803,6 +816,9 @@ public:
     void setCountries(const QStringList& countries) { d->countries = countries; }
     QStringList countries() const { return d->countries; }
 
+    void setCertificate(const QString& certificate) { d->certificate = certificate; }
+    QString certificate() const { return d->certificate; }
+
 };
 
 class Scraper : public QObject
@@ -811,7 +827,7 @@ class Scraper : public QObject
 
 public:
 
-    enum SearchCapabilities {
+    enum SearchCapabilitie {
         Movie = 0x0001,
         TV = 0x0002
     };
@@ -827,33 +843,32 @@ public:
     };
 
     Q_DECLARE_FLAGS(SearchFor, SearchOption)
+    Q_DECLARE_FLAGS(SearchCapabilities, SearchCapabilitie)
 
     Scraper(QObject *parent=0);
 
-    virtual bool haveCapability(const SearchCapabilities ) const{
-        return true;
-    }
+    virtual bool haveCapability(const SearchCapabilities ) const=0;
+    virtual bool supportLanguage(const QString& languageCodeISO639) const=0;
 
-    virtual QIcon getIcon() const =0;
-    virtual QString getName() const = 0;
+    virtual QIcon icon() const=0;
+    virtual QString name() const = 0;
 
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
-    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year) const;
-    void searchTV(QNetworkAccessManager* manager, const QString& toSearch) ;
-    void findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor) ;
-    void findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor) ;
+    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year, const QString &language) const;
+    void searchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) ;
+    void findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString &language) ;
+    void findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString &language) ;
 
     virtual QString getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size, Qt::AspectRatioMode mode=Qt::KeepAspectRatio,QFlags<ImageType> imageType=ImageType::All) const=0;
+
+
 
 protected:
     virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
     virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
     virtual void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) =0;
     virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) =0;
-
-
-    QString language() const;
 
 public slots:
     void closeDialog();

@@ -88,7 +88,8 @@ HEADERS  += src/mainwindow.h \
     src/widgets/checklock.h \
     src/third/QLightBoxWidget/src/qlightboxwidget.h \
     src/widgets/jaqetmainwindow.h \
-    src/blocker.h
+    src/blocker.h \
+    src/jsonhelper.h
 
 
 FORMS    += src/mainwindow.ui \
@@ -109,4 +110,5 @@ TRANSLATIONS = jaqet_fr.ts
 DEFINES += LOGRULES=\\\"ui.*.debug=true\\\"
 
 DISTFILES += \
-    jaqet_fr.ts
+    jaqet_fr.ts \
+    src/scrapers/lll

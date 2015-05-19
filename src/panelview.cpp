@@ -20,9 +20,9 @@
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
 #include "engine/engine.h"
-#include "./inprogressdialog.h"
 #include "mediachooserpopup.h"
 #include "blocker.h"
+#include "jaqetmainwindow.h"
 
 MediaChooserPopup* c;
 
@@ -243,9 +243,9 @@ void PanelView::search(Engine* engine, const QModelIndex &index){
             if (!fd.getResult().isNull()){
                 if (!fd.getResult().isTV()){
 
-                    fd.getResult().getScraper()->findMovieInfo(&this->manager,MediaMovieSearchPtr(new MediaMovieSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All);
+                    fd.getResult().getScraper()->findMovieInfo(&this->manager,MediaMovieSearchPtr(new MediaMovieSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All,fd.getResult().language());
                 } else {
-                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,MediaTVSearchPtr(new MediaTVSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All);
+                    fd.getResult().getScraper()->findEpisodeInfo(&this->manager,MediaTVSearchPtr(new MediaTVSearch(fileInfo,r.mediaInfo,fd.getResult(),engine)), Scraper::SearchOption::All,fd.getResult().language());
                 }
             }
         }
@@ -273,7 +273,7 @@ void PanelView::updateUI(){
     ui->stackedWidget->setCurrentIndex(1);
 
     ui->titleEdit->setText(currentSearch.title());
-
+    ui->originalTitleEdit->setText(currentSearch.originalTitle());
     ui->chooseBackgroundButton->setMedia(currentSearch.currentBackdrop);
     ui->choosePosterButton->setMedia(currentSearch.currentPoster);
 
@@ -291,7 +291,7 @@ void PanelView::updateUI(){
      for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
             QListWidgetItem *item = ui->countriesListWidget->item(i);
            // qDebug() << item->text();
-            int index=currentSearch.countries().indexOf(item->text().toUpper());
+            int index=currentSearch.countries().indexOf(item->text());
             if (index>=0){
                 item->setCheckState(Qt::Checked);
                 item->setData(Qt::UserRole, index);
@@ -475,7 +475,7 @@ void PanelView::setBanner(const QString& url, const QSize& originalSize, const S
 
     if (!currentSearch._banner.resources().isEmpty()){
 
-        InProgressDialog* p=InProgressDialog::create();
+        JaqetMainWindow::getInstance()->showWaitDialog();
 
         QString url=currentSearch._banner.scraper()->getBestImageUrl(currentSearch._banner.resources(),originalSize,currentSearch.engine()->getPosterSize(), Qt::KeepAspectRatio,ImageType::Banner);
 
@@ -499,7 +499,7 @@ void PanelView::setBanner(const QString& url, const QSize& originalSize, const S
                 setBannerState(NETRESOURCE::ERROR);
             }
 
-            p->closeAndDeleteLater();
+            JaqetMainWindow::getInstance()->hideWaitDialog();
 
         });
 
@@ -515,7 +515,7 @@ void PanelView::setThumbnail (const QString& url, const QSize& originalSize, con
 
     if (!currentSearch._thumbnail.resources().isEmpty()){
 
-        InProgressDialog* p=InProgressDialog::create();
+        JaqetMainWindow::getInstance()->showWaitDialog();
 
         QString url=currentSearch._thumbnail.scraper()->getBestImageUrl(currentSearch._thumbnail.resources(),originalSize,currentSearch.engine()->getPosterSize());
 
@@ -537,7 +537,7 @@ void PanelView::setThumbnail (const QString& url, const QSize& originalSize, con
                 setThumbnailState(NETRESOURCE::ERROR);
             }
 
-            p->closeAndDeleteLater();
+            JaqetMainWindow::getInstance()->hideWaitDialog();
         });
 
     } else {
@@ -553,7 +553,7 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
 
     if (!currentSearch._poster.resources().isEmpty()){
 
-        InProgressDialog* p=InProgressDialog::create();
+        JaqetMainWindow::getInstance()->showWaitDialog();
 
         QString url=currentSearch._poster.scraper()->getBestImageUrl(currentSearch._poster.resources(),originalSize,currentSearch.engine()->getPosterSize());
 
@@ -575,7 +575,7 @@ void PanelView::setPoster (const QString& url, const QSize& originalSize, const 
                 setPosterState(NETRESOURCE::ERROR);
             }
 
-            p->closeAndDeleteLater();
+            JaqetMainWindow::getInstance()->hideWaitDialog();
         });
 
     } else {
@@ -639,11 +639,9 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
     if (!currentSearch._backdrop.resources().isEmpty()){
         QString url=currentSearch._backdrop.scraper()->getBestImageUrl(currentSearch._backdrop.resources(),originalSize,currentSearch.engine()->getBackdropSize(),Qt::KeepAspectRatioByExpanding);
 
-        //   InProgressDialog* p=InProgressDialog::create();
-
         Promise* promise=Promise::loadAsync(manager,url,false);
 
-        JaqetMainWindow::getInstance()->showLightBox();
+        JaqetMainWindow::getInstance()->showWaitDialog();
 
         //  QObject::connect(this, &templateYadis::canceled, promise, &Promise::canceled);
 
@@ -663,10 +661,8 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
                 setBackdropState(NETRESOURCE::ERROR);
             }
 
-            JaqetMainWindow::getInstance()->hideLightBox();
-
-            //  p->closeAndDeleteLater();
-        });
+            JaqetMainWindow::getInstance()->hideWaitDialog();
+      });
 
     } else {
         setBackdropState(NETRESOURCE::NONE);
@@ -767,7 +763,7 @@ void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
     for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
         QListWidgetItem *item = ui->countriesListWidget->item(i);
         if (item->checkState()==Qt::Checked){
-            indexCountry[item->data(Qt::UserRole).toInt()]<<item->text().toUpper();
+            indexCountry[item->data(Qt::UserRole).toInt()]<<item->text();
         }
     }
 
@@ -777,8 +773,7 @@ void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
 
     currentSearch.setCountries(countries);
 
-    qDebug() << countries;
-
     updateUI();
+
    if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
 }

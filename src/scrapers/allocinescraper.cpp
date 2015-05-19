@@ -12,11 +12,16 @@
 
 #include "../promise.h"
 #include "../utils.h"
+#include "../jsonhelper.h"
+
+const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES="images.allocine.fr";
+
+QMap<int,QString> AlloCineScraper::codesToCountries;
 
 AlloCineScraper::AlloCineScraper(QObject *parent)
-    :Scraper(parent)
+    :Scraper(parent), m_icon(loadIcon())
 {
-    initIcon();
+    init();
 }
 
 QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QString> &params) const
@@ -67,6 +72,8 @@ void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const Q
 
 void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
 
+    Q_UNUSED(language);
+
     QMap<QString,QString> params;
     params["filter"]="tvseries";
     params["q"]=QUrl::toPercentEncoding(toSearch);
@@ -91,6 +98,8 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
 }
 
 void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) {
+
+    Q_UNUSED(language);
 
     QString movieCode= mediaMovieSearchPtr->foundResult().getCode();
 
@@ -128,7 +137,6 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, Med
         }
     });
 }
-
 
 void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor &searchFor, const QString &language)  {
 
@@ -200,8 +208,8 @@ bool AlloCineScraper::extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument&
 
     if (tvseriesObject["statistics"].isObject()){
         double rating;
-        if (getRatingFromStatistics(tvseriesObject["statistics"].toObject(),rating)){
-              mediaTVSearchPtr->setShowRating(rating);
+        if (extractRating(tvseriesObject["statistics"].toObject(),rating)){
+            mediaTVSearchPtr->setShowRating(rating);
         }
     }
 
@@ -227,7 +235,6 @@ bool AlloCineScraper::extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument&
             return true;
         }
     }
-
 
     return false;
 }
@@ -494,7 +501,7 @@ void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, cons
     });
 }
 
-bool AlloCineScraper::getRatingFromStatistics(const QJsonObject& statisticsObject, double& rating) const {
+bool AlloCineScraper::extractRating(const QJsonObject& statisticsObject, double& rating) const {
 
     rating=0.f;
     int diviseur=0;
@@ -517,12 +524,228 @@ bool AlloCineScraper::getRatingFromStatistics(const QJsonObject& statisticsObjec
 
 }
 
-bool extractNationality(const QJsonArray& nationalityArray, MediaMovieSearchPtr mediaMovieSearchPtr) {
-    foreach (const QJsonValue & value, nationalityArray){
-        qDebug() << value.toString();
-        qDebug() << value.toObject()["code"].toString();
-    }
 
+bool AlloCineScraper::extractCertificate(const QJsonObject& certificateObject, MediaMovieSearchPtr mediaMovieSearchPtr) const {
+    auto code = certificateObject[QStringLiteral("certificate")].toObject()["code"];
+    if (!code.isNull()){
+        qDebug() << code.toInt();
+        switch(code.toInt()){
+        case 14001:  // Interdit aux moins de 12 ans
+        case 14044:  // Interdit aux moins de 12 ans avec avertissement
+            mediaMovieSearchPtr->setCertificate("fr_12");
+            ; break;
+        case 14002:  // Interdit aux moins de 16 ans
+        case 14045:  // Interdit aux moins de 16 ans avec avertissement"
+            mediaMovieSearchPtr->setCertificate("fr_16");
+            ; break;
+
+        case 14004: // Interdit aux moins de 18 ans
+            mediaMovieSearchPtr->setCertificate("fr_18");
+
+            ; break;
+        case 14005: // Film classe X
+            mediaMovieSearchPtr->setCertificate("fr_X");
+
+        case 14035: // Avertissement : des scÃ¨nes, des propos ou des images peuvent heurter la sensibilitÃ© des spectateurs"}
+            ; break;
+        }
+    }
+}
+
+
+
+void AlloCineScraper::init(){
+    struct code2Country {
+        int codeAlloCine;
+        char* ISO3166;
+    };
+
+    static code2Country alloCineCodeToCountries[]=
+    {
+        {5001,"FR"},//France
+        {5002,"US"},//U.S.A.
+        {5003,"DE"},//Allemagne de l'Est
+        {5004,"GB"},//Grande-Bretagne
+        {5005,"NZ"},//Nouvelle-Zélande
+        {5007,"ZA"},//Afrique du Sud
+        {5008,"KR"},//Corée du Sud
+        {5009,"KP"},//Corée du Nord
+        {5010,"CH"},//Suisse
+        {5012,"NE"},//Niger
+        {5013,"DZ"},//Algérie
+        {5014,"BE"},//Belgique
+        {5015,"SO"},//Somalie
+        {5016,"AM"},//Arménie
+        {5017,"ES"},//Espagne
+        {5018,"CA"},//Canada
+        {5019,"GR"},//Grèce
+        {5020,"IT"},//Italie
+        {5021,"JP"},//Japon
+        {5022,"JM"},//Jamaïque
+        {5023,"PL"},//Pologne
+        {5024,"PT"},//Portugal
+        {5025,"AR"},//Argentine
+        {5026,"TR"},//Turquie
+        {5027,"CN"},//Chine
+        {5028,"BR"},//Brésil
+        {5029,"AU"},//Australie
+        {5030,"IE"},//Irlande
+        {5031,"MX"},//Mexique
+        {5032,"AT"},//Autriche
+        {5033,"MA"},//Maroc
+        {5034,"NG"},//Nigéria
+        {5036,"ZW"},//Zimbabwé
+        {5037,"IL"},//Israël
+        {5038,"ML"},//Mali
+        {5039,"RU"},//Russie
+        {5040,"TW"},//Taïwan
+        {5041,"CZ"},//Tchécoslovaquie
+        {5042,"IN"},//Inde
+        {5043,"PS"},//Palestine
+        {5044,"AO"},//Angola
+        {5045,"LU"},//Luxembourg
+        {5047,"CM"},//Cameroun
+        {5048,"CG"},//Congo (Brazzaville)
+        {5049,"LB"},//Liban
+        {5051,"PE"},//Pérou
+        {5052,"TN"},//Tunisie
+        {5053,"CD"},//Zaïre
+        {5054,"VN"},//Vietnam
+        {5055,"BO"},//Bolivie
+        {5056,"BY"},//Biélorussie
+        {5057,"KR"},//Corée
+        {5058,"MM"},//Birmanie
+        {5059,"CL"},//Chili
+        {5060,"CU"},//Cuba
+        {5061,"DK"},//Danemark
+        {5062,"NO"},//Norvège
+        {5063,"EG"},//Egypte
+        {5064,"BG"},//Bulgarie
+        {5065,"CO"},//Colombie
+        {5066,"XX"},//Yougoslavie
+        {5067,"SE"},//Suède
+        {5068,"HU"},//Hongrie
+        {5069,"FI"},//Finlande
+        {5070,"ID"},//Indonésie
+        {5072,"BD"},//Bengladesh
+        {5073,"BA"},//Bosnie-Herzégovine
+        {5074,"BW"},//Botswana
+        {5076,"CS"},//Serbie
+        {5077,"HR"},//Croatie
+        {5079,"AE"},//Emirats Arabes Unis
+        {5080,"EE"},//Estonie
+        {5081,"CY"},//Chypre
+        {5082,"VE"},//Vénézuela
+        {5083,"HT"},//Haïti
+        {5084,"KH"},//Cambodge
+        {5086,"IR"},//Iran
+        {5087,"LT"},//Lituanie
+        {5088,"RO"},//Roumanie
+        {5089,"SN"},//Sénégal
+        {5090,"GA"},//Gabon
+        {5091,"TD"},//Tchad
+        {5093,"IS"},//Islande
+        {5095,"SY"},//Syrie
+        {5097,"MZ"},//Mozambique
+        {5098,"LK"},//Sri Lanka
+        {5099,"NP"},//Népal
+        {5100,"SK"},//Slovaquie
+        {5101,"LV"},//Lettonie
+        {5102,"AZ"},//Azerbaïdjan
+        {5103,"MR"},//Mauritanie
+        {5104,"MN"},//Mongolie
+        {5105,"BZ"},//Belize
+        {5106,"UA"},//Ukraine
+        {5107,"UY"},//Uruguay
+        {5108,"SI"},//Slovénie
+        {5109,"TJ"},//Tadjikistan
+        {5111,"BJ"},//Bénin
+        {5112,"TG"},//Togo
+        {5113,"SG"},//Singapour
+        {5114,"SA"},//Arabie Saoudite
+        {5115,"PH"},//Philippines
+        {5116,"PA"},//Panama
+        {5117,"AF"},//Afghanistan
+        {5118,"KG"},//kirghizistan
+        {5119,"GE"},//Géorgie
+        {5120,"KZ"},//kazakhstan
+        {5121,"MG"},//Madagascar
+        {5122,"GN"},//Guinée
+        {5123,"CI"},//Côte-d'Ivoire
+        {5125,"GT"},//Guatemala
+        {5126,"GH"},//Ghana
+        {5127,"TH"},//Thaïlande
+        {5128,"AL"},//Albanie
+        {5129,"DE"},//Allemagne
+        {5130,"DE"},//Allemagne de l'Ouest
+        {5132,"CD"},//Congo (Kinshasa)
+        {5133,"DO"},//République dominicaine
+        {5134,"EC"},//Equateur
+        {5135,"ER"},//Erythrée
+        {5136,"ET"},//Ethiopie
+        {5137,"GM"},//Gambie
+        {5138,"GW"},//Guinée-Bissau
+        {5139,"GQ"},//Guinée équatoriale
+        {5140,"GY"},//Guyana
+        {5141,"HN"},//Honduras
+        {5142,"HK"},//Hong-Kong
+        {5143,"JO"},//Jordanie
+        {5147,"LY"},//Libye
+        {5148,"MK"},//Macédoine
+        {5149,"MY"},//Malaisie
+        {5150,"MD"},//Moldavie
+        {5152,"OM"},//Oman
+        {5153,"UG"},//Ouganda
+        {5154,"UZ"},//Ouzbékistan
+        {5155,"PK"},//Pakistan
+        {5156,"PY"},//Paraguay
+        {5158,"RW"},//Rwanda
+        {5159,"SV"},//Salvador
+        {5161,"XX"},//U.R.S.S.
+        {5164,"TZ"},//Tanzanie
+        {5165,"CZ"},//République tchèque
+        {5166,"TM"},//Turkménistan
+        {5167,"ZM"},//Zambie
+        {5171,"MC"},//Monaco
+        {5173,"BF"},//Burkina Faso
+        {5174,"IQ"},//Irak
+        {5177,"NL"},//Pays-Bas
+        {7236,"XX"},//Porto Rico
+        {7239,"XX"},//Québec
+        {7240,"XX"},//Indéfini
+        {7241,"KE"},//Kenya
+        {7244,"BB"},//Barbade
+        {7246,"BS"},//Bahamas
+        {7247,"CV"},//Cap-Vert
+        {7249,"DM"},//Dominique
+        {7254,"LC"},//Sainte-Lucie
+        {7255,"ME"},//Monténégro
+        {7257,"MU"},//Maurice
+        {7264,"TT"},//Trinité-et-Tobago
+        {7268,"WS"},//Samoa
+        {7270,"CR"} //Costa Rica
+    };
+
+    if (codesToCountries.isEmpty()){
+        for (code2Country c : alloCineCodeToCountries){
+            codesToCountries[c.codeAlloCine]=QString(c.ISO3166).toLower();
+        }
+    }
+}
+
+bool AlloCineScraper::extractNationality(const QJsonArray& nationalityArray, MediaMovieSearchPtr mediaMovieSearchPtr) const {
+    QStringList countries;
+
+    for (const QJsonValue & value : nationalityArray){
+        if (JSonHelper::isInt(value.toObject()["code"])){
+            int code=value.toObject()["code"].toInt();
+            if (codesToCountries.contains(code)){
+                countries << codesToCountries[code];
+            }
+        }
+
+    }
+    mediaMovieSearchPtr->setCountries(countries);
 }
 
 bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor& searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const{
@@ -545,7 +768,8 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     mediaMovieSearchPtr->setSynopsis(movieObject["synopsis"].toString());
     mediaMovieSearchPtr->setProductionYear(movieObject["productionYear"].toInt());
 
-    extractNationality(movieObject["nationality"].toArray(),mediaMovieSearchPtr);
+    extractNationality(movieObject[QStringLiteral("nationality")].toArray(),mediaMovieSearchPtr);
+    extractCertificate(movieObject[QStringLiteral("movieCertificate")].toObject(),mediaMovieSearchPtr);
 
     // mediaMovieSearchPtr.runtime = movieObject["runtime"].toInt();
 
@@ -574,8 +798,8 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
 
     if (movieObject["statistics"].isObject()){
         double rating;
-        if (getRatingFromStatistics(movieObject["statistics"].toObject(),rating)){
-              mediaMovieSearchPtr->setRating(rating);
+        if (extractRating(movieObject["statistics"].toObject(),rating)){
+            mediaMovieSearchPtr->setRating(rating);
         }
     }
 
@@ -687,18 +911,7 @@ ShowPtrList AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) co
     return shows;
 }
 
-const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES="images.allocine.fr";
-
-
-QString AlloCineScraper::getName() const{
-    return "Allocine";
-}
-
-QIcon AlloCineScraper::getIcon() const {
-    return _icon;
-}
-
-void AlloCineScraper::initIcon(){
+QIcon AlloCineScraper::loadIcon() const {
 
     static const uchar icon_png[] = {
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
@@ -830,7 +1043,24 @@ void AlloCineScraper::initIcon(){
 
     QPixmap pixmap;
     if (pixmap.loadFromData(icon_png, sizeof(icon_png)/sizeof(uchar))){
-        _icon=QIcon(pixmap);
+        return QIcon(pixmap);
     }
+
+    return QIcon();
 }
 
+QString AlloCineScraper::name() const{
+    return QStringLiteral("Allocine");
+}
+
+QIcon AlloCineScraper::icon() const {
+    return m_icon;
+}
+bool AlloCineScraper::haveCapability(const SearchCapabilities capability) const {
+    Q_UNUSED(capability);
+    return true;
+}
+
+bool AlloCineScraper::supportLanguage(const QString& languageCodeISO639) const {
+    return QStringLiteral("fr")==languageCodeISO639;
+}

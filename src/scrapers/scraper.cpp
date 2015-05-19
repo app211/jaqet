@@ -35,33 +35,37 @@ Scraper::Scraper(QObject *parent)
             SLOT(closeDialog()));
 }
 
-QString Scraper::language() const
-{
-    // QLocale::name returns the locale in lang_COUNTRY format
-    // we only need the 2 letter lang code
-    QString lang = QLocale::system().name();
-    return lang.left(2);
+
+
+#include "jaqetmainwindow.h"
+
+void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year, const QString& language) const {
+
+    JaqetMainWindow::getInstance()->showWaitDialog();
+
+    internalSearchFilm( manager, toSearch, language, year);
+}
+
+void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  {
+
+    JaqetMainWindow::getInstance()->showWaitDialog();
+
+    internalSearchTV( manager, toSearch, language);
 }
 
 
-QPointer<InProgressDialog> p;
+void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor, const QString& language)  {
 
-void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year) const {
+    JaqetMainWindow::getInstance()->showWaitDialog();
 
-    if (p.isNull()) {
-        p=InProgressDialog::create();
-    }
-
-    internalSearchFilm( manager, toSearch, language(), year);
+    internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, language);
 }
 
-void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch)  {
+void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language)  {
 
-    if (p.isNull()) {
-        p=InProgressDialog::create();
-    }
+    JaqetMainWindow::getInstance()->showWaitDialog();
 
-    internalSearchTV( manager, toSearch, language());
+    internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, language);
 }
 
 void Scraper::showErrorDialog(const QString& error){
@@ -73,31 +77,7 @@ void Scraper::showErrorDialog(const QString& error){
     msgBox.exec();
 }
 
-void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor)  {
-
-    if (p.isNull()) {
-        p=InProgressDialog::create();
-    }
-
-    internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, language());
-}
-
-void  Scraper::findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor)  {
-
-    if (p.isNull()) {
-        p=InProgressDialog::create();
-    }
-
-    internalFindEpisodeInfo(manager, mediaTVSearchPtr, searchFor, language());
-}
-
-
 void Scraper::closeDialog(){
-    if (!p.isNull()){
-        p->close();
-        p->deleteLater();
-        p = nullptr;
-        QCoreApplication::processEvents();
-    }
+    JaqetMainWindow::getInstance()->hideWaitDialog();
 }
 

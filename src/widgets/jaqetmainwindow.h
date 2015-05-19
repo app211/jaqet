@@ -13,22 +13,18 @@ class JaqetMainWindow : public QMainWindow
 
     QLightBoxWidget* lightBox;
 
+    void showLightBox();
+    void hideLightBox();
+
 public:
     explicit JaqetMainWindow(QWidget *parent = 0);
     ~JaqetMainWindow();
 
-    void showLightBox();
+    void showWaitDialog();
+    void hideWaitDialog();
 
-    void hideLightBox();
+    static JaqetMainWindow* getInstance();
 
-    static JaqetMainWindow* getInstance()
-   {
-     if(!instance)
-     {
-       instance = new JaqetMainWindow();
-     }
-     return instance;
-   }
 signals:
 
 public slots:
