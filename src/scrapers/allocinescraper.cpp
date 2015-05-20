@@ -14,9 +14,21 @@
 #include "../utils.h"
 #include "../jsonhelper.h"
 
-const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES="images.allocine.fr";
+const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES=QStringLiteral("images.allocine.fr");
 
 QMap<int,QString> AlloCineScraper::codesToCountries;
+
+static QString CODE(QStringLiteral("code"));
+static QString PROFILE(QStringLiteral("profile"));
+static QString DOLLAR(QStringLiteral("$"));
+static QString HREF(QStringLiteral("href"));
+static QString MOVIE(QStringLiteral("movie"));
+static QString FILTER(QStringLiteral("filter"));
+static QString Q(QStringLiteral("q"));
+static QString TITLE(QStringLiteral("title"));
+static QString TVSERIES(QStringLiteral("tvseries"));
+static QString LARGE(QStringLiteral("large"));
+static QString ORIGINALCHANNEL(QStringLiteral("originalChannel"));
 
 AlloCineScraper::AlloCineScraper(QObject *parent)
     :Scraper(parent), m_icon(loadIcon())
@@ -36,7 +48,7 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
 
     QString toEncrypt = "29d185d98c984a359e6e6f26a0474269"+searchQuery;
 
-    QString fullQuery= QString("http://api.allocine.fr/%2?%3&sig=%4").arg( type, searchQuery, QUrl::toPercentEncoding(QCryptographicHash::hash(toEncrypt.toUtf8(), QCryptographicHash::Sha1).toBase64()));
+    QString fullQuery= QStringLiteral("http://api.allocine.fr/%2?%3&sig=%4").arg( type, searchQuery, QUrl::toPercentEncoding(QCryptographicHash::hash(toEncrypt.toUtf8(), QCryptographicHash::Sha1).toBase64()));
 
     qDebug() << fullQuery;
 
@@ -46,10 +58,10 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
 void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString&, int year) const
 {
     QMap<QString,QString> params;
-    params["filter"]=QUrl::toPercentEncoding("movie");
-    params["q"]=QUrl::toPercentEncoding(toSearch);
+    params[FILTER]=QUrl::toPercentEncoding(MOVIE);
+    params[Q]=QUrl::toPercentEncoding(toSearch);
 
-    QString url=createURL("rest/v3/search",params);
+    QString url=createURL(QStringLiteral("rest/v3/search"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -75,10 +87,10 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     Q_UNUSED(language);
 
     QMap<QString,QString> params;
-    params["filter"]="tvseries";
-    params["q"]=QUrl::toPercentEncoding(toSearch);
+    params[FILTER]=TVSERIES;
+    params[Q]=QUrl::toPercentEncoding(toSearch);
 
-    QString url=createURL("rest/v3/search",params);
+    QString url=createURL(QStringLiteral("rest/v3/search"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -104,17 +116,17 @@ void  AlloCineScraper::internalFindMovieInfo(QNetworkAccessManager *manager, Med
     QString movieCode= mediaMovieSearchPtr->foundResult().getCode();
 
     QMap<QString,QString> params;
-    params["filter"]=QUrl::toPercentEncoding("movie");
-    params["code"]=QUrl::toPercentEncoding(movieCode);
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+    params[FILTER]=QUrl::toPercentEncoding(MOVIE);
+    params[CODE]=QUrl::toPercentEncoding(movieCode);
+    params[QStringLiteral("striptags")]=QUrl::toPercentEncoding(QStringLiteral("synopsis,synopsisshort"));
 
     if (searchFor & SearchOption::AllMedia){
-        params["profile"]=QUrl::toPercentEncoding("large");
+        params[PROFILE]=QUrl::toPercentEncoding(LARGE);
     } else {
-        params["profile"]=QUrl::toPercentEncoding("medium");
+        params[PROFILE]=QUrl::toPercentEncoding(QStringLiteral("medium"));
     }
 
-    QString url=createURL("rest/v3/movie",params);
+    QString url=createURL(QStringLiteral("rest/v3/movie"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -148,11 +160,11 @@ void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, Me
     int episode=mediaTVSearchPtr->foundResult().getEpisode();
 
     QMap<QString,QString> params;
-    params["code"]=QUrl::toPercentEncoding(showCode);
-    params["profile"]=QUrl::toPercentEncoding("large"); // large for season id
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+    params[CODE]=QUrl::toPercentEncoding(showCode);
+    params[PROFILE]=QUrl::toPercentEncoding(LARGE); // large for season id
+    params[QStringLiteral("striptags")]=QUrl::toPercentEncoding(QStringLiteral("synopsis,synopsisshort"));
 
-    QString url=createURL("rest/v3/tvseries",params);
+    QString url=createURL(QStringLiteral("rest/v3/tvseries"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -187,51 +199,51 @@ bool AlloCineScraper::extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument&
     }
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["tvseries"].isObject()){
+    if (!jsonObject[TVSERIES].isObject()){
         return false;
     }
 
-    QJsonObject tvseriesObject = jsonObject["tvseries"].toObject();
+    QJsonObject tvseriesObject = jsonObject[TVSERIES].toObject();
 
-    mediaTVSearchPtr->setTitle(tvseriesObject["title"].toString());
-    mediaTVSearchPtr->setOriginalTitle(tvseriesObject["originalTitle"].toString());
+    mediaTVSearchPtr->setTitle(tvseriesObject[TITLE].toString());
+    mediaTVSearchPtr->setOriginalTitle(tvseriesObject[QStringLiteral("originalTitle")].toString());
 
-    if (tvseriesObject["originalChannel"].isObject() && tvseriesObject["originalChannel"].toObject()["channel"].isObject()){
-        mediaTVSearchPtr->addNetwork(tvseriesObject["originalChannel"].toObject()["channel"].toObject()["name"].toString());
+    if (tvseriesObject[ORIGINALCHANNEL].isObject() && tvseriesObject[ORIGINALCHANNEL].toObject()[QStringLiteral("channel")].isObject()){
+        mediaTVSearchPtr->addNetwork(tvseriesObject[ORIGINALCHANNEL].toObject()[QStringLiteral("channel")].toObject()[QStringLiteral("name")].toString());
     }
 
-    if (tvseriesObject["media"].isArray()){
-        parseMedia(tvseriesObject["media"].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
+    if (tvseriesObject[QStringLiteral("media")].isArray()){
+        parseMedia(tvseriesObject[QStringLiteral("media")].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
     }
 
-    mediaTVSearchPtr->setProductionYear(tvseriesObject["yearStart"].toInt());
+    mediaTVSearchPtr->setProductionYear(tvseriesObject[QStringLiteral("yearStart")].toInt());
 
-    if (tvseriesObject["statistics"].isObject()){
+    if (tvseriesObject[QStringLiteral("statistics")].isObject()){
         double rating;
-        if (extractRating(tvseriesObject["statistics"].toObject(),rating)){
+        if (extractRating(tvseriesObject[QStringLiteral("statistics")].toObject(),rating)){
             mediaTVSearchPtr->setShowRating(rating);
         }
     }
 
-    if (tvseriesObject["genre"].isArray()){
+    if (tvseriesObject[QStringLiteral("genre")].isArray()){
         QStringList genres;
 
-        QJsonArray jsonArrayGenre = tvseriesObject["genre"].toArray();
+        QJsonArray jsonArrayGenre = tvseriesObject[QStringLiteral("genre")].toArray();
 
         foreach (const QJsonValue & value, jsonArrayGenre)
         {
-            QString genre = value.toObject()["$"].toString();
+            QString genre = value.toObject()[DOLLAR].toString();
             if (!genre.isEmpty()) genres.append(genre);
         }
 
         mediaTVSearchPtr->setGenre(genres);
     }
 
-    for (const QJsonValue & value : tvseriesObject["season"].toArray())
+    for (const QJsonValue & value : tvseriesObject[QStringLiteral("season")].toArray())
     {
         QJsonObject season = value.toObject();
-        if(season["seasonNumber"].toInt()==seasonToFind){
-            seasonCode.setNum(season["code"].toInt());
+        if(season[QStringLiteral("seasonNumber")].toInt()==seasonToFind){
+            seasonCode.setNum(season[CODE].toInt());
             return true;
         }
     }
@@ -242,11 +254,11 @@ bool AlloCineScraper::extractSeasonCodeFromLargeTVSerieInfo(const QJsonDocument&
 void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager, const QString seasonCode, const int episode, MediaTVSearchPtr mediaTVSearchPtr) const{
 
     QMap<QString,QString> params;
-    params["code"]=QUrl::toPercentEncoding(seasonCode);
-    params["profile"]=QUrl::toPercentEncoding("large");
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+    params[CODE]=QUrl::toPercentEncoding(seasonCode);
+    params[PROFILE]=QUrl::toPercentEncoding(LARGE);
+    params[QStringLiteral("striptags")]=QUrl::toPercentEncoding(QStringLiteral("synopsis,synopsisshort"));
 
-    QString url=createURL("rest/v3/season",params);
+    QString url=createURL(QStringLiteral("rest/v3/season"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -280,32 +292,32 @@ bool AlloCineScraper::extractEpisodeCodeFromLargeSeasonTVSerieInfo(const QJsonDo
     }
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["season"].isObject()){
+    if (!jsonObject[QStringLiteral("season")].isObject()){
         return false;
     }
 
-    QJsonObject season = jsonObject["season"].toObject();
+    QJsonObject season = jsonObject[QStringLiteral("season")].toObject();
 
-    if (season["media"].isArray()){
-        parseMedia(season["media"].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
+    if (season[QStringLiteral("media")].isArray()){
+        parseMedia(season[QStringLiteral("media")].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
     }
 
-    if (season["originalChannel"].isObject() && season["originalChannel"].toObject()["channel"].isObject()){
-        mediaTVSearchPtr->addNetwork(season["originalChannel"].toObject()["channel"].toObject()["name"].toString());
+    if (season[ORIGINALCHANNEL].isObject() && season[ORIGINALCHANNEL].toObject()[QStringLiteral("channel")].isObject()){
+        mediaTVSearchPtr->addNetwork(season[ORIGINALCHANNEL].toObject()[QStringLiteral("channel")].toObject()[QStringLiteral("name")].toString());
     }
 
-    if (!season["episode"].isArray()){
+    if (!season[QStringLiteral("episode")].isArray()){
         return false;
     }
 
-    QJsonArray episodes = season["episode"].toArray();
+    QJsonArray episodes = season[QStringLiteral("episode")].toArray();
 
     foreach (const QJsonValue & value, episodes)
     {
         QJsonObject episode = value.toObject();
-        if(episode["episodeNumberSeason"].toInt()==episodeToFind ){
-            episodeCode.setNum(episode["code"].toInt());
-            mediaTVSearchPtr->setProductionYear(season["yearStart"].toInt());
+        if(episode[QStringLiteral("episodeNumberSeason")].toInt()==episodeToFind ){
+            episodeCode.setNum(episode[CODE].toInt());
+            mediaTVSearchPtr->setProductionYear(season[QStringLiteral("yearStart")].toInt());
             return true;
         }
     }
@@ -320,19 +332,19 @@ bool parseMediaTemplate(const QJsonArray& mediaArray,const Scraper::SearchFor& s
         foreach (const QJsonValue & value, mediaArray)
         {
             QJsonObject media = value.toObject();
-            if (media["class"]=="picture"){
-                if (media["type"].isObject()){
-                    QJsonObject typeObject = media["type"].toObject();
-                    if (typeObject["$"].isString() && (typeObject["$"].toString()=="Affiche" || typeObject["$"].toString()=="Photo")){
-                        QJsonObject thumbnailObject=media["thumbnail"].toObject();
-                        if (thumbnailObject["href"].isString()){
-                            if (typeObject["$"].toString()=="Affiche"){
+            if (media[QStringLiteral("class")]==QStringLiteral("picture")){
+                if (media[QStringLiteral("type")].isObject()){
+                    QJsonObject typeObject = media[QStringLiteral("type")].toObject();
+                    if (typeObject[DOLLAR].isString() && (typeObject[DOLLAR].toString()==QStringLiteral("Affiche") || typeObject[DOLLAR].toString()==QStringLiteral("Photo"))){
+                        QJsonObject thumbnailObject=media[QStringLiteral("thumbnail")].toObject();
+                        if (thumbnailObject[HREF].isString()){
+                            if (typeObject[DOLLAR].toString()==QStringLiteral("Affiche")){
                                 if (searchFor & Scraper::SearchOption::Poster){
-                                    mediaSearchPtr->addPoster(thumbnailObject["href"].toString(),QSize(media["width"].toInt(), media["height"].toInt()));
+                                    mediaSearchPtr->addPoster(thumbnailObject[HREF].toString(),QSize(media[QStringLiteral("width")].toInt(), media[QStringLiteral("height")].toInt()));
                                 }
                             } else {
                                 if (searchFor & Scraper::SearchOption::BackDrop){
-                                    mediaSearchPtr->addBackdrop(thumbnailObject["href"].toString(),QSize(media["width"].toInt(), media["height"].toInt()));
+                                    mediaSearchPtr->addBackdrop(thumbnailObject[HREF].toString(),QSize(media[QStringLiteral("width")].toInt(), media[QStringLiteral("height")].toInt()));
                                 }
                             }
                         }
@@ -360,52 +372,52 @@ bool AlloCineScraper::parseEpisodeTVSerieInfo(const QJsonDocument& resultset, Me
     }
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["episode"].isObject()){
+    if (!jsonObject[QStringLiteral("episode")].isObject()){
         return false;
     }
 
-    QJsonObject episodeObject = jsonObject["episode"].toObject();
+    QJsonObject episodeObject = jsonObject[QStringLiteral("episode")].toObject();
 
-    mediaTVSearchPtr->setSynopsis(episodeObject["synopsis"].toString());
-    mediaTVSearchPtr->setCode(episodeObject["code"].toString());
-    mediaTVSearchPtr->setEpisodeTitle(episodeObject["title"].toString());
-    mediaTVSearchPtr->setOriginalEpisodeTitle(episodeObject["originalTitle"].toString());
+    mediaTVSearchPtr->setSynopsis(episodeObject[QStringLiteral("synopsis")].toString());
+    mediaTVSearchPtr->setCode(episodeObject[CODE].toString());
+    mediaTVSearchPtr->setEpisodeTitle(episodeObject[TITLE].toString());
+    mediaTVSearchPtr->setOriginalEpisodeTitle(episodeObject[QStringLiteral("originalTitle")].toString());
 
-    QJsonArray jsonArray = episodeObject["link"].toArray();
+    QJsonArray jsonArray = episodeObject[QStringLiteral("link")].toArray();
 
     foreach (const QJsonValue & value, jsonArray)
     {
         QJsonObject link = value.toObject();
 
-        if (link["rel"].toString()=="aco:web"){
-            mediaTVSearchPtr->setLinkName(link["name"].toString());
+        if (link[QStringLiteral("rel")].toString()==QStringLiteral("aco:web")){
+            mediaTVSearchPtr->setLinkName(link[QStringLiteral("name")].toString());
             if (mediaTVSearchPtr->linkName().isEmpty()){
                 mediaTVSearchPtr->setLinkName(mediaTVSearchPtr->title());
             }
-            mediaTVSearchPtr->setLinkHref(link["href"].toString());
+            mediaTVSearchPtr->setLinkHref(link[HREF].toString());
             break;
         }
     }
 
-    if (episodeObject["media"].isArray()){
-        parseMedia(episodeObject["media"].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
+    if (episodeObject[QStringLiteral("media")].isArray()){
+        parseMedia(episodeObject[QStringLiteral("media")].toArray(), Scraper::SearchOption::All, mediaTVSearchPtr);
     }
 
     QStringList actors;
     QStringList directors;
 
-    if (episodeObject["castMember"].isArray()){
-        QJsonArray castArray = episodeObject["castMember"].toArray();
+    if (episodeObject[QStringLiteral("castMember")].isArray()){
+        QJsonArray castArray = episodeObject[QStringLiteral("castMember")].toArray();
         foreach (const QJsonValue & value, castArray)
         {
             QJsonObject cast = value.toObject();
 
-            if (cast["person"].isObject() && cast["activity"].isObject()){
-                int code=cast["activity"].toObject()["code"].toInt();
+            if (cast[QStringLiteral("person")].isObject() && cast[QStringLiteral("activity")].isObject()){
+                int code=cast[QStringLiteral("activity")].toObject()[CODE].toInt();
                 if (code==8001){
-                    actors.append(cast["person"].toObject()["name"].toString());
+                    actors.append(cast[QStringLiteral("person")].toObject()[QStringLiteral("name")].toString());
                 } else if (code==8002){
-                    directors.append(cast["person"].toObject()["name"].toString());
+                    directors.append(cast[QStringLiteral("person")].toObject()[QStringLiteral("name")].toString());
                 }
             }
         }
@@ -414,21 +426,21 @@ bool AlloCineScraper::parseEpisodeTVSerieInfo(const QJsonDocument& resultset, Me
     mediaTVSearchPtr->setActors(mediaTVSearchPtr->actors() << actors);
     mediaTVSearchPtr->setDirectors(mediaTVSearchPtr->directors() << directors);
 
-    if (episodeObject["broadcast"].isArray()){
-        QJsonArray broadcastArray = episodeObject["broadcast"].toArray();
+    if (episodeObject[QStringLiteral("broadcast")].isArray()){
+        QJsonArray broadcastArray = episodeObject[QStringLiteral("broadcast")].toArray();
         foreach (const QJsonValue & value, broadcastArray)
         {
             QJsonObject broadcast = value.toObject();
 
-            if (broadcast["channel"].isObject()){
-                mediaTVSearchPtr->addNetwork( broadcast["channel"].toObject()["$"].toString());
+            if (broadcast[QStringLiteral("channel")].isObject()){
+                mediaTVSearchPtr->addNetwork( broadcast[QStringLiteral("channel")].toObject()[DOLLAR].toString());
             }
 
-            QString dateTime=broadcast["datetime"].toString();
+            QString dateTime=broadcast[QStringLiteral("datetime")].toString();
             QStringList d =dateTime.split('T');
             if (d.size()==2){
-                QDate date = QDate::fromString(d.at(0), "yyyy-MM-dd");
-                QTime time = QTime::fromString(d.at(1), "h:m:s");
+                QDate date = QDate::fromString(d.at(0), QStringLiteral("yyyy-MM-dd"));
+                QTime time = QTime::fromString(d.at(1), QStringLiteral("h:m:s"));
                 if (date.isValid() && time.isValid()){
                     mediaTVSearchPtr->setAired(QDateTime(date,time));
                 }
@@ -442,10 +454,10 @@ bool AlloCineScraper::parseEpisodeTVSerieInfo(const QJsonDocument& resultset, Me
 
 void AlloCineScraper::findMediaInfo(QNetworkAccessManager *manager, const QString mediaCode) const{
     QMap<QString,QString> params;
-    params["code"]=QUrl::toPercentEncoding(mediaCode);
+    params[CODE]=QUrl::toPercentEncoding(mediaCode);
     //  params["profile"]=QUrl::toPercentEncoding("large");
 
-    QString url=createURL("rest/v3/media",params);
+    QString url=createURL(QStringLiteral("rest/v3/media"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -473,11 +485,11 @@ void AlloCineScraper::findMediaInfo(QNetworkAccessManager *manager, const QStrin
 void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, const QString episodeCode, MediaTVSearchPtr mediaTVSearchPtr) const{
 
     QMap<QString,QString> params;
-    params["code"]=QUrl::toPercentEncoding(episodeCode);
-    params["profile"]=QUrl::toPercentEncoding("large");
-    params["striptags"]=QUrl::toPercentEncoding("synopsis,synopsisshort");
+    params[CODE]=QUrl::toPercentEncoding(episodeCode);
+    params[PROFILE]=QUrl::toPercentEncoding(LARGE);
+    params[QStringLiteral("striptags")]=QUrl::toPercentEncoding(QStringLiteral("synopsis,synopsisshort"));
 
-    QString url=createURL("rest/v3/episode",params);
+    QString url=createURL(QStringLiteral("rest/v3/episode"),params);
     Promise* promise=Promise::loadAsync(*manager,url);
     QObject::connect(promise, &Promise::completed, [=]()
     {
@@ -505,13 +517,13 @@ bool AlloCineScraper::extractRating(const QJsonObject& statisticsObject, double&
 
     rating=0.f;
     int diviseur=0;
-    if (statisticsObject["userRating"].isDouble()){
-        rating += statisticsObject["userRating"].toDouble();
+    if (statisticsObject[QStringLiteral("userRating")].isDouble()){
+        rating += statisticsObject[QStringLiteral("userRating")].toDouble();
         diviseur++;
     }
 
-    if (statisticsObject["pressRating"].isDouble()){
-        rating += statisticsObject["pressRating"].toDouble();
+    if (statisticsObject[QStringLiteral("pressRating")].isDouble()){
+        rating += statisticsObject[QStringLiteral("pressRating")].toDouble();
         diviseur++;
     }
 
@@ -526,27 +538,27 @@ bool AlloCineScraper::extractRating(const QJsonObject& statisticsObject, double&
 
 
 bool AlloCineScraper::extractCertificate(const QJsonObject& certificateObject, MediaMovieSearchPtr mediaMovieSearchPtr) const {
-    auto code = certificateObject[QStringLiteral("certificate")].toObject()["code"];
+    auto code = certificateObject[QStringLiteral("certificate")].toObject()[CODE];
     if (!code.isNull()){
         qDebug() << code.toInt();
         switch(code.toInt()){
         case 14001:  // Interdit aux moins de 12 ans
         case 14044:  // Interdit aux moins de 12 ans avec avertissement
-            mediaMovieSearchPtr->setCertificate("fr_12");
+            mediaMovieSearchPtr->setCertificate(QStringLiteral("fr_12"));
             ; break;
         case 14002:  // Interdit aux moins de 16 ans
         case 14045:  // Interdit aux moins de 16 ans avec avertissement"
-            mediaMovieSearchPtr->setCertificate("fr_16");
+            mediaMovieSearchPtr->setCertificate(QStringLiteral("fr_16"));
             ; break;
 
         case 14004: // Interdit aux moins de 18 ans
-            mediaMovieSearchPtr->setCertificate("fr_18");
+            mediaMovieSearchPtr->setCertificate(QStringLiteral("fr_18"));
 
             ; break;
         case 14005: // Film classe X
-            mediaMovieSearchPtr->setCertificate("fr_X");
+            mediaMovieSearchPtr->setCertificate(QStringLiteral("fr_X"));
 
-        case 14035: // Avertissement : des scÃ¨nes, des propos ou des images peuvent heurter la sensibilitÃ© des spectateurs"}
+        case 14035: // Avertissement : des scÃ¨nes, des propos ou des images peuvent heurter la sensibilitÃ© des spectateurs")}
             ; break;
         }
     }
@@ -557,173 +569,173 @@ bool AlloCineScraper::extractCertificate(const QJsonObject& certificateObject, M
 void AlloCineScraper::init(){
     struct code2Country {
         int codeAlloCine;
-        char* ISO3166;
+        QLatin1String ISO3166;
     };
 
     static code2Country alloCineCodeToCountries[]=
     {
-        {5001,"FR"},//France
-        {5002,"US"},//U.S.A.
-        {5003,"DE"},//Allemagne de l'Est
-        {5004,"GB"},//Grande-Bretagne
-        {5005,"NZ"},//Nouvelle-Zélande
-        {5007,"ZA"},//Afrique du Sud
-        {5008,"KR"},//Corée du Sud
-        {5009,"KP"},//Corée du Nord
-        {5010,"CH"},//Suisse
-        {5012,"NE"},//Niger
-        {5013,"DZ"},//Algérie
-        {5014,"BE"},//Belgique
-        {5015,"SO"},//Somalie
-        {5016,"AM"},//Arménie
-        {5017,"ES"},//Espagne
-        {5018,"CA"},//Canada
-        {5019,"GR"},//Grèce
-        {5020,"IT"},//Italie
-        {5021,"JP"},//Japon
-        {5022,"JM"},//Jamaïque
-        {5023,"PL"},//Pologne
-        {5024,"PT"},//Portugal
-        {5025,"AR"},//Argentine
-        {5026,"TR"},//Turquie
-        {5027,"CN"},//Chine
-        {5028,"BR"},//Brésil
-        {5029,"AU"},//Australie
-        {5030,"IE"},//Irlande
-        {5031,"MX"},//Mexique
-        {5032,"AT"},//Autriche
-        {5033,"MA"},//Maroc
-        {5034,"NG"},//Nigéria
-        {5036,"ZW"},//Zimbabwé
-        {5037,"IL"},//Israël
-        {5038,"ML"},//Mali
-        {5039,"RU"},//Russie
-        {5040,"TW"},//Taïwan
-        {5041,"CZ"},//Tchécoslovaquie
-        {5042,"IN"},//Inde
-        {5043,"PS"},//Palestine
-        {5044,"AO"},//Angola
-        {5045,"LU"},//Luxembourg
-        {5047,"CM"},//Cameroun
-        {5048,"CG"},//Congo (Brazzaville)
-        {5049,"LB"},//Liban
-        {5051,"PE"},//Pérou
-        {5052,"TN"},//Tunisie
-        {5053,"CD"},//Zaïre
-        {5054,"VN"},//Vietnam
-        {5055,"BO"},//Bolivie
-        {5056,"BY"},//Biélorussie
-        {5057,"KR"},//Corée
-        {5058,"MM"},//Birmanie
-        {5059,"CL"},//Chili
-        {5060,"CU"},//Cuba
-        {5061,"DK"},//Danemark
-        {5062,"NO"},//Norvège
-        {5063,"EG"},//Egypte
-        {5064,"BG"},//Bulgarie
-        {5065,"CO"},//Colombie
-        {5066,"XX"},//Yougoslavie
-        {5067,"SE"},//Suède
-        {5068,"HU"},//Hongrie
-        {5069,"FI"},//Finlande
-        {5070,"ID"},//Indonésie
-        {5072,"BD"},//Bengladesh
-        {5073,"BA"},//Bosnie-Herzégovine
-        {5074,"BW"},//Botswana
-        {5076,"CS"},//Serbie
-        {5077,"HR"},//Croatie
-        {5079,"AE"},//Emirats Arabes Unis
-        {5080,"EE"},//Estonie
-        {5081,"CY"},//Chypre
-        {5082,"VE"},//Vénézuela
-        {5083,"HT"},//Haïti
-        {5084,"KH"},//Cambodge
-        {5086,"IR"},//Iran
-        {5087,"LT"},//Lituanie
-        {5088,"RO"},//Roumanie
-        {5089,"SN"},//Sénégal
-        {5090,"GA"},//Gabon
-        {5091,"TD"},//Tchad
-        {5093,"IS"},//Islande
-        {5095,"SY"},//Syrie
-        {5097,"MZ"},//Mozambique
-        {5098,"LK"},//Sri Lanka
-        {5099,"NP"},//Népal
-        {5100,"SK"},//Slovaquie
-        {5101,"LV"},//Lettonie
-        {5102,"AZ"},//Azerbaïdjan
-        {5103,"MR"},//Mauritanie
-        {5104,"MN"},//Mongolie
-        {5105,"BZ"},//Belize
-        {5106,"UA"},//Ukraine
-        {5107,"UY"},//Uruguay
-        {5108,"SI"},//Slovénie
-        {5109,"TJ"},//Tadjikistan
-        {5111,"BJ"},//Bénin
-        {5112,"TG"},//Togo
-        {5113,"SG"},//Singapour
-        {5114,"SA"},//Arabie Saoudite
-        {5115,"PH"},//Philippines
-        {5116,"PA"},//Panama
-        {5117,"AF"},//Afghanistan
-        {5118,"KG"},//kirghizistan
-        {5119,"GE"},//Géorgie
-        {5120,"KZ"},//kazakhstan
-        {5121,"MG"},//Madagascar
-        {5122,"GN"},//Guinée
-        {5123,"CI"},//Côte-d'Ivoire
-        {5125,"GT"},//Guatemala
-        {5126,"GH"},//Ghana
-        {5127,"TH"},//Thaïlande
-        {5128,"AL"},//Albanie
-        {5129,"DE"},//Allemagne
-        {5130,"DE"},//Allemagne de l'Ouest
-        {5132,"CD"},//Congo (Kinshasa)
-        {5133,"DO"},//République dominicaine
-        {5134,"EC"},//Equateur
-        {5135,"ER"},//Erythrée
-        {5136,"ET"},//Ethiopie
-        {5137,"GM"},//Gambie
-        {5138,"GW"},//Guinée-Bissau
-        {5139,"GQ"},//Guinée équatoriale
-        {5140,"GY"},//Guyana
-        {5141,"HN"},//Honduras
-        {5142,"HK"},//Hong-Kong
-        {5143,"JO"},//Jordanie
-        {5147,"LY"},//Libye
-        {5148,"MK"},//Macédoine
-        {5149,"MY"},//Malaisie
-        {5150,"MD"},//Moldavie
-        {5152,"OM"},//Oman
-        {5153,"UG"},//Ouganda
-        {5154,"UZ"},//Ouzbékistan
-        {5155,"PK"},//Pakistan
-        {5156,"PY"},//Paraguay
-        {5158,"RW"},//Rwanda
-        {5159,"SV"},//Salvador
-        {5161,"XX"},//U.R.S.S.
-        {5164,"TZ"},//Tanzanie
-        {5165,"CZ"},//République tchèque
-        {5166,"TM"},//Turkménistan
-        {5167,"ZM"},//Zambie
-        {5171,"MC"},//Monaco
-        {5173,"BF"},//Burkina Faso
-        {5174,"IQ"},//Irak
-        {5177,"NL"},//Pays-Bas
-        {7236,"XX"},//Porto Rico
-        {7239,"XX"},//Québec
-        {7240,"XX"},//Indéfini
-        {7241,"KE"},//Kenya
-        {7244,"BB"},//Barbade
-        {7246,"BS"},//Bahamas
-        {7247,"CV"},//Cap-Vert
-        {7249,"DM"},//Dominique
-        {7254,"LC"},//Sainte-Lucie
-        {7255,"ME"},//Monténégro
-        {7257,"MU"},//Maurice
-        {7264,"TT"},//Trinité-et-Tobago
-        {7268,"WS"},//Samoa
-        {7270,"CR"} //Costa Rica
+        {5001,QLatin1String("FR")},//France
+        {5002,QLatin1String("US")},//U.S.A.
+        {5003,QLatin1String("DE")},//Allemagne de l'Est
+        {5004,QLatin1String("GB")},//Grande-Bretagne
+        {5005,QLatin1String("NZ")},//Nouvelle-Zélande
+        {5007,QLatin1String("ZA")},//Afrique du Sud
+        {5008,QLatin1String("KR")},//Corée du Sud
+        {5009,QLatin1String("KP")},//Corée du Nord
+        {5010,QLatin1String("CH")},//Suisse
+        {5012,QLatin1String("NE")},//Niger
+        {5013,QLatin1String("DZ")},//Algérie
+        {5014,QLatin1String("BE")},//Belgique
+        {5015,QLatin1String("SO")},//Somalie
+        {5016,QLatin1String("AM")},//Arménie
+        {5017,QLatin1String("ES")},//Espagne
+        {5018,QLatin1String("CA")},//Canada
+        {5019,QLatin1String("GR")},//Grèce
+        {5020,QLatin1String("IT")},//Italie
+        {5021,QLatin1String("JP")},//Japon
+        {5022,QLatin1String("JM")},//Jamaïque
+        {5023,QLatin1String("PL")},//Pologne
+        {5024,QLatin1String("PT")},//Portugal
+        {5025,QLatin1String("AR")},//Argentine
+        {5026,QLatin1String("TR")},//Turquie
+        {5027,QLatin1String("CN")},//Chine
+        {5028,QLatin1String("BR")},//Brésil
+        {5029,QLatin1String("AU")},//Australie
+        {5030,QLatin1String("IE")},//Irlande
+        {5031,QLatin1String("MX")},//Mexique
+        {5032,QLatin1String("AT")},//Autriche
+        {5033,QLatin1String("MA")},//Maroc
+        {5034,QLatin1String("NG")},//Nigéria
+        {5036,QLatin1String("ZW")},//Zimbabwé
+        {5037,QLatin1String("IL")},//Israël
+        {5038,QLatin1String("ML")},//Mali
+        {5039,QLatin1String("RU")},//Russie
+        {5040,QLatin1String("TW")},//Taïwan
+        {5041,QLatin1String("CZ")},//Tchécoslovaquie
+        {5042,QLatin1String("IN")},//Inde
+        {5043,QLatin1String("PS")},//Palestine
+        {5044,QLatin1String("AO")},//Angola
+        {5045,QLatin1String("LU")},//Luxembourg
+        {5047,QLatin1String("CM")},//Cameroun
+        {5048,QLatin1String("CG")},//Congo (Brazzaville)
+        {5049,QLatin1String("LB")},//Liban
+        {5051,QLatin1String("PE")},//Pérou
+        {5052,QLatin1String("TN")},//Tunisie
+        {5053,QLatin1String("CD")},//Zaïre
+        {5054,QLatin1String("VN")},//Vietnam
+        {5055,QLatin1String("BO")},//Bolivie
+        {5056,QLatin1String("BY")},//Biélorussie
+        {5057,QLatin1String("KR")},//Corée
+        {5058,QLatin1String("MM")},//Birmanie
+        {5059,QLatin1String("CL")},//Chili
+        {5060,QLatin1String("CU")},//Cuba
+        {5061,QLatin1String("DK")},//Danemark
+        {5062,QLatin1String("NO")},//Norvège
+        {5063,QLatin1String("EG")},//Egypte
+        {5064,QLatin1String("BG")},//Bulgarie
+        {5065,QLatin1String("CO")},//Colombie
+        {5066,QLatin1String("XX")},//Yougoslavie
+        {5067,QLatin1String("SE")},//Suède
+        {5068,QLatin1String("HU")},//Hongrie
+        {5069,QLatin1String("FI")},//Finlande
+        {5070,QLatin1String("ID")},//Indonésie
+        {5072,QLatin1String("BD")},//Bengladesh
+        {5073,QLatin1String("BA")},//Bosnie-Herzégovine
+        {5074,QLatin1String("BW")},//Botswana
+        {5076,QLatin1String("CS")},//Serbie
+        {5077,QLatin1String("HR")},//Croatie
+        {5079,QLatin1String("AE")},//Emirats Arabes Unis
+        {5080,QLatin1String("EE")},//Estonie
+        {5081,QLatin1String("CY")},//Chypre
+        {5082,QLatin1String("VE")},//Vénézuela
+        {5083,QLatin1String("HT")},//Haïti
+        {5084,QLatin1String("KH")},//Cambodge
+        {5086,QLatin1String("IR")},//Iran
+        {5087,QLatin1String("LT")},//Lituanie
+        {5088,QLatin1String("RO")},//Roumanie
+        {5089,QLatin1String("SN")},//Sénégal
+        {5090,QLatin1String("GA")},//Gabon
+        {5091,QLatin1String("TD")},//Tchad
+        {5093,QLatin1String("IS")},//Islande
+        {5095,QLatin1String("SY")},//Syrie
+        {5097,QLatin1String("MZ")},//Mozambique
+        {5098,QLatin1String("LK")},//Sri Lanka
+        {5099,QLatin1String("NP")},//Népal
+        {5100,QLatin1String("SK")},//Slovaquie
+        {5101,QLatin1String("LV")},//Lettonie
+        {5102,QLatin1String("AZ")},//Azerbaïdjan
+        {5103,QLatin1String("MR")},//Mauritanie
+        {5104,QLatin1String("MN")},//Mongolie
+        {5105,QLatin1String("BZ")},//Belize
+        {5106,QLatin1String("UA")},//Ukraine
+        {5107,QLatin1String("UY")},//Uruguay
+        {5108,QLatin1String("SI")},//Slovénie
+        {5109,QLatin1String("TJ")},//Tadjikistan
+        {5111,QLatin1String("BJ")},//Bénin
+        {5112,QLatin1String("TG")},//Togo
+        {5113,QLatin1String("SG")},//Singapour
+        {5114,QLatin1String("SA")},//Arabie Saoudite
+        {5115,QLatin1String("PH")},//Philippines
+        {5116,QLatin1String("PA")},//Panama
+        {5117,QLatin1String("AF")},//Afghanistan
+        {5118,QLatin1String("KG")},//kirghizistan
+        {5119,QLatin1String("GE")},//Géorgie
+        {5120,QLatin1String("KZ")},//kazakhstan
+        {5121,QLatin1String("MG")},//Madagascar
+        {5122,QLatin1String("GN")},//Guinée
+        {5123,QLatin1String("CI")},//Côte-d'Ivoire
+        {5125,QLatin1String("GT")},//Guatemala
+        {5126,QLatin1String("GH")},//Ghana
+        {5127,QLatin1String("TH")},//Thaïlande
+        {5128,QLatin1String("AL")},//Albanie
+        {5129,QLatin1String("DE")},//Allemagne
+        {5130,QLatin1String("DE")},//Allemagne de l'Ouest
+        {5132,QLatin1String("CD")},//Congo (Kinshasa)
+        {5133,QLatin1String("DO")},//République dominicaine
+        {5134,QLatin1String("EC")},//Equateur
+        {5135,QLatin1String("ER")},//Erythrée
+        {5136,QLatin1String("ET")},//Ethiopie
+        {5137,QLatin1String("GM")},//Gambie
+        {5138,QLatin1String("GW")},//Guinée-Bissau
+        {5139,QLatin1String("GQ")},//Guinée équatoriale
+        {5140,QLatin1String("GY")},//Guyana
+        {5141,QLatin1String("HN")},//Honduras
+        {5142,QLatin1String("HK")},//Hong-Kong
+        {5143,QLatin1String("JO")},//Jordanie
+        {5147,QLatin1String("LY")},//Libye
+        {5148,QLatin1String("MK")},//Macédoine
+        {5149,QLatin1String("MY")},//Malaisie
+        {5150,QLatin1String("MD")},//Moldavie
+        {5152,QLatin1String("OM")},//Oman
+        {5153,QLatin1String("UG")},//Ouganda
+        {5154,QLatin1String("UZ")},//Ouzbékistan
+        {5155,QLatin1String("PK")},//Pakistan
+        {5156,QLatin1String("PY")},//Paraguay
+        {5158,QLatin1String("RW")},//Rwanda
+        {5159,QLatin1String("SV")},//Salvador
+        {5161,QLatin1String("XX")},//U.R.S.S.
+        {5164,QLatin1String("TZ")},//Tanzanie
+        {5165,QLatin1String("CZ")},//République tchèque
+        {5166,QLatin1String("TM")},//Turkménistan
+        {5167,QLatin1String("ZM")},//Zambie
+        {5171,QLatin1String("MC")},//Monaco
+        {5173,QLatin1String("BF")},//Burkina Faso
+        {5174,QLatin1String("IQ")},//Irak
+        {5177,QLatin1String("NL")},//Pays-Bas
+        {7236,QLatin1String("XX")},//Porto Rico
+        {7239,QLatin1String("XX")},//Québec
+        {7240,QLatin1String("XX")},//Indéfini
+        {7241,QLatin1String("KE")},//Kenya
+        {7244,QLatin1String("BB")},//Barbade
+        {7246,QLatin1String("BS")},//Bahamas
+        {7247,QLatin1String("CV")},//Cap-Vert
+        {7249,QLatin1String("DM")},//Dominique
+        {7254,QLatin1String("LC")},//Sainte-Lucie
+        {7255,QLatin1String("ME")},//Monténégro
+        {7257,QLatin1String("MU")},//Maurice
+        {7264,QLatin1String("TT")},//Trinité-et-Tobago
+        {7268,QLatin1String("WS")},//Samoa
+        {7270,QLatin1String("CR")} //Costa Rica
     };
 
     if (codesToCountries.isEmpty()){
@@ -737,8 +749,8 @@ bool AlloCineScraper::extractNationality(const QJsonArray& nationalityArray, Med
     QStringList countries;
 
     for (const QJsonValue & value : nationalityArray){
-        if (JSonHelper::isInt(value.toObject()["code"])){
-            int code=value.toObject()["code"].toInt();
+        if (JSonHelper::isInt(value.toObject()[CODE])){
+            int code=value.toObject()[CODE].toInt();
             if (codesToCountries.contains(code)){
                 countries << codesToCountries[code];
             }
@@ -757,16 +769,16 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     }
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["movie"].isObject()){
+    if (!jsonObject[MOVIE].isObject()){
         return false;
     }
 
-    QJsonObject movieObject = jsonObject["movie"].toObject();
+    QJsonObject movieObject = jsonObject[MOVIE].toObject();
 
-    mediaMovieSearchPtr->setTitle(movieObject["title"].toString());
-    mediaMovieSearchPtr->setOriginalTitle(movieObject["originalTitle"].toString());
-    mediaMovieSearchPtr->setSynopsis(movieObject["synopsis"].toString());
-    mediaMovieSearchPtr->setProductionYear(movieObject["productionYear"].toInt());
+    mediaMovieSearchPtr->setTitle(movieObject[TITLE].toString());
+    mediaMovieSearchPtr->setOriginalTitle(movieObject[QStringLiteral("originalTitle")].toString());
+    mediaMovieSearchPtr->setSynopsis(movieObject[QStringLiteral("synopsis")].toString());
+    mediaMovieSearchPtr->setProductionYear(movieObject[QStringLiteral("productionYear")].toInt());
 
     extractNationality(movieObject[QStringLiteral("nationality")].toArray(),mediaMovieSearchPtr);
     extractCertificate(movieObject[QStringLiteral("movieCertificate")].toObject(),mediaMovieSearchPtr);
@@ -778,27 +790,27 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     //        info.postersHref.append(info.posterHref);
     //    }
 
-    if(movieObject["castingShort"].isObject()){
-        QStringList directors = movieObject["castingShort"].toObject()["directors"].toString().split(",", QString::SkipEmptyParts);
+    if(movieObject[QStringLiteral("castingShort")].isObject()){
+        QStringList directors = movieObject[QStringLiteral("castingShort")].toObject()[QStringLiteral("directors")].toString().split(',', QString::SkipEmptyParts);
         directors.replaceInStrings(QRegExp("^\\s+"),"");
         mediaMovieSearchPtr->setDirectors(mediaMovieSearchPtr->directors() << directors);
 
-        QStringList actors=movieObject["castingShort"].toObject()["actors"].toString().split(",", QString::SkipEmptyParts);
+        QStringList actors=movieObject[QStringLiteral("castingShort")].toObject()[QStringLiteral("actors")].toString().split(',', QString::SkipEmptyParts);
         actors.replaceInStrings(QRegExp("^\\s+"),"");
         mediaMovieSearchPtr->setActors(mediaMovieSearchPtr->actors() << actors);
     }
 
 
-    if (movieObject["media"].isArray()){
+    if (movieObject[QStringLiteral("media")].isArray()){
         if (searchFor & SearchOption::AllMedia){
-            parseMedia(movieObject["media"].toArray(), searchFor, mediaMovieSearchPtr);
+            parseMedia(movieObject[QStringLiteral("media")].toArray(), searchFor, mediaMovieSearchPtr);
         }
     }
 
 
-    if (movieObject["statistics"].isObject()){
+    if (movieObject[QStringLiteral("statistics")].isObject()){
         double rating;
-        if (extractRating(movieObject["statistics"].toObject(),rating)){
+        if (extractRating(movieObject[QStringLiteral("statistics")].toObject(),rating)){
             mediaMovieSearchPtr->setRating(rating);
         }
     }
@@ -816,10 +828,9 @@ QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& o
     } else {
 
         QUrl url(filePath);
-        QSize scaledSize = originalSize.scaled(size, Qt::KeepAspectRatio);
-
+        QSize scaledSize = originalSize.scaled(size, mode);
         // Cf. https://raw.githubusercontent.com/etienne-gauvin/api-allocine-helper/master/AlloImage.class.php
-        return QString("http://%1/r_%2_%3%4").arg(url.host()).arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
+        return QString(QStringLiteral("http://%1/r_%2_%3%4")).arg(url.host()).arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
     }
 }
 
@@ -833,17 +844,17 @@ FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) cons
 
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["feed"].isObject()){
+    if (!jsonObject[QStringLiteral("feed")].isObject()){
         return films;
     }
 
-    QJsonObject feedObject = jsonObject["feed"].toObject();
+    QJsonObject feedObject = jsonObject[QStringLiteral("feed")].toObject();
 
-    if (!feedObject["movie"].isArray()){
+    if (!feedObject[MOVIE].isArray()){
         return films;
     }
 
-    QJsonArray jsonArray = feedObject["movie"].toArray();
+    QJsonArray jsonArray = feedObject[MOVIE].toArray();
 
     foreach (const QJsonValue & value, jsonArray)
     {
@@ -851,12 +862,12 @@ FilmPrtList AlloCineScraper::parseResultset(const QJsonDocument& resultset) cons
 
         FilmPtr film(new Film());
 
-        film->originalTitle= obj["originalTitle"].toString();
-        film->title= obj["title"].toString();
+        film->originalTitle= obj[QStringLiteral("originalTitle")].toString();
+        film->title= obj[TITLE].toString();
         if (film->title.isEmpty()){
             film->title=film->originalTitle;
         }
-        film->productionYear = QString::number(obj["productionYear"].toDouble());
+        film->productionYear = QString::number(obj[QStringLiteral("productionYear")].toDouble());
         film->code= QString::number(obj["code"].toDouble());
         //        if(obj["poster"].isObject()){
         //            film->posterHref = obj["poster"].toObject()["href"].toString();
@@ -880,29 +891,29 @@ ShowPtrList AlloCineScraper::parseTVResultset(const QJsonDocument& resultset) co
 
     QJsonObject jsonObject = resultset.object();
 
-    if (!jsonObject["feed"].isObject()){
+    if (!jsonObject[QStringLiteral("feed")].isObject()){
         return shows;
     }
 
-    QJsonObject feedObject = jsonObject["feed"].toObject();
+    QJsonObject feedObject = jsonObject[QStringLiteral("feed")].toObject();
 
-    if (!feedObject["tvseries"].isArray()){
+    if (!feedObject[TVSERIES].isArray()){
         return shows;
     }
 
-    QJsonArray jsonArray = feedObject["tvseries"].toArray();
+    QJsonArray jsonArray = feedObject[TVSERIES].toArray();
 
     foreach (const QJsonValue & value, jsonArray)
     {
         QJsonObject obj = value.toObject();
 
         ShowPtr show(new Show());
-        show->originalTitle= obj["originalTitle"].toString();
-        show->title= obj["originalTitle"].toString();
-        show->productionYear = QString::number(obj["yearStart"].toDouble());
-        show->code= QString::number(obj["code"].toDouble());
-        if(obj["poster"].isObject()){
-            show->posterHref = obj["poster"].toObject()["href"].toString();
+        show->originalTitle= obj[QStringLiteral("originalTitle")].toString();
+        show->title= obj[QStringLiteral("originalTitle")].toString();
+        show->productionYear = QString::number(obj[QStringLiteral("yearStart")].toDouble());
+        show->code= QString::number(obj[CODE].toDouble());
+        if(obj[QStringLiteral("poster")].isObject()){
+            show->posterHref = obj[QStringLiteral("poster")].toObject()[HREF].toString();
         }
 
         shows.append(show);

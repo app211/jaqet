@@ -59,6 +59,8 @@ private:
     void addImages(const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes, QFlags<ImageType> type);
     void updateFrom(const CurrentItemData& newData);
     void updateUI();
+    void buildPreview( const CurrentItemData& currentSearch);
+    void buildPoster( const CurrentItemData& currentSearch);
 
 private slots:
 
@@ -80,10 +82,6 @@ private slots:
 
     void enableDirectorRemove();
     void directorRemove();
-
-    // From Engine
-    void previewOK(QGraphicsScene*);
-
 
     void backgroundSelected(const MediaChoosed& mediaChoosed);
     void posterSelected(const MediaChoosed& mediaChoosed);

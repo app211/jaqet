@@ -74,7 +74,7 @@ void SearchScraperDialog::updateMenu(){
     }
 }
 
-SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& foundResult, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
+SearchScraperDialog::SearchScraperDialog(QWidget *parent, const CurrentItemData& foundResult, QList<Scraper*> scrapers, QNetworkAccessManager* manager) :
     QDialog(parent),
     ui(new Ui::SearchScraperDialog),
     m_manager(manager)
@@ -84,18 +84,18 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const FoundResult& fou
 
     init(scrapers);
 
-    ui->lineEditTitle->setText(foundResult.getOriginalTitle());
+    ui->lineEditTitle->setText(foundResult.originalTitle());
 
     if (foundResult.isTV()){
         ui->radioTV->setChecked(true);
-        ui->spinBoxSeason->setValue(foundResult.getSeason());
-        ui->spinBoxEpisode->setValue(foundResult.getEpisode());
+        ui->spinBoxSeason->setValue(foundResult.season());
+        ui->spinBoxEpisode->setValue(foundResult.episode());
     } else {
         ui->radioMovie->setChecked(true);
     }
 
-    if (!foundResult.getProductionYear().isEmpty()){
-        ui->dateEdit->setDate(QDate(foundResult.getProductionYear().toInt(),1,1));
+    if (!foundResult.year()>1900){
+        ui->dateEdit->setDate(QDate(foundResult.year(),1,1));
         ui->checkBoxUseYear->setChecked(true);
      } else {
         ui->dateEdit->setDate(QDate());

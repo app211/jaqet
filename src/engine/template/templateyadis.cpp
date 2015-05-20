@@ -153,10 +153,11 @@ void TemplateYadis::proceed(const CurrentItemData& data){
         }
 }
 
-void TemplateYadis::internalCreate(const CurrentItemData& data){
+QPixmap TemplateYadis::internalCreate(const CurrentItemData& data){
 
     QPixmap result=createBackdrop(data);
-    emit tivxOk(result.scaled(QSize(result.width()/2,result.height()/2),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation));
+
+    return result.scaled(QSize(result.width()/2,result.height()/2),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
 }
 
 QPixmap TemplateYadis::createBackdrop(const CurrentItemData& data){

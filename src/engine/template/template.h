@@ -16,18 +16,17 @@ class Template : public QObject
 public:
     explicit Template(QObject *parent = 0);
 
-    void create(const CurrentItemData &data);
+    QPixmap create(const CurrentItemData &data);
     virtual void proceed(const CurrentItemData& data)=0;
     virtual QSize getBackdropSize() const=0;
     virtual QSize getPosterSize() const=0;
     virtual QSize getBannerSize() const=0;
 
 
-
 protected:
 
 
-   virtual void internalCreate(const CurrentItemData& data)=0;
+   virtual QPixmap internalCreate(const CurrentItemData& data)=0;
 
 };
 

@@ -3,33 +3,33 @@
 
 TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
     FileEngine(parent, path){
-   init(path);
+    init(path);
 }
 
 void TVIXEngine::init(const QString& path){
-   b.loadTemplate(":/resources/templates/CryFibril/template.xml");
+    b.loadTemplate(":/resources/templates/CryFibril/template.xml");
 
-  // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
+    // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 
     visibleFileExtensions << "*.asf"
-                              <<"*.avi"
-                              <<"*.dat"
-                              <<"*.divx"
-                              <<"*.ifo"
-                              <<"*.iso"
-                              <<"*.m2v"
-                              <<"*.mkv"
-                              <<"*.mpeg"
-                              <<"*.mpg"
-                              <<"*.tp"
-                              <<"*.trp"
-                              <<"*.ts"
-                              <<"*.vob"
-                              <<"*.wmv"
-                              <<"*.wvx"
-                              <<"*.xvid"<<
-                              "*.mp4"
-                            <<"*.wma";
+                          <<"*.avi"
+                         <<"*.dat"
+                        <<"*.divx"
+                       <<"*.ifo"
+                      <<"*.iso"
+                     <<"*.m2v"
+                    <<"*.mkv"
+                   <<"*.mpeg"
+                  <<"*.mpg"
+                 <<"*.tp"
+                <<"*.trp"
+               <<"*.ts"
+              <<"*.vob"
+             <<"*.wmv"
+            <<"*.wvx"
+           <<"*.xvid"<<
+             "*.mp4"
+          <<"*.wma";
 
     FileEngine::init(path);
 
@@ -60,48 +60,58 @@ QStringList TVIXEngine::getVisibleFileExtensions() const {
     return visibleFileExtensions;
 }
 
-void TVIXEngine::preview(const CurrentItemData &data){
-    connect(&b, SIGNAL(tivxOk(QPixmap )), this, SLOT(previewOk(QPixmap )));
-    b.create(data);
+QGraphicsScene &TVIXEngine::preview(const CurrentItemData &data){
+    m_previewScene.clear();
+    m_previewScene.addPixmap(b.create(data));
+    return m_previewScene;
 }
 
-void TVIXEngine::previewOk(QPixmap pimap){
-    result.clear();
-    result.addPixmap(pimap);
-    emit previewOK(&result);
-}
-
-void TVIXEngine::preview(const QModelIndex & index){
+QGraphicsScene &TVIXEngine::preview(const QModelIndex & index){
     QFileInfo f=fileInfo(index);
 
-    result.clear();
+    m_previewScene.clear();
 
-    if (getTypeItem(f)!=TypeItem::PROCEEDED){
-
-    } else {
-        QFileInfo posterFileinfo(QDir(f.absoluteFilePath()),"folder.jpg");
-        QPixmap poster;
-        if (posterFileinfo.exists()){
-            if (poster.load(posterFileinfo.absoluteFilePath())){
-                result.addPixmap(poster);
-            }
-        }
+    if (getTypeItem(f)==TypeItem::PROCEEDED){
 
         QFileInfo imageFileinfo(QDir(f.absoluteFilePath()),"tvix.jpg");
         QPixmap image;
         if (imageFileinfo.exists()){
             if (image.load(imageFileinfo.absoluteFilePath())){
-                QGraphicsPixmapItem *p= result.addPixmap(image);
-                if (!poster.isNull()){
-                    p->setPos(0,poster.height());
-                }
+                QGraphicsPixmapItem *p= m_previewScene.addPixmap(image);
             }
         }
     }
 
-   emit previewOK(&result);
+    return m_previewScene;
 }
 
+QGraphicsScene& TVIXEngine::poster(const QModelIndex & index)  {
+    QFileInfo f=fileInfo(index);
+
+    m_posterScene.clear();
+
+    if (getTypeItem(f)==TypeItem::PROCEEDED){
+
+        QFileInfo posterFileinfo(QDir(f.absoluteFilePath()),"folder.jpg");
+        QPixmap poster;
+        if (posterFileinfo.exists()){
+            if (poster.load(posterFileinfo.absoluteFilePath())){
+                m_posterScene.addPixmap(poster);
+            }
+        }
+    }
+
+    return m_posterScene;
+}
+
+QGraphicsScene& TVIXEngine::poster(const CurrentItemData& data) {
+    m_posterScene.clear();
+    QPixmap poster=data.getPoster();
+    if (!poster.isNull()){
+        m_posterScene.addPixmap(poster);
+    }
+    return m_posterScene;
+}
 
 void TVIXEngine::proceed(const CurrentItemData& data){
     b.proceed(data);

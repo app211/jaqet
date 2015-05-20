@@ -19,10 +19,11 @@
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
-#include "engine/engine.h"
+#include "engine/fileengine.h"
 #include "mediachooserpopup.h"
 #include "blocker.h"
 #include "jaqetmainwindow.h"
+
 
 MediaChooserPopup* c;
 
@@ -199,12 +200,9 @@ void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
 
     ui->stackedWidget->setCurrentIndex(3);
 
-    QObject::disconnect(engine,SIGNAL(previewOK(QGraphicsScene* )),this,0);
-    QObject::connect(engine, &Engine::previewOK, [=](QGraphicsScene* newScene){
-        ui->graphicsViewBingo->setScene(newScene);
-    });
-
-    engine->preview(index);
+    FileEngine* fileEngine = static_cast<FileEngine*>(engine);
+    ui->graphicsViewBingo->setScene(&fileEngine->preview(index));
+    ui->graphicsViewPosterBingo->setScene(&fileEngine->poster(index));
 
 }
 
@@ -307,7 +305,7 @@ void PanelView::updateUI(){
         ui->doubleSpinBoxRating->setValue(currentSearch.rating());
     }
 
-    currentSearch.engine()->preview(currentSearch);
+    buildPreview(currentSearch);
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -443,6 +441,31 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
     newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
     newData.setCountries(mediaMovieSearchPtr->countries());
     newData.setRating(mediaMovieSearchPtr->rating());
+
+    if (ui->checkBoxLockBackground->isLock()){
+        newData._backdrop=currentSearch._backdrop;
+        newData.backdropState=currentSearch.backdropState;
+        newData.currentBackdrop=currentSearch.currentBackdrop;
+    }
+
+    if (ui->checkBoxLockBanner->isLock()){
+        newData._banner=currentSearch._banner;
+        newData.bannerState=currentSearch.bannerState;
+        newData.currentBanner=currentSearch.currentBanner;
+    }
+
+    if (ui->checkBoxLockPoster->isLock()){
+        newData._poster=currentSearch._poster;
+        newData.posterState=currentSearch.posterState;
+        newData.currentPoster=currentSearch.currentPoster;
+    }
+
+    if (ui->checkBoxLockThumbail->isLock()){
+        newData._thumbnail=currentSearch._thumbnail;
+        newData.thumbnailState=currentSearch.thumbnailState;
+        newData.currentThumbail=currentSearch.currentThumbail;
+    }
+
 
     c->clear();
 
@@ -602,21 +625,22 @@ bool setMediaState(NETRESOURCE mediaState, const QPixmap& media, NETRESOURCE& cu
 void PanelView::setBackdropState(NETRESOURCE backdropState, const QPixmap& backDrop){
     if (setMediaState(backdropState, backDrop,currentSearch.backdropState, currentSearch.currentBackdrop)){
         ui->chooseBackgroundButton->setMedia(backDrop);
-        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
+        buildPreview(currentSearch);
     }
 }
 
 void PanelView::setPosterState(NETRESOURCE posterState, const QPixmap& poster){
     if (setMediaState(posterState, poster,currentSearch.posterState, currentSearch.currentPoster)){
         ui->choosePosterButton->setMedia(poster);
-        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
+        buildPreview(currentSearch);
+        buildPoster(currentSearch);
     }
 }
 
 void PanelView::setThumbnailState(NETRESOURCE thumbnailState, const QPixmap& thumbnail){
     if (setMediaState(thumbnailState, thumbnail,currentSearch.thumbnailState, currentSearch.currentThumbail)){
         ui->chooseThumbailButton->setMedia(thumbnail);
-        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
+        buildPreview(currentSearch);
     }
 }
 
@@ -624,12 +648,9 @@ void PanelView::setBannerState(NETRESOURCE bannerState, const QPixmap& banner){
 
     if (setMediaState(bannerState, banner,currentSearch.bannerState, currentSearch.currentBanner)){
         ui->chooseBannerButton->setMedia(banner);
-        if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
+        buildPreview(currentSearch);
     }
 }
-
-#include "src/widgets/jaqetmainwindow.h"
-
 
 
 void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const Scraper *_currentScrape){
@@ -670,33 +691,42 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
 
 }
 
+void PanelView::buildPoster( const CurrentItemData& currentSearch){
+    if (!currentSearch.engine()){
+        return;
+    }
 
-
-
-void PanelView::previewOK(QGraphicsScene* s){
-    ui->graphicsView->setScene(s);
+    ui->graphicsViewPoster->setScene(&currentSearch.engine()->poster(currentSearch));
 }
+
+void PanelView::buildPreview( const CurrentItemData& currentSearch){
+    if (!currentSearch.engine()){
+        return;
+    }
+
+    ui->graphicsView->setScene(&currentSearch.engine()->preview(currentSearch));
+}
+
 
 void PanelView::proceed(){
     currentSearch.engine()->proceed(currentSearch);
 }
 
 void PanelView::rescrap() {
-#if 0
-    SearchScraperDialog fd(this, currentSearch.fd , this->scrapes, &this->manager);
+
+    SearchScraperDialog fd(this, currentSearch, this->scrapes, &this->manager);
     if (fd.exec()==QDialog::Accepted){
         if (!fd.getResult().isNull()){
             if (!fd.getResult().isTV()){
-                fd.getResult().getScraper()->findMovieInfo(&this->manager,fd.getResult().getCode(), Scraper::SearchOption::Poster);
+
+                fd.getResult().getScraper()->findMovieInfo(&this->manager,MediaMovieSearchPtr(new MediaMovieSearch(currentSearch.fileInfo(),currentSearch.mediaInfo(),fd.getResult(),currentSearch.engine())), Scraper::SearchOption::All,fd.getResult().language());
             } else {
-                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,fd.getResult().getCode(),fd.getResult().getSeason(),fd.getResult().getEpisode(),Scraper::SearchOption::Poster);
+                fd.getResult().getScraper()->findEpisodeInfo(&this->manager,MediaTVSearchPtr(new MediaTVSearch(currentSearch.fileInfo(),currentSearch.mediaInfo(),fd.getResult(),currentSearch.engine())), Scraper::SearchOption::All,fd.getResult().language());
             }
         }
     }
-#endif
 
 }
-
 
 void PanelView::backgroundSelected(const MediaChoosed& mediaChoosed){
 
@@ -775,5 +805,5 @@ void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
 
     updateUI();
 
-   if (currentSearch.engine()) currentSearch.engine()->preview(currentSearch);
+   buildPreview(currentSearch);
 }

@@ -6,6 +6,6 @@ Template::Template(QObject *parent) :
 {
 }
 
-void Template::create(const CurrentItemData& data){
-     internalCreate(data);
+QPixmap Template::create(const CurrentItemData& data){
+     return internalCreate(data);
 }

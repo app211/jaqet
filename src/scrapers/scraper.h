@@ -530,10 +530,11 @@ private:
     public:
         CurrentItemDataPrivate()  { }
 
-        CurrentItemDataPrivate(Engine* engine, bool tv, const QFileInfo& fileInfo){
+        CurrentItemDataPrivate(Engine* engine, bool tv, const QFileInfo& fileInfo, const MediaInfo& mediaInfo){
             this->engine=engine;
             this->tv=tv;
             this->fileInfo=fileInfo;
+            this->mediaInfo = mediaInfo;
         }
 
         CurrentItemDataPrivate(const CurrentItemDataPrivate &other)
@@ -575,7 +576,8 @@ private:
               fileInfo(other.fileInfo),
               countries(other.countries),
               tagLine(other.tagLine),
-              certificate(other.certificate)
+              certificate(other.certificate),
+              mediaInfo(other.mediaInfo)
 
         { }
 
@@ -619,7 +621,7 @@ private:
         QStringList countries;
         QString tagLine;
         QString certificate;
-
+        MediaInfo mediaInfo;
     };
 
     QSharedDataPointer<CurrentItemDataPrivate> d;
@@ -631,7 +633,7 @@ public:
     }
 
     CurrentItemData(Engine* engine, bool tv, const MediaInfo& mediaInfo, const QFileInfo& fileInfo)
-        : d(new CurrentItemDataPrivate(engine,tv,fileInfo))
+        : d(new CurrentItemDataPrivate(engine,tv,fileInfo,mediaInfo))
     {
         if (!mediaInfo.isEmpty()){
             setVDurationSecs(mediaInfo.durationSecs());
@@ -683,6 +685,10 @@ public:
 
     QFileInfo fileInfo() const{
         return d->fileInfo;
+    }
+
+    MediaInfo mediaInfo() const{
+        return d->mediaInfo;
     }
 
     ScraperResource _poster;
@@ -805,7 +811,6 @@ public:
 
     void setALanguages(const QStringList& alanguages) { d->alanguages = alanguages; }
     QStringList alanguages() const { return d->alanguages; }
-
 
     void setTLanguages(const QStringList& tlanguages) { d->tlanguages = tlanguages; }
     QStringList tlanguages() const { return d->tlanguages; }

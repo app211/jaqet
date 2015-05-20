@@ -16,7 +16,7 @@ class SearchScraperDialog : public QDialog
 
 public:
     SearchScraperDialog(QWidget *parent, const QFileInfo& f, QList<Scraper *> scrapers, QNetworkAccessManager *manager);
-    SearchScraperDialog(QWidget *parent, const FoundResult& foundResult, QList<Scraper *> scrapers, QNetworkAccessManager *manager);
+    SearchScraperDialog(QWidget *parent, const CurrentItemData &foundResult, QList<Scraper *> scrapers, QNetworkAccessManager *manager);
     ~SearchScraperDialog();
 
     FoundResult getResult() const;

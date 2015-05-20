@@ -31,8 +31,8 @@ public :
     virtual QFileInfo getFileInfo(const QModelIndex &){return QFileInfo();}
     virtual void internalDoubleClicked ( const QModelIndex & index )=0;
 
-     virtual void preview(const QModelIndex & index)=0;
-    virtual void preview(const CurrentItemData& data)=0;
+    virtual QGraphicsScene& preview(const CurrentItemData& data)=0;
+    virtual QGraphicsScene& poster(const CurrentItemData& data)=0;
 
     virtual void proceed(const CurrentItemData& data)=0;
 

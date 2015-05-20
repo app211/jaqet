@@ -17,19 +17,20 @@ public:
     QSize getPosterSize() const;
     QSize getBannerSize() const;
 
-    void preview(const QModelIndex & index);
-    void preview(const CurrentItemData& data);
+    QGraphicsScene& preview(const QModelIndex & index) override;
+    QGraphicsScene& preview(const CurrentItemData& data) override;
+
+    QGraphicsScene& poster(const QModelIndex & index) override ;
+    QGraphicsScene& poster(const CurrentItemData& data) override;
 
     void init(const QString& path);
 protected:
     virtual TypeItem getTypeItem(const QFileInfo &f) const;
 
-private slots:
-    void previewOk(QPixmap result);
-
-
 private:
-    QGraphicsScene result;
+    QGraphicsScene m_previewScene;
+    QGraphicsScene m_posterScene;
+
     TemplateYadis b;
 
 };

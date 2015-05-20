@@ -34,7 +34,7 @@ public:
     TemplateYadis();
     bool loadTemplate(const QString& fileName);
     QSize getSize();
-    void internalCreate(const CurrentItemData &data);
+    QPixmap internalCreate(const CurrentItemData &data);
     void proceed(const CurrentItemData& data);
 
     QSize getBackdropSize() const;
@@ -86,11 +86,6 @@ public:
     int episodeHeight=0;
     QString episodeMask;
     QString episodeFrame;
-
-
-signals :
-    void tivxOk(QPixmap result);
-    void canceled();
 };
 
 #endif // TEMPLATEYADIS_H
