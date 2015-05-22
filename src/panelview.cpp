@@ -202,7 +202,13 @@ void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
 
     FileEngine* fileEngine = static_cast<FileEngine*>(engine);
     ui->graphicsViewBingo->setScene(&fileEngine->preview(index));
-    ui->graphicsViewPosterBingo->setScene(&fileEngine->poster(index));
+
+    QRectF bounds = ui->graphicsViewBingo->scene()->itemsBoundingRect();
+       bounds.setWidth(bounds.width()*0.9);         // to tighten-up margins
+       bounds.setHeight(bounds.height()*0.9);       // same as above
+       ui->graphicsViewBingo->fitInView(bounds, Qt::KeepAspectRatio);
+    //ui->graphicsViewBingo->fitInView();
+    //ui->graphicsViewPosterBingo->setScene(&fileEngine->poster(index));
 
 }
 
@@ -305,7 +311,7 @@ void PanelView::updateUI(){
         ui->doubleSpinBoxRating->setValue(currentSearch.rating());
     }
 
-    buildPreview(currentSearch);
+    (currentSearch);
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -696,7 +702,7 @@ void PanelView::buildPoster( const CurrentItemData& currentSearch){
         return;
     }
 
-    ui->graphicsViewPoster->setScene(&currentSearch.engine()->poster(currentSearch));
+    //ui->graphicsViewPoster->setScene(&currentSearch.engine()->poster(currentSearch));
 }
 
 void PanelView::buildPreview( const CurrentItemData& currentSearch){

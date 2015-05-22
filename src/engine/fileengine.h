@@ -28,7 +28,6 @@ public:
     void internalDoubleClicked ( const QModelIndex & index );
 
     virtual QGraphicsScene& preview(const QModelIndex & index) =0;
-    virtual QGraphicsScene& poster(const QModelIndex & index) =0;
 
 protected:
     void populate();

@@ -52,7 +52,8 @@ SOURCES += src/main.cpp\
     src/mediachooserpopup.cpp \
     src/widgets/checklock.cpp \
     src/third/QLightBoxWidget/src/qlightboxwidget.cpp \
-    src/widgets/jaqetmainwindow.cpp
+    src/widgets/jaqetmainwindow.cpp \
+    src/settingdialog.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -89,7 +90,8 @@ HEADERS  += src/mainwindow.h \
     src/third/QLightBoxWidget/src/qlightboxwidget.h \
     src/widgets/jaqetmainwindow.h \
     src/blocker.h \
-    src/jsonhelper.h
+    src/jsonhelper.h \
+    src/settingdialog.h
 
 
 FORMS    += src/mainwindow.ui \
@@ -97,7 +99,8 @@ FORMS    += src/mainwindow.ui \
     src/chooseitemdialog.ui \
     src/inprogressdialog.ui \
     src/panelview.ui \
-    src/mediachooserpopup.ui
+    src/mediachooserpopup.ui \
+    src/settingdialog.ui
 
 RESOURCES += \
     resources/resources.qrc

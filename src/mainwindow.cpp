@@ -30,15 +30,9 @@
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/thetvdbscraper.h"
 
-
-
-
 #include "engine/tvixengine.h"
 #include "promise.h"
 #include "searchscraperdialog.h"
-
-
-
 
 void MainWindow::doubleClicked ( const QModelIndex & ){
 
@@ -119,7 +113,12 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
 
 
 
+#include "settingdialog.h"
 
+void MainWindow::settings(){
+    SettingDialog d;
+    d.exec();
+}
 
 
 
@@ -143,5 +142,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 

@@ -72,19 +72,31 @@ QGraphicsScene &TVIXEngine::preview(const QModelIndex & index){
     m_previewScene.clear();
 
     if (getTypeItem(f)==TypeItem::PROCEEDED){
+        QGraphicsPixmapItem *preview=nullptr;
 
         QFileInfo imageFileinfo(QDir(f.absoluteFilePath()),"tvix.jpg");
-        QPixmap image;
         if (imageFileinfo.exists()){
+            QPixmap image;
             if (image.load(imageFileinfo.absoluteFilePath())){
-                QGraphicsPixmapItem *p= m_previewScene.addPixmap(image);
+                preview= m_previewScene.addPixmap(image);
+            }
+        }
+
+        QFileInfo posterFileinfo(QDir(f.absoluteFilePath()),"folder.jpg");
+        if (posterFileinfo.exists()){
+            QPixmap poster;
+            if (poster.load(posterFileinfo.absoluteFilePath())){
+                 QGraphicsPixmapItem *poster2=m_previewScene.addPixmap(poster);
+                 if (preview != nullptr){
+                     poster2->setPos(preview->pos()+QPoint(preview->boundingRect().width(),0));
+                 }
             }
         }
     }
 
     return m_previewScene;
 }
-
+/*
 QGraphicsScene& TVIXEngine::poster(const QModelIndex & index)  {
     QFileInfo f=fileInfo(index);
 
@@ -112,7 +124,7 @@ QGraphicsScene& TVIXEngine::poster(const CurrentItemData& data) {
     }
     return m_posterScene;
 }
-
+*/
 void TVIXEngine::proceed(const CurrentItemData& data){
     b.proceed(data);
     populate();

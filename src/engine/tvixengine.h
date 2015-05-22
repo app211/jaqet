@@ -20,9 +20,6 @@ public:
     QGraphicsScene& preview(const QModelIndex & index) override;
     QGraphicsScene& preview(const CurrentItemData& data) override;
 
-    QGraphicsScene& poster(const QModelIndex & index) override ;
-    QGraphicsScene& poster(const CurrentItemData& data) override;
-
     void init(const QString& path);
 protected:
     virtual TypeItem getTypeItem(const QFileInfo &f) const;

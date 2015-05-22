@@ -79,6 +79,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>PushButton</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QListView" name="listView"/>
             </item>
            </layout>
@@ -111,12 +118,28 @@
    <slot>chooseTizzBirdFolder()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>71</y>
+     <x>235</x>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
      <x>454</x>
      <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>settings()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>264</y>
     </hint>
    </hints>
   </connection>
@@ -129,5 +152,6 @@
   <slot>setSynopsis()</slot>
   <slot>savePix()</slot>
   <slot>search()</slot>
+  <slot>settings()</slot>
  </slots>
 </ui>

@@ -35,13 +35,15 @@ private slots:
 
     void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
     void chooseTizzBirdFolder();
+    void settings();
 
     void doubleClicked (const QModelIndex &);
 
     void modelReset();
     void modelAboutToBeReset();
 
- private:
+
+private:
     MyProxyModel* model;
     QAction* allocineAction;
     QAction* tmdbAction;

@@ -148,7 +148,12 @@ void TemplateYadis::proceed(const CurrentItemData& data){
         back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
 
         QPixmap poster=data.getPoster();
+
         if (!poster.isNull()){
+            //
+        //    folder.jpg: celui-là, on le connait, c’est l’image de la jaquette au format portrait (138×186 pixels).
+            poster=poster.scaled(QSize(138,186),Qt::KeepAspectRatio);
+
             poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
         }
 }
