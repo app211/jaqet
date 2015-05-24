@@ -53,7 +53,8 @@ SOURCES += src/main.cpp\
     src/widgets/checklock.cpp \
     src/third/QLightBoxWidget/src/qlightboxwidget.cpp \
     src/widgets/jaqetmainwindow.cpp \
-    src/settingdialog.cpp
+    src/settingdialog.cpp \
+    src/scrapers/fanarttvprovider.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -91,7 +92,8 @@ HEADERS  += src/mainwindow.h \
     src/widgets/jaqetmainwindow.h \
     src/blocker.h \
     src/jsonhelper.h \
-    src/settingdialog.h
+    src/settingdialog.h \
+    src/scrapers/fanarttvprovider.h
 
 
 FORMS    += src/mainwindow.ui \
