@@ -84,7 +84,11 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const CurrentItemData&
 
     init(scrapers);
 
-    ui->lineEditTitle->setText(foundResult.originalTitle());
+    if (!foundResult.originalTitle().isEmpty()){
+        ui->lineEditTitle->setText(foundResult.originalTitle());
+    } else if (!foundResult.title().isEmpty()){
+        ui->lineEditTitle->setText(foundResult.title());
+    }
 
     if (foundResult.isTV()){
         ui->radioTV->setChecked(true);
@@ -94,7 +98,7 @@ SearchScraperDialog::SearchScraperDialog(QWidget *parent, const CurrentItemData&
         ui->radioMovie->setChecked(true);
     }
 
-    if (!foundResult.year()>1900){
+    if (foundResult.year()>1900){
         ui->dateEdit->setDate(QDate(foundResult.year(),1,1));
         ui->checkBoxUseYear->setChecked(true);
      } else {

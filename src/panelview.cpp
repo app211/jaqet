@@ -15,7 +15,8 @@
 #include "scrapers/themoviedbscraper.h"
 #include "scrapers/allocinescraper.h"
 #include "scrapers/thetvdbscraper.h"
-#include "scrapers/defaultscraper.h"
+#include "scrapers/fanarttvprovider.h"
+
 #include "searchscraperdialog.h"
 #include "promise.h"
 #include "scanner/mediainfoscanner.h"
@@ -58,16 +59,16 @@ PanelView::PanelView(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /*Scraper* defaultScraper=new DefaultScraper(this);
+    Scraper* defaultScraper=new FanArtTVProvider(this);
 
-    connect(defaultScraper, SIGNAL(found(const Scraper*, SearchMovieInfo)), this,
-            SLOT(foundMovie(const Scraper*,SearchMovieInfo)));
+    connect(defaultScraper, SIGNAL(found(const Scraper*, MediaMovieSearchPtr)), this,
+            SLOT(foundMovie(const Scraper*,MediaMovieSearchPtr)));
 
-    connect(defaultScraper, SIGNAL(found(const Scraper*, SearchEpisodeInfo)), this,
-            SLOT(foundEpisode(const Scraper*,SearchEpisodeInfo)));
+    connect(defaultScraper, SIGNAL(found(const Scraper*, MediaTVSearchPtr)), this,
+            SLOT(foundEpisode(const Scraper*,MediaTVSearchPtr)));
 
     this->scrapes.append(defaultScraper);
-*/
+
     Scraper* s=new TheMovieDBScraper(this);
     connect(s, SIGNAL(found(const Scraper*, MediaMovieSearchPtr)), this,
             SLOT(foundMovie(const Scraper*,MediaMovieSearchPtr)));
@@ -447,6 +448,7 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
     newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
     newData.setCountries(mediaMovieSearchPtr->countries());
     newData.setRating(mediaMovieSearchPtr->rating());
+    newData.setYear(mediaMovieSearchPtr->productionYear());
 
     if (ui->checkBoxLockBackground->isLock()){
         newData._backdrop=currentSearch._backdrop;

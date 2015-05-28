@@ -842,7 +842,8 @@ public:
         Poster = 2,
         BackDrop = 4,
         Banner = 8,
-        AllMedia = Poster | BackDrop | Banner,
+        Thumbnail = 16,
+        AllMedia = Poster | BackDrop | Banner | Thumbnail,
         All = Information | AllMedia
 
     };

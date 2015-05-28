@@ -3,18 +3,11 @@
 
 #include <QMainWindow>
 
-class QLightBoxWidget;
-
 class JaqetMainWindow : public QMainWindow
 {
     Q_OBJECT
 
     static JaqetMainWindow* instance;
-
-    QLightBoxWidget* lightBox;
-
-    void showLightBox();
-    void hideLightBox();
 
 public:
     explicit JaqetMainWindow(QWidget *parent = 0);

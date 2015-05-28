@@ -18,17 +18,20 @@ const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES=QStringLiteral("images.al
 
 QMap<int,QString> AlloCineScraper::codesToCountries;
 
-static QString CODE(QStringLiteral("code"));
-static QString PROFILE(QStringLiteral("profile"));
-static QString DOLLAR(QStringLiteral("$"));
-static QString HREF(QStringLiteral("href"));
-static QString MOVIE(QStringLiteral("movie"));
-static QString FILTER(QStringLiteral("filter"));
-static QString Q(QStringLiteral("q"));
-static QString TITLE(QStringLiteral("title"));
-static QString TVSERIES(QStringLiteral("tvseries"));
-static QString LARGE(QStringLiteral("large"));
-static QString ORIGINALCHANNEL(QStringLiteral("originalChannel"));
+namespace  {
+
+QString CODE(QStringLiteral("code"));
+QString PROFILE(QStringLiteral("profile"));
+QString DOLLAR(QStringLiteral("$"));
+QString HREF(QStringLiteral("href"));
+QString MOVIE(QStringLiteral("movie"));
+QString FILTER(QStringLiteral("filter"));
+QString Q(QStringLiteral("q"));
+QString TITLE(QStringLiteral("title"));
+QString TVSERIES(QStringLiteral("tvseries"));
+QString LARGE(QStringLiteral("large"));
+QString ORIGINALCHANNEL(QStringLiteral("originalChannel"));
+}
 
 AlloCineScraper::AlloCineScraper(QObject *parent)
     :Scraper(parent), m_icon(loadIcon())
@@ -175,9 +178,11 @@ void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, Me
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
                 QString seasonCode;
+                if (searchFor & SearchOption::Information){
+                    mediaTVSearchPtr->setEpisode(episode);
+                    mediaTVSearchPtr->setSeason(season);
+                }
 
-                mediaTVSearchPtr->setEpisode(episode);
-                mediaTVSearchPtr->setSeason(season);
                 if(extractSeasonCodeFromLargeTVSerieInfo(doc,season,seasonCode,mediaTVSearchPtr) && !seasonCode.isEmpty()){
                     findSeasonInfoByCode(manager, seasonCode, episode,mediaTVSearchPtr);
                 } else {

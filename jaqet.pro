@@ -47,11 +47,9 @@ SOURCES += src/main.cpp\
     src/engine/fileengine.cpp \
     src/engine/fileenginefilesystemwatcher.cpp \
     src/utils.cpp \
-    src/scrapers/defaultscraper.cpp \
     src/mediachooserbutton.cpp \
     src/mediachooserpopup.cpp \
     src/widgets/checklock.cpp \
-    src/third/QLightBoxWidget/src/qlightboxwidget.cpp \
     src/widgets/jaqetmainwindow.cpp \
     src/settingdialog.cpp \
     src/scrapers/fanarttvprovider.cpp
@@ -83,12 +81,10 @@ HEADERS  += src/mainwindow.h \
     src/engine/fileengine.h \
     src/engine/fileenginefilesystemwatcher.h \
     src/utils.h \
-    src/scrapers/defaultscraper.h \
     src/mediachooserbutton.h \
     src/mediachoosermediatype.h \
     src/mediachooserpopup.h \
     src/widgets/checklock.h \
-    src/third/QLightBoxWidget/src/qlightboxwidget.h \
     src/widgets/jaqetmainwindow.h \
     src/blocker.h \
     src/jsonhelper.h \
