@@ -57,6 +57,8 @@ private:
     void setCast(const QStringList& actors);
     void setDirectors(const QStringList& directors);
     void addImages(const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes, QFlags<ImageType> type);
+    void addImages(const Scraper* scraper, const QList<media>& medias,  QFlags<ImageType> type, const QString &language);
+
     void updateFrom(const CurrentItemData& newData);
     void updateUI();
     void buildPreview( const CurrentItemData& currentSearch);

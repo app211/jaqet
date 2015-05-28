@@ -172,6 +172,12 @@ Q_DECLARE_METATYPE(ScraperResource)
 
 class Engine;
 
+struct media {
+    QString href;
+    QSize size;
+    QString language;
+    float rating;
+};
 
 template< typename P>
 class MediaSearch
@@ -202,19 +208,27 @@ public:
 
     QStringList backdropsHref() const { return d->backdropsHref; }
     QList<QSize> backdropsSize() const { return d->backdropsSize; }
-    QStringList postersHref() const { return d->postersHref; }
-    QList<QSize> postersSize() const { return d->postersSize; }
-    QStringList thumbailHref() const { return d->thumbailHref; }
+     QStringList thumbailHref() const { return d->thumbailHref; }
     QList<QSize> thumbailSize() const { return d->thumbailSize; }
+     QList<media> posters() const { return d->posters; }
 
-    void addPoster(const QString& posterPath, const QSize& posterSize=QSize()){
+    void addPoster(const QString& posterPath, const QSize& posterSize=QSize(), const QString language=QString::null, float rating=10.f){
         if (!posterPath.isEmpty()){
-            d->postersHref.append(posterPath);
-            d->postersSize.append(posterSize);
+            if (rating<0. || rating>10.){
+                rating=10.;
+            }
+
+            media m;
+            m.href=posterPath;
+            m.language=language;
+            m.size=posterSize;
+            m.rating=rating;
+
+            d->posters.append(m);
         }
     }
 
-    void addBackdrop(const QString& backdropPath, const QSize& backdropSize=QSize()){
+    void addBackdrop(const QString& backdropPath, const QSize& backdropSize=QSize(), const QString language=QString::null, float rating=10.f){
         if (!backdropPath.isEmpty()){
             d->backdropsHref.append(backdropPath);
             d->backdropsSize.append(backdropSize);
@@ -222,7 +236,7 @@ public:
     }
 
 
-    void addThumbail(const QString& thumbailPath, const QSize& thumbailSize=QSize()){
+    void addThumbail(const QString& thumbailPath, const QSize& thumbailSize=QSize(), const QString language=QString::null, float rating=10.f){
         if (!thumbailPath.isEmpty()){
             d->thumbailHref.append(thumbailPath);
             d->thumbailSize.append(thumbailSize);
@@ -260,8 +274,7 @@ public:
           synopsis(other.synopsis),
           backdropsHref(other.backdropsHref),
           backdropsSize(other.backdropsSize),
-          postersSize(other.postersSize),
-          postersHref(other.postersHref),
+          posters(other.posters),
           thumbailHref(other.thumbailHref),
           thumbailSize(other.thumbailSize),
           linkName(other.linkName),
@@ -289,8 +302,7 @@ public:
     QString synopsis;
     QStringList backdropsHref;
     QList<QSize> backdropsSize;
-    QList<QSize> postersSize;
-    QStringList postersHref;
+    QList<media> posters;
     QStringList thumbailHref;
     QList<QSize> thumbailSize;
     QString linkName;
@@ -386,8 +398,7 @@ public:
           synopsis(other.synopsis),
           backdropsHref(other.backdropsHref),
           backdropsSize(other.backdropsSize),
-          postersSize(other.postersSize),
-          postersHref(other.postersHref),
+          posters(other.posters),
           bannersHref(other.bannersHref),
           bannersSize(other.bannersSize),
           thumbailHref(other.thumbailHref),
@@ -424,8 +435,7 @@ public:
     QString synopsis;
     QStringList backdropsHref;
     QList<QSize> backdropsSize;
-    QList<QSize> postersSize;
-    QStringList postersHref;
+    QList<media> posters;
     QStringList bannersHref;
     QList<QSize> bannersSize;
     QStringList thumbailHref;

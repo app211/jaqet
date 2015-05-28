@@ -33,7 +33,7 @@ public:
 
 
     FlagWidgetItem(const QString &text, QListWidget *view = 0, int type = Type):
-    QListWidgetItem(text,view,type){
+        QListWidgetItem(text,view,type){
 
     }
 
@@ -114,7 +114,7 @@ PanelView::PanelView(QWidget *parent) :
             QRegularExpressionMatch match = flagNamePattern.match(flag);
             if (match.hasMatch()) {
                 FlagWidgetItem* item = new FlagWidgetItem( match.captured(1), ui->countriesListWidget);
-                 item->setIcon(QIcon(QFileInfo(flags,flag).absoluteFilePath()));
+                item->setIcon(QIcon(QFileInfo(flags,flag).absoluteFilePath()));
                 item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
                 item->setCheckState(Qt::Unchecked);
                 item->setData(Qt::UserRole,std::numeric_limits<int>::max());
@@ -205,9 +205,9 @@ void PanelView::setProceeded(Engine* engine, const QModelIndex &index){
     ui->graphicsViewBingo->setScene(&fileEngine->preview(index));
 
     QRectF bounds = ui->graphicsViewBingo->scene()->itemsBoundingRect();
-       bounds.setWidth(bounds.width()*0.9);         // to tighten-up margins
-       bounds.setHeight(bounds.height()*0.9);       // same as above
-       ui->graphicsViewBingo->fitInView(bounds, Qt::KeepAspectRatio);
+    bounds.setWidth(bounds.width()*0.9);         // to tighten-up margins
+    bounds.setHeight(bounds.height()*0.9);       // same as above
+    ui->graphicsViewBingo->fitInView(bounds, Qt::KeepAspectRatio);
     //ui->graphicsViewBingo->fitInView();
     //ui->graphicsViewPosterBingo->setScene(&fileEngine->poster(index));
 
@@ -293,9 +293,9 @@ void PanelView::updateUI(){
 
 
     whileBlocking(ui->countriesListWidget, [&](){
-     for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
+        for (int i = 0; i <  ui->countriesListWidget->count(); i++) {
             QListWidgetItem *item = ui->countriesListWidget->item(i);
-           // qDebug() << item->text();
+            // qDebug() << item->text();
             int index=currentSearch.countries().indexOf(item->text());
             if (index>=0){
                 item->setCheckState(Qt::Checked);
@@ -305,7 +305,7 @@ void PanelView::updateUI(){
                 item->setData(Qt::UserRole, std::numeric_limits<int>::max());
             }
         }
-     });
+    });
 
 
     if (!currentSearch.isTV()){
@@ -327,6 +327,39 @@ void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, co
             }
 
             c->addImageFromScraper(scraper,url,posterSize,type);
+        }
+    }
+}
+
+#include <algorithm>
+
+void PanelView::addImages( const Scraper* scraper, const QList<media>& medias,  QFlags<ImageType> type, const QString& language){
+    QList<media> mediasSorted=medias;
+
+    std::sort(mediasSorted.begin(), mediasSorted.end(), [language](const media&a,const media&b)
+    {
+        if ( a.language.isNull() && b.language.isNull()){
+            return a.rating > b.rating;
+        } else  if ( a.language.isNull() && !b.language.isNull()){
+            return !(b.language==language);
+        } else  if ( !a.language.isNull() && b.language.isNull()){
+            return (a.language==language);
+        } else if (a.language==b.language){
+            return a.rating > b.rating;
+        } else if (a.language==language){
+            return true;
+        } else if (b.language==language){
+            return false;
+        } else {
+            return QString::compare(a.language,b.language)<0;
+        }
+    } );
+
+    for (int i=0; i<mediasSorted.size(); i++){
+
+        QString url= mediasSorted[i].href;
+        if (!url.isEmpty()){
+            c->addImageFromScraper(scraper,url,mediasSorted[i].size,type);
         }
     }
 }
@@ -402,7 +435,8 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
 
     addImages(  scraper,  QStringList() << mediaTVSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
 
-    addImages(  scraper,   mediaTVSearchPtr->postersHref(), mediaTVSearchPtr->postersSize(),ImageType::Poster);
+
+    addImages(  scraper,   mediaTVSearchPtr->posters(),ImageType::Poster,mediaTVSearchPtr->foundResult().language());
 
     addImages(  scraper, mediaTVSearchPtr->backdropsHref(), mediaTVSearchPtr->backdropsSize(), ImageType::Backdrop);
 
@@ -477,9 +511,9 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
 
     c->clear();
 
-    addImages(  scraper,  QStringList() << mediaMovieSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
+    //addImages(  scraper,  QStringList() << mediaMovieSearchPtr->foundResult().getPosterHref(), QList<QSize>(), ImageType::Poster);
 
-    addImages(  scraper,   mediaMovieSearchPtr->postersHref(), mediaMovieSearchPtr->postersSize(),ImageType::Poster);
+    addImages(  scraper,   mediaMovieSearchPtr->posters(), ImageType::Poster,mediaMovieSearchPtr->foundResult().language());
 
     addImages(  scraper, mediaMovieSearchPtr->backdropsHref(), mediaMovieSearchPtr->backdropsSize(), ImageType::Backdrop);
 
@@ -691,7 +725,7 @@ void PanelView::setBackdrop(const QString& url, const QSize& originalSize,const 
             }
 
             JaqetMainWindow::getInstance()->hideWaitDialog();
-      });
+        });
 
     } else {
         setBackdropState(NETRESOURCE::NONE);
@@ -813,5 +847,5 @@ void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
 
     updateUI();
 
-   buildPreview(currentSearch);
+    buildPreview(currentSearch);
 }

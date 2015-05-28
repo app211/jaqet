@@ -453,6 +453,7 @@ void TheMovieDBScraper::findMovieInfoGetImage(QNetworkAccessManager* manager, co
             if (promise->replyError() ==QNetworkReply::NoError){
                 QJsonParseError e;
                 QByteArray data=promise->replyData();
+                qDebug() << data;
                 QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
                 if (e.error== QJsonParseError::NoError){
                     if(parseImageInfo(doc,searchFor,mediaMovieSearchPtr)){
@@ -603,6 +604,23 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const Sea
     return true;
 }
 
+bool extractImageInfo(const QJsonObject& imageObject, QString& href, QString& iso_639_1, QSize& size, float& rating){
+    href=imageObject["file_path"].toString();
+    if (!imageObject["iso_639_1"].isNull()){
+        iso_639_1=imageObject["iso_639_1"].toString();
+    } else {
+        iso_639_1=QString::null;
+    }
+    size=QSize(imageObject["width"].toInt(), imageObject["height"].toInt());
+
+    rating=-1.;
+    if (imageObject["vote_count"].isDouble() && imageObject["vote_count"].toDouble()>0 && imageObject["vote_average"].isDouble()){
+        rating=imageObject["vote_average"].toDouble();
+    }
+
+
+}
+
 bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const{
 
     if (!resultset.isObject()){
@@ -619,9 +637,10 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const Sea
 
             foreach (const QJsonValue & value, backdropsArray)
             {
-                QJsonObject backdropObject = value.toObject();
+                QString href; QString iso_639_1; QSize size; float rating;
+                extractImageInfo(value.toObject(),  href,  iso_639_1,  size,  rating);
 
-                mediaMovieSearchPtr->addBackdrop( backdropObject["file_path"].toString());
+                mediaMovieSearchPtr->addBackdrop(href,size,iso_639_1,rating);
             }
         }
     }
@@ -634,9 +653,9 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const Sea
 
             foreach (const QJsonValue & value, postersArray)
             {
-                QJsonObject posterObject = value.toObject();
-
-                mediaMovieSearchPtr->addPoster( posterObject["file_path"].toString());
+                QString href; QString iso_639_1; QSize size; float rating;
+                extractImageInfo(value.toObject(),  href,  iso_639_1,  size,  rating);
+                mediaMovieSearchPtr->addPoster( href,size,iso_639_1,rating);
             }
         }
     }
