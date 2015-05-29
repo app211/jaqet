@@ -52,7 +52,8 @@ SOURCES += src/main.cpp\
     src/widgets/checklock.cpp \
     src/widgets/jaqetmainwindow.cpp \
     src/settingdialog.cpp \
-    src/scrapers/fanarttvprovider.cpp
+    src/scrapers/fanarttvprovider.cpp \
+    src/jaquetapplication.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -89,7 +90,8 @@ HEADERS  += src/mainwindow.h \
     src/blocker.h \
     src/jsonhelper.h \
     src/settingdialog.h \
-    src/scrapers/fanarttvprovider.h
+    src/scrapers/fanarttvprovider.h \
+    src/jaquetapplication.h
 
 
 FORMS    += src/mainwindow.ui \
