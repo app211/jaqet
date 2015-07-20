@@ -104,6 +104,8 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
 
         int width = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Width"))).trimmed().toInt();
         int height = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Height"))).trimmed().toInt();
+
+     //   qDebug() <<
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoResolution, QSize(width, height));
 
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoFrameRate, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("FrameRate"))).trimmed().toUInt());

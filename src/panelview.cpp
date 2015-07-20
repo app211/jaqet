@@ -312,7 +312,20 @@ void PanelView::updateUI(){
         ui->doubleSpinBoxRating->setValue(currentSearch.rating());
     }
 
-    (currentSearch);
+    switch(currentSearch.vresolution().width()){
+        case 1920:{
+            // 1080
+        }; break;
+
+        case 1280:{
+        // 720
+        }
+    }
+        //
+    }
+    qDebug()<< "°°°°" << currentSearch.vresolution();
+
+   // (currentSearch);
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
