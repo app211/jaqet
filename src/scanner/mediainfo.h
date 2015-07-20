@@ -358,7 +358,9 @@ public:
         /** QString */
         VideoEncodedLibrary,
 
-        VideoAspectRatioString
+        VideoAspectRatioString,
+
+        VideoScanType
     };
 
     int videoStreamCount() const;

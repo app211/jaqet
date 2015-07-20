@@ -93,14 +93,7 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
 
          _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoAspectRatioString,QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio/String"))).trimmed());
 
-         qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio")));
-                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio/String")));
-
-    //    QString aspectRatio=
-
-                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("PixelAspectRatio_Original")));
-                     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("PixelAspectRatio_Original/String")));
-                     qDebug() << "%%%%" << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("ScanType/String")));
+         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoScanType, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("ScanType"))).trimmed());
 
         int width = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Width"))).trimmed().toInt();
         int height = QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Height"))).trimmed().toInt();

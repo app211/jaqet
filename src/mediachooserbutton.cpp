@@ -3,6 +3,8 @@
 #include <QStylePainter>
 #include <QStyleOptionButton>
 #include <QDebug>
+#include <QApplication>
+#include <QDesktopWidget>
 
 #include "mediachooserpopup.h"
 
@@ -145,22 +147,64 @@ void MediaChooserButton::popupClosed(){
 }
 
 void MediaChooserButton::showPopup(){
+
     QLoggingCategory fcIo("ui.mediaChooser");
+
     qCDebug(fcIo) << "showPopup";
 
     if (_popup && !_popup->isVisible()){
 
-        QPoint p2=mapToGlobal(QPoint(0,0));
+        QRect screenRect = QApplication::desktop()->screenGeometry();
+
+        QPoint buttonPosition=mapToGlobal(QPoint(0,0));
+
         QSize menuSize = _popup->size();
-        if (p2.y()-menuSize.height() > 0){
-            _popup->move(QPoint(p2.x(),p2.y()-menuSize.height()));
+
+        int x=buttonPosition.x();
+
+        if (x+menuSize.width() > screenRect.right()){
+
+            x=screenRect.right()-menuSize.width();
+
         }
 
-        _popup->popup(this,m_popupFilter);
-        setDown(true);
-    }
-}
+        qDebug() << screenRect;
 
+        qDebug() << frameGeometry();
+
+        qDebug() << buttonPosition;
+
+        qDebug() << menuSize;
+
+        int y=buttonPosition.y()+frameGeometry().height();
+
+        qDebug() << y;
+
+        if (y+menuSize.height() > screenRect.bottom()){
+
+            // no enough space under
+
+            y=buttonPosition.y()-menuSize.height();
+
+            if (y < screenRect.top()){
+
+                 //no enough space below
+
+                //...
+
+             }
+
+        }
+
+        _popup->move(QPoint(x,y));
+
+        _popup->popup(this,m_popupFilter);
+
+        setDown(true);
+
+    }
+
+}
 void MediaChooserButton::mediaSelected(const MediaChoosed &mediaChoosed){
     Q_ASSERT(sender()==_popup);
 
