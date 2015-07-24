@@ -273,8 +273,8 @@ void MediaChooserPopup::addImage(const QUrl& url, const MediaChoosed& mediaChoos
 
     int x=0;
     int y=0;
-    int h=ui->graphicsView->minimumHeight(); // = maximun h
-    int w=h; // scare
+     int h=200;
+     int w=200;
 
     QList<QGraphicsItem*> groupItems;
 
@@ -297,7 +297,7 @@ void MediaChooserPopup::addImage(const QUrl& url, const MediaChoosed& mediaChoos
 
     ClickQGraphicsPixmapItem *pbutton= new ClickQGraphicsPixmapItem(QPointer<MediaChooserPopup>(this), mediaChoosed, QPixmap(":/resources/images/bingo16x16.png"));
     scene->addItem(pbutton);
-    pbutton->setPos(x+2,h-20);
+    pbutton->setPos(x,h);
     groupItems.append(pbutton);
 
     QGraphicsItemGroup * cliGroup = scene->createItemGroup(groupItems);
@@ -379,6 +379,7 @@ void MediaChooserPopup::doFilter( QFlags<ImageType> filter){
     _currentFilter=filter;
 
     int x=0;
+    int w=0;
     foreach (QGraphicsItem *item, ui->graphicsView->scene()->items(Qt::AscendingOrder))
     {
         if (item->type()==MediaChooserGraphicsObject::Type){
@@ -391,24 +392,22 @@ void MediaChooserPopup::doFilter( QFlags<ImageType> filter){
                     m->group()->setX(x);
 
                     x+=210;
+                    w+=210;
                 } else {
-                    m->group()->setVisible(false);
+                    m->group()->setVisible(false);                
                     m->group()->setX(0); // for itemsBoundingRect
-
                 }
             }
         }
     }
 
 
-    ui->graphicsView->setSceneRect(ui->graphicsView->scene()->itemsBoundingRect());
-
-    //ui->graphicsView->fitInView(ui->graphicsView->scene()->sceneRect(), Qt::KeepAspectRatio);
-
     whileBlocking(ui->checkBoxThumbail)->setChecked(filter & ImageType::Thumbnail);
     whileBlocking(ui->checkBoxBackdrop)->setChecked(filter & ImageType::Backdrop);
     whileBlocking(ui->checkBoxBanner)->setChecked(filter & ImageType::Banner);
     whileBlocking(ui->checkBoxPoster)->setChecked(filter & ImageType::Poster);
+
+    ui->graphicsView->setSceneRect(ui->graphicsView->scene()->itemsBoundingRect());
 }
 
 QFlags<ImageType> MediaChooserPopup::currentFilter(){
@@ -431,9 +430,8 @@ void MediaChooserPopup::popup(MediaChooserButton *button, QFlags<ImageType> filt
 void MediaChooserPopup::clear(){
     urls.clear();
 
-    if (ui->graphicsView->scene()){
         ui->graphicsView->scene()->clear();
-    }
+
 
 
 }

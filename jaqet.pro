@@ -113,4 +113,5 @@ TRANSLATIONS = jaqet_fr.ts
 DEFINES += LOGRULES=\\\"ui.*.debug=true\\\"
 
 DISTFILES += \
-    jaqet_fr.ts
+    jaqet_fr.ts \
+    src/scrapers/lll
