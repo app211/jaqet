@@ -31,7 +31,14 @@ bool TemplateYadis::execPoster(const QDomElement& e, const CurrentItemData &data
             poster_standard_height=size.attribute("height");
             poster_standard_border=size.attribute("border");
         }
-        
+
+        QDomElement inner=standard.firstChildElement("inner");
+        if (!inner.isNull()){
+            poster_inner=QRect(inner.attribute("x").toInt(),inner.attribute("y").toInt(),inner.attribute("width").toInt(),inner.attribute("height").toInt());
+        } else {
+            poster_inner=QRect();
+        }
+
         QDomElement mask=standard.firstChildElement("mask");
         if (!mask.isNull()){
             poster_standard_mask=mask.text();
@@ -76,13 +83,15 @@ QSize TemplateYadis::getSize(){
     return QSize(w,h);
 }
 
-QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame  ){
+QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSize, int standard_width, int standard_height, int standard_border, const QString& poster_standard_mask, const QString& poster_standard_frame, const QRect& poster_inner  ){
 
     QSize standardSize(standard_width,standard_height);
 
     QSize size= standardSize.isNull()?desiredSize:standardSize;
 
-    QPixmap scaledPoster = poster.scaled(size,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    QSize posterSize = poster_inner.isNull() ? size : poster_inner.size();
+
+    QPixmap scaledPoster = poster.scaled(posterSize,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
     QPixmap result(size);
     result.fill(Qt::transparent);
@@ -94,10 +103,14 @@ QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSi
             return QPixmap();
         }
 
-        scaledPoster.setMask(mask.scaled(size,Qt::IgnoreAspectRatio,Qt::SmoothTransformation).mask());
+        scaledPoster.setMask(mask.scaled(posterSize,Qt::IgnoreAspectRatio,Qt::SmoothTransformation).mask());
     }
 
-    pixPaint.drawPixmap(0,0,size.width(),size.height(),scaledPoster);
+    if (!poster_inner.isNull()){
+        pixPaint.drawPixmap(poster_inner.x(),poster_inner.y(),poster_inner.width(),poster_inner.height(),scaledPoster);
+    } else {
+        pixPaint.drawPixmap(0,0,size.width(),size.height(),scaledPoster);
+    }
 
     if (!poster_standard_frame.isEmpty()){
         QPixmap frame;
@@ -111,51 +124,48 @@ QPixmap TemplateYadis::buildPoster(const QPixmap& poster, const QSize& desiredSi
     return result;
 }
 
-
-
-
 void TemplateYadis::proceed(const CurrentItemData& data){
-       QFileInfo f= data.fileInfo();
-        if (!f.exists()){
-            return;
-        }
+    QFileInfo f= data.fileInfo();
+    if (!f.exists()){
+        return;
+    }
 
-       QString title=data.title();
-       if (data.isTV()){
-         title= QString("%1.s%2e%3").arg(data.title()).arg(data.season(),2, 10, QChar('0')).arg(data.episode(),2, 10, QChar('0'));
-       }
-        QString suffixe="";
-        int counter=0;
-        while (QFileInfo(f.absoluteDir(),title+suffixe).exists()){
-            suffixe=QString::number(counter++);
-        }
+    QString title=data.title();
+    if (data.isTV()){
+        title= QString("%1.s%2e%3").arg(data.title()).arg(data.season(),2, 10, QChar('0')).arg(data.episode(),2, 10, QChar('0'));
+    }
+    QString suffixe="";
+    int counter=0;
+    while (QFileInfo(f.absoluteDir(),title+suffixe).exists()){
+        suffixe=QString::number(counter++);
+    }
 
-        QDir d;
+    QDir d;
 
-        if (!d.mkpath( QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath())){
-            return;
-        }
+    if (!d.mkpath( QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath())){
+        return;
+    }
 
-        d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
+    d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
 
-        QFile file(f.absoluteFilePath());
-        if (!file.rename(QFileInfo(d,f.completeBaseName()).absoluteFilePath())){
-            return;
-        }
+    QFile file(f.absoluteFilePath());
+    if (!file.rename(QFileInfo(d,f.completeBaseName()).absoluteFilePath())){
+        return;
+    }
 
 
-        QPixmap back=createBackdrop(data);
-        back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
+    QPixmap back=createBackdrop(data);
+    back.save(QFileInfo(d,"tvix.jpg").absoluteFilePath());
 
-        QPixmap poster=data.getPoster();
+    QPixmap poster=data.getPoster();
 
-        if (!poster.isNull()){
-            //
+    if (!poster.isNull()){
+        //
         //    folder.jpg: celui-là, on le connait, c’est l’image de la jaquette au format portrait (138×186 pixels).
-            poster=poster.scaled(QSize(138,186),Qt::KeepAspectRatio);
+        poster=poster.scaled(QSize(138,186),Qt::KeepAspectRatio);
 
-            poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
-        }
+        poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
+    }
 }
 
 QPixmap TemplateYadis::internalCreate(const CurrentItemData& data){
@@ -349,7 +359,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
             }
         } else if (context==Context::tv_synopsis_common) {
             if (data.showRating()>0. && data.showRating()<=10.){
-                 textToDraw=QString::number(data.showRating(),'f',1);
+                textToDraw=QString::number(data.showRating(),'f',1);
             }
         }
 
@@ -372,7 +382,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
             textToDraw = QString::number(data.episode())+separator+textToDraw;
         }
     }  else if (type==QStringLiteral("originaltitle")) {
-           textToDraw=data.originalTitle();
+        textToDraw=data.originalTitle();
 
     } else if (type=="resolution"){
         if (!data.vresolution().isEmpty()){
@@ -482,7 +492,8 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
     } else if (type=="poster"){
         QPixmap poster=data.getPoster();
         if (!poster.isNull()){
-            QPixmap scaled= buildPoster(poster,QSize(w,h),  poster_standard_width.toInt(), poster_standard_height.toInt(), poster_standard_border.toInt(), poster_standard_mask,  poster_standard_frame  );
+            QPixmap scaled1= buildPoster(poster,QSize(w,h),  poster_standard_width.toInt(), poster_standard_height.toInt(), poster_standard_border.toInt(), poster_standard_mask,  poster_standard_frame , poster_inner );
+            QPixmap scaled=scaled1.scaled(QSize(w,h),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
             qDebug() << QSize(w,h) << scaled.size();
             int _x= x+ (w-scaled.width())/2;
             int _y= y+ (h-scaled.height())/2;
@@ -494,7 +505,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
     }else if (type=="thumbnail"){
         QPixmap thumbnail=data.getThumbail();
         if (!thumbnail.isNull()){
-            QPixmap scaled= buildPoster(thumbnail,QSize(w,h),  episodeWidth, episodeHeight, 0, episodeMask,  episodeFrame  );
+            QPixmap scaled= buildPoster(thumbnail,QSize(w,h),  episodeWidth, episodeHeight, 0, episodeMask,  episodeFrame,  QRect() );
             int _x= x+ (w-scaled.width())/2;
             int _y= y+ (h-scaled.height())/2;
             int _w= scaled.width();
@@ -505,7 +516,7 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
     } else if (type=="banner"){
         QPixmap banner=data.getBanner();
         if (!banner.isNull()){
-            QPixmap scaled= buildPoster(banner,QSize(w,h),  bannerWidth, bannerHeight, bannerBorder, bannerMask,  bannerFrame  );
+            QPixmap scaled= buildPoster(banner,QSize(w,h),  bannerWidth, bannerHeight, bannerBorder, bannerMask,  bannerFrame , QRect() );
             int _x= x+ (w-scaled.width())/2;
             int _y= y+ (h-scaled.height())/2;
             int _w= scaled.width();

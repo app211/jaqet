@@ -53,6 +53,16 @@ public:
 
 };
 
+namespace {
+QString R480I(QStringLiteral("480i"));
+QString R480P(QStringLiteral("480p"));
+QString R576I(QStringLiteral("576i"));
+QString R576P(QStringLiteral("576p"));
+QString R720P(QStringLiteral("720p"));
+QString R1080I(QStringLiteral("1080i"));
+QString R1080P(QStringLiteral("1080p"));
+}
+
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelView)
@@ -125,13 +135,14 @@ PanelView::PanelView(QWidget *parent) :
     ui->countriesListWidget->setSortingEnabled(true);
 
     ui->comboResolution->addItems({
-                                      QStringLiteral("480i") ,
-                                      QStringLiteral("480p"),
-                                      QStringLiteral("576i"),
-                                      QStringLiteral("576p"),
-                                      QStringLiteral("720p"),
-                                      QStringLiteral("1080i"),
-                                      QStringLiteral("1080p")
+                                      R480I,
+                                      R480P,
+                                      R576I,
+                                      R576P,
+                                      R720P,
+                                      R1080I,
+                                      R1080P
+
                                   });
     /*     QCompleter* resolutionCompleter= new QCompleter(l,this);
          resolutionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -312,7 +323,19 @@ void PanelView::updateUI(){
         ui->doubleSpinBoxRating->setValue(currentSearch.rating());
     }
 
-    (currentSearch);
+    bool progressive=QString::compare(currentSearch.vscantype(),"Progressive",Qt::CaseInsensitive)==0;
+
+    switch(currentSearch.vresolution().width()){
+    case 1920:
+        // 1080
+        ui->comboResolution->setCurrentIndex(ui->comboResolution->findText(progressive?R1080P:R1080I));
+        break;
+
+    case 1280:
+        // 720
+        ui->comboResolution->setCurrentIndex(ui->comboResolution->findText(R720P));
+        break;
+    }
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){

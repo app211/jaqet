@@ -32,7 +32,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageProceed">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -156,7 +156,7 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>0</y>
+                <y>-311</y>
                 <width>917</width>
                 <height>691</height>
                </rect>

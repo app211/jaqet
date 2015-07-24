@@ -576,6 +576,7 @@ private:
               vresolution(other.vresolution),
               vaspect(other.vaspect),
               vdurationSecs(other.vdurationSecs),
+              vscantype(other.vscantype),
               achannelsCount(other.achannelsCount) ,
               acodec(other.acodec),
               format(other.format),
@@ -618,6 +619,7 @@ private:
         QString format;
         QSize vresolution;
         QString vaspect;
+        QString vscantype;
         int vdurationSecs=0;
         int achannelsCount=-1;
         QStringList alanguages;
@@ -652,6 +654,7 @@ public:
                 setVCodec(mediaInfo.videoStreamValue(0, MediaInfo::VideoCodec).toString().trimmed());
                 setVResolution(mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize());
                 setVAspect(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString().trimmed());
+                setVScanType(mediaInfo.videoStreamValue(0, MediaInfo::VideoScanType).toString().trimmed());
             }
 
             if (mediaInfo.audioStreamCount()>0){
@@ -758,6 +761,9 @@ public:
 
     void setVAspect(const QString& vaspect) { d->vaspect = vaspect; }
     QString vaspect() const { return d->vaspect; }
+
+    void setVScanType(const QString& vscantype) { d->vscantype = vscantype; }
+    QString vscantype() const { return d->vscantype; }
 
     void setRuntimeInSec( int runtimeInSec) { d->runtimeInSec=runtimeInSec; }
     int runtimeInSec() const { return d->runtimeInSec;}
