@@ -63,6 +63,25 @@ QString R1080I(QStringLiteral("1080i"));
 QString R1080P(QStringLiteral("1080p"));
 }
 
+/*
+ *
+ * 1.0 2.0 2.1 5.0 5.1 6.1 7.1
+
+AAC AC3 AC3 DTS DTS-HD DTS-HD HRA DTS-HD MA FLAC MP3 PCM True HD Vorbis WMA
+
+3IVX AVC H.264 MPEG-1 MPEG-2 MPEG-4 Ogg QuickTime RealVideo VC-1 WMV XviD
+
+480i 480p 576i 576p 720p 1080i 1080p
+
+AVI BDAV MP4 MPEG-PS MPEG-TS
+
+4:3 16:9 1.25:1 1.33:1 1.66:1 1.78:1 1.85:1 2.20:1 2.35:1
+
+2.39:1 2.40:1 2.55:1 2.76:1
+
+23.976 24 25 29.97 30 50 59.94 60
+*/
+
 PanelView::PanelView(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelView)
