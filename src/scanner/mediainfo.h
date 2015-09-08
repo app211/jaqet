@@ -153,6 +153,9 @@ public:
     QString encodedApplication() const;
     void setEncodedApplication(const QString & encodedApplication);
 
+    QString format() const;
+    void setFormat(const QString & format);
+
     /**
      * MetaData.
      *
@@ -284,6 +287,10 @@ public:
     void setExtendedMetaData(const QString & key, const QVariant & value);
     QVariant extendedMetaData(const QString & key) const;
 
+
+    QString firstVideoCodec() const;
+    void setFirstVideoCodec(const QString& videoCodec);
+
     //Audio
     enum AudioStream {
         /**
@@ -360,7 +367,9 @@ public:
 
         VideoAspectRatioString,
 
-        VideoScanType
+        VideoScanType,
+
+        VideoDisplayAspectRatioString
     };
 
     int videoStreamCount() const;
@@ -444,6 +453,9 @@ private:
 
     /** Extended metadata. */
     QHash<QString, QVariant> _extendedMetaData;
+
+    QString _format;
+    QString _firstVideoCodec;
 };
 
 Q_DECLARE_METATYPE(MediaInfo);

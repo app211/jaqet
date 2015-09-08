@@ -70,6 +70,7 @@ public :
 
 protected:
     bool sceneEvent(QEvent *event){
+        Q_UNUSED(event);
         return false ; //m_p->sceneEvent(event);
     }
 
@@ -116,7 +117,7 @@ protected:
         }
     }
 
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e){}
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *){}
 };
 
 

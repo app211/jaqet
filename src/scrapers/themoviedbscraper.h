@@ -7,7 +7,6 @@ class TheMovieDBScraper: public Scraper
 {
     Q_OBJECT
 
-    static const QString API_KEY;
     QIcon m_icon;
 
     FilmPrtList parseResultset(const QJsonDocument& ) const;

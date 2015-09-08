@@ -360,6 +360,13 @@ QString FanArtTVProvider::getBestImageUrl(const QString& url, const QSize& origi
     Q_UNUSED(mode);
     Q_UNUSED(imageType);
 
+    qDebug() << url;
+    qDebug() << url;
+    qDebug() << url;
+    qDebug() << url;
+    qDebug() << url;
+    qDebug() << url;
+
     return url;
 }
 

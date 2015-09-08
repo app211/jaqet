@@ -40,10 +40,12 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
     _mediaInfo.setDurationMSecs(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("Duration"))).toULongLong());
     _mediaInfo.setBitrate(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("OverallBitRate"))).toInt() / 1000);
     _mediaInfo.setEncodedApplication(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0,__T("Encoded_Application"))));
+    _mediaInfo.setFormat(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format"))));
 
      _mediaInfo.setMetaData(MediaInfo::Format, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format"))));
     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format/Family")));
     qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format/Extensions")));
+    qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_General, 0, __T("Format")));
 
 
 
@@ -88,7 +90,12 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
 
     //Video
     int videoStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Video);
+    if (videoStreamCount > 0){
+       _mediaInfo.setFirstVideoCodec(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, 0,__T("Codec/String"))));
+    }
+
     for (int videoStreamId = 0; videoStreamId < videoStreamCount; videoStreamId++) {
+
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoBitrate, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("BitRate"))).trimmed().toUInt() / 1000);
 
          _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoAspectRatioString,QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("AspectRatio/String"))).trimmed());
@@ -103,17 +110,39 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoFormat, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Format"))).trimmed());
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoCodec, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Codec/String"))).trimmed());
         _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoEncodedLibrary, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Encoded_Library/String"))).trimmed());
+        _mediaInfo.insertVideoStream(videoStreamId, MediaInfo::VideoDisplayAspectRatioString, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("DisplayAspectRatio/String"))).trimmed());
+
 
         qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Codec/String")));
-        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Format"))).trimmed();
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("FrameRate/String"))).trimmed();
 
-        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Width/String")));
-        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Height/String")));
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Format")));
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("Format/String")));
+
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("DisplayAspectRatio/String")));
+        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Video, videoStreamId,__T("DisplayAspectRatio")));
 
     }
 
 
 
+
+    /*
+     *
+     * 1.0 2.0 2.1 5.0 5.1 6.1 7.1
+
+    AAC AC3 AC3+ DTS DTS-HD 'DTS-HD HRA' 'DTS-HD MA' FLAC MP3 PCM TrueHD Vorbis WMA
+
+    Codec : 3IVX AVC H.264 MPEG-1 MPEG-2 MPEG-4 Ogg QuickTime RealVideo VC-1 WMV XviD
+
+    480i 480p 576i 576p 720p 1080i 1080p
+
+    Format : AVI Blu-ray BDAV DVD Matroska MP4 MPEG-PS MPEG-TS Org QuickTime WindowMedia
+
+    4:3 16:9 1.25:1 1.33:1 1.66:1 1.78:1 1.85:1 2.20:1 2.35:1 2.39:1 2.40:1 2.55:1 2.76:1
+
+    23.976 24 25 29.97 30 50 59.94 60
+    */
 
     //Text
     int textStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Text);

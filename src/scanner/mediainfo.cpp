@@ -138,10 +138,8 @@ void MediaInfo::setFileSize(qint64 bytes) {
 QString MediaInfo::durationFormatted() const {
     if (_duration > 0) {
         //return TkTime::convertMilliseconds(_duration);
-    } else {
-        return QString();
-    }
-}
+    }   return QString();
+  }
 
 qint64 MediaInfo::durationSecs() const {
     if (_duration == -1) {
@@ -257,6 +255,22 @@ void MediaInfo::setExtendedMetaData(const QString & key, const QVariant & value)
     _extendedMetaData.insert(key, value);
 }
 
+void MediaInfo::setFormat(const QString & format) {
+   _format = format.trimmed();
+}
+
+QString MediaInfo::format() const {
+    return _format;
+}
+
+QString MediaInfo::firstVideoCodec() const{
+    return _firstVideoCodec;
+}
+void MediaInfo::setFirstVideoCodec(const QString& videoCodec){
+    _firstVideoCodec=videoCodec;
+}
+
+
 QVariant MediaInfo::extendedMetaData(const QString & key) const {
     return _extendedMetaData.value(key);
 }
@@ -350,3 +364,5 @@ QVariant MediaInfo::networkStreamValue(NetworkStream networkStream) const {
 void MediaInfo::insertNetworkStream(NetworkStream networkStream, const QVariant & value) {
     _networkStreamHash.insert(networkStream, value);
 }
+
+

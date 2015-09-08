@@ -36,7 +36,6 @@ Scraper::Scraper(QObject *parent)
 }
 
 
-
 #include "jaqetmainwindow.h"
 
 void Scraper::searchFilm( QNetworkAccessManager* manager, const QString& toSearch, int year, const QString& language) const {

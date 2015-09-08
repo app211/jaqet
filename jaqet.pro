@@ -3,6 +3,7 @@ TARGET = jaqet
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS_WARN_ON += -Wno-reorder
 
 DEFINES += QUAZIP_STATIC
 
@@ -30,7 +31,6 @@ SOURCES += src/main.cpp\
     src/scrapers/scraper.cpp \
     src/scrapers/themoviedbscraper.cpp \
     src/scrapers/thetvdbscraper.cpp \
-    src/scrapers/cncclassificationwrapper.cpp \
     src/promise.cpp \
     src/searchscraperdialog.cpp \
     src/scanner/filenamescanner.cpp \
@@ -60,12 +60,7 @@ HEADERS  += src/mainwindow.h \
     src/scrapers/allocinescraper.h \
     src/scrapers/themoviedbscraper.h \
     src/scrapers/scraper.h \
-    src/scrapers/allocinescraper.h \
-    src/scrapers/scraper.h \
-    src/scrapers/themoviedbscraper.h \
-    src/template/templateyadis.h \
     src/scrapers/thetvdbscraper.h \
-    src/scrapers/cncclassificationwrapper.h \
     src/promise.h \
     src/searchscraperdialog.h \
     src/scanner/filenamescanner.h \

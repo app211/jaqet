@@ -116,6 +116,7 @@ struct FoundResult {
         return m_language;
     }
 
+
     Scraper *scraper;
     int season;
     int episode;
@@ -229,6 +230,9 @@ public:
     }
 
     void addBackdrop(const QString& backdropPath, const QSize& backdropSize=QSize(), const QString language=QString::null, float rating=10.f){
+        Q_UNUSED(language)
+        Q_UNUSED(rating)
+
         if (!backdropPath.isEmpty()){
             d->backdropsHref.append(backdropPath);
             d->backdropsSize.append(backdropSize);
@@ -237,6 +241,9 @@ public:
 
 
     void addThumbail(const QString& thumbailPath, const QSize& thumbailSize=QSize(), const QString language=QString::null, float rating=10.f){
+        Q_UNUSED(language)
+        Q_UNUSED(rating)
+
         if (!thumbailPath.isEmpty()){
             d->thumbailHref.append(thumbailPath);
             d->thumbailSize.append(thumbailSize);
@@ -575,6 +582,7 @@ private:
               vcodec(other.vcodec),
               vresolution(other.vresolution),
               vaspect(other.vaspect),
+              vdisplayaspect(other.vdisplayaspect),
               vdurationSecs(other.vdurationSecs),
               vscantype(other.vscantype),
               achannelsCount(other.achannelsCount) ,
@@ -619,6 +627,7 @@ private:
         QString format;
         QSize vresolution;
         QString vaspect;
+        QString vdisplayaspect;
         QString vscantype;
         int vdurationSecs=0;
         int achannelsCount=-1;
@@ -655,6 +664,7 @@ public:
                 setVResolution(mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize());
                 setVAspect(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString().trimmed());
                 setVScanType(mediaInfo.videoStreamValue(0, MediaInfo::VideoScanType).toString().trimmed());
+                setVDisplayAspect(mediaInfo.videoStreamValue(0, MediaInfo::VideoDisplayAspectRatioString).toString().trimmed());
             }
 
             if (mediaInfo.audioStreamCount()>0){
@@ -761,6 +771,9 @@ public:
 
     void setVAspect(const QString& vaspect) { d->vaspect = vaspect; }
     QString vaspect() const { return d->vaspect; }
+
+    void setVDisplayAspect(const QString& vdisplayaspect) { d->vdisplayaspect = vdisplayaspect; }
+    QString vdisplayaspect() const { return d->vdisplayaspect; }
 
     void setVScanType(const QString& vscantype) { d->vscantype = vscantype; }
     QString vscantype() const { return d->vscantype; }

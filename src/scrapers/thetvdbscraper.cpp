@@ -22,7 +22,9 @@ static QList<QString> m_bannermirrors;
 static QList<QString> m_zipmirrors;
 static bool retrieveMirror = true;
 
-const QString TheTVDBScraper::API_KEY="C526A71D6E158EF0";
+namespace  {
+    const QString API_KEY(QStringLiteral("C526A71D6E158EF0"));
+}
 
 TheTVDBScraper::TheTVDBScraper(QObject *parent)
     : Scraper(parent), m_icon(loadIcon())
@@ -122,6 +124,9 @@ QString TheTVDBScraper::createURL(const QString& command, const QMap<QString, QS
 
 void TheTVDBScraper::parseSeriesList( QNetworkAccessManager* manager, const QString& toSearch, const QByteArray& data, const QString& langage)
 {
+    Q_UNUSED(manager)
+    Q_UNUSED(toSearch)
+    Q_UNUSED(langage)
 
     QMap<QString,QList<QPair<QString,ShowPtr>>> series;
 
@@ -618,6 +623,11 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, Med
 
 
 void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const {
+    Q_UNUSED(manager);
+    Q_UNUSED(toSearch);
+    Q_UNUSED(language);
+    Q_UNUSED(year);
+
     emit scraperError("Unsupported Operation");
 }
 

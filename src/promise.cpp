@@ -67,7 +67,7 @@ void Promise::clear(){
     deleteLater();
 }
 
-Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
+Promise* Promise::loadAsync( QNetworkAccessManager & manager, const QString& url, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
     QNetworkRequest req;
     req.setUrl(QUrl(url));
     if (useRandomUserAgent){
@@ -92,6 +92,33 @@ Promise* Promise::loadAsync(     QNetworkAccessManager & manager, const QString&
 
     return promise;
 }
+
+Promise* Promise::loadAsync( QNetworkAccessManager & manager, const QString& url, QByteArray& data, bool useRandomIP, bool useRandomUserAgent, QNetworkRequest::Priority priority){
+    QNetworkRequest req;
+    req.setUrl(QUrl(url));
+    if (useRandomUserAgent){
+        req.setRawHeader( "User-Agent" , getRandomUserAgent().toLatin1());
+    }
+
+    if (useRandomIP){
+        QString ip = QString("%1.%2.%3.%4").arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255)).arg(Utils::randInt(0, 255));
+        req.setRawHeader("X-Forwarded-For", ip.toLatin1());
+        req.setRawHeader("Client-IP", ip.toLatin1());
+        req.setRawHeader("VIA", ip.toLatin1());
+    }
+
+    req.setPriority(priority);
+
+    QNetworkReply * reply = manager.post(req, data);
+
+    Promise * promise = new Promise;
+    promise->reply=reply;
+
+    QObject::connect(reply, &QNetworkReply::finished, promise, &Promise::completed);
+
+    return promise;
+}
+
 
 QNetworkReply::NetworkError Promise::replyError(){
     if (!reply.isNull()){

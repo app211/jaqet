@@ -6,7 +6,6 @@
 
 class TheTVDBScraper : public Scraper
 {
-    static const QString API_KEY;
     QIcon m_icon;
 
 private:

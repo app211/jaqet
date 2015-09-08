@@ -171,22 +171,6 @@ QPushButton::menu-indicator:pressed, QPushButton::menu-indicator:open {
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QWidget" name="widget_3" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QRadioButton" name="radioButton">
-        <property name="toolTip">
-         <string> the image is scaled to size.</string>
-        </property>
-        <property name="text">
-         <string>RadioButton</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>

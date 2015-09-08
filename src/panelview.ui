@@ -107,20 +107,6 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="labelMovieTitle">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelSeasonEpisode">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QLabel" name="labelEpisodeTitle">
                <property name="text">
                 <string>TextLabel</string>
@@ -156,9 +142,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-311</y>
+                <y>-340</y>
                 <width>917</width>
-                <height>691</height>
+                <height>742</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -616,7 +602,160 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                 <layout class="QVBoxLayout" name="verticalLayout_28">
+                  <item>
+                   <widget class="QWidget" name="widget_27" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_13">
+                     <item>
+                      <widget class="QComboBox" name="comboDisplayAspectRatio">
+                       <property name="editable">
+                        <bool>true</bool>
+                       </property>
+                       <property name="currentText">
+                        <string notr="true"/>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>4:3</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>16:9</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.25:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.33:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.66:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.78:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>1.85:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.20:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.35:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.39:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.40:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.55:1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>2.76:1</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="comboBoxFormat">
+                       <property name="editable">
+                        <bool>true</bool>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>AVI</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Blu-ray</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>BDAV</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>DVD</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Matroska</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MP4</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MPEG-PS</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MPEG-TS</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Ogg</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>QuickTime</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>WindowMedia</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                   <item>
                    <widget class="QWidget" name="widget_18" native="true">
                     <layout class="QHBoxLayout" name="horizontalLayout_21">
@@ -643,11 +782,93 @@
                        </property>
                       </widget>
                      </item>
+                     <item>
+                      <widget class="QLabel" name="label_2">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Codec</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="comboBoxVideoCodec">
+                       <property name="editable">
+                        <bool>true</bool>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>3IVX</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>AVC</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>H.264</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MPEG-1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MPEG-2</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MPEG-4</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Ogg</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>QuickTime</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>RealVideo</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>VC-1</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>WMV</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>XviD</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
                     </layout>
                    </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_27" native="true"/>
                   </item>
                  </layout>
                 </widget>

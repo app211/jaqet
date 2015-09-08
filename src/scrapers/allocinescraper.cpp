@@ -19,7 +19,6 @@ const QString AlloCineScraper::ALLO_DEFAULT_URL_IMAGES=QStringLiteral("images.al
 QMap<int,QString> AlloCineScraper::codesToCountries;
 
 namespace  {
-
 QString CODE(QStringLiteral("code"));
 QString PROFILE(QStringLiteral("profile"));
 QString DOLLAR(QStringLiteral("$"));
@@ -60,6 +59,8 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
 
 void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString&, int year) const
 {
+    Q_UNUSED(year)
+
     QMap<QString,QString> params;
     params[FILTER]=QUrl::toPercentEncoding(MOVIE);
     params[Q]=QUrl::toPercentEncoding(toSearch);
@@ -567,6 +568,8 @@ bool AlloCineScraper::extractCertificate(const QJsonObject& certificateObject, M
             ; break;
         }
     }
+
+    return true;
 }
 
 
@@ -763,6 +766,8 @@ bool AlloCineScraper::extractNationality(const QJsonArray& nationalityArray, Med
 
     }
     mediaMovieSearchPtr->setCountries(countries);
+
+    return true;
 }
 
 bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJsonDocument& resultset, const SearchFor& searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const{

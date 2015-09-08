@@ -10,7 +10,10 @@
 
 #include "../promise.h"
 
-const QString TheMovieDBScraper::API_KEY="446af083f4ed58d996410c131b2e95b3";
+namespace  {
+    const QString API_KEY(QStringLiteral("446af083f4ed58d996410c131b2e95b3"));
+}
+
 
 TheMovieDBScraper::TheMovieDBScraper(QObject *parent)
     : Scraper(parent), m_icon(loadIcon())
@@ -618,7 +621,7 @@ bool extractImageInfo(const QJsonObject& imageObject, QString& href, QString& is
         rating=imageObject["vote_average"].toDouble();
     }
 
-
+    return true;
 }
 
 bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const SearchFor &searchFor, MediaMovieSearchPtr mediaMovieSearchPtr) const{
@@ -665,6 +668,7 @@ bool TheMovieDBScraper::parseImageInfo(const QJsonDocument& resultset, const Sea
 
 QString TheMovieDBScraper::getBestImageUrl(const QString& filePath, const QSize& originalSize, const QSize& size,  Qt::AspectRatioMode mode, QFlags<ImageType> imageType) const {
     Q_UNUSED(mode);
+    Q_UNUSED(originalSize);
     Q_UNUSED(imageType);
 
     return QString().append(baseUrl).append(findBestSize(posterSizes,size.width())).append(filePath);
@@ -673,6 +677,7 @@ QString TheMovieDBScraper::getBestImageUrl(const QString& filePath, const QSize&
 QIcon TheMovieDBScraper::loadIcon() const {
 
     static const uchar icon_png[] = {
+        // xxd -i 1.png > 1.h
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
         0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x10, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0xf3, 0xff,
         0x61, 0x00, 0x00, 0x00, 0x06, 0x62, 0x4b, 0x47, 0x44, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0xa0,
