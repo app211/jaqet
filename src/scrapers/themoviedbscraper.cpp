@@ -138,6 +138,9 @@ void TheMovieDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, 
     int season=mediaTVSearchPtr->foundResult().getSeason();
     int episode=mediaTVSearchPtr->foundResult().getEpisode();
 
+    mediaTVSearchPtr->setTitle(mediaTVSearchPtr->foundResult().getTitle());
+    mediaTVSearchPtr->setOriginalTitle(mediaTVSearchPtr->foundResult().getOriginalTitle());
+
     QMap<QString,QString> params;
     params["language"]=language;
 
@@ -533,7 +536,8 @@ bool TheMovieDBScraper::parseEpisodeInfo(const QJsonDocument& resultset, MediaTV
 
     QJsonObject episodeObject = resultset.object();
 
-    mediaTVSearchPtr->setTitle(episodeObject["name"].toString());
+
+    mediaTVSearchPtr->setEpisodeTitle(episodeObject["name"].toString());
     mediaTVSearchPtr->setCode(episodeObject["id"].toString());
     mediaTVSearchPtr->setSynopsis(episodeObject["overview"].toString());
     mediaTVSearchPtr->setSeason(episodeObject["season_number"].toInt());

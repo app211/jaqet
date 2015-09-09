@@ -6,6 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>
 #include <QtCore/QVariant>
+#include <QSize>
 
 /**
  * Infos and other metadata associated with a media/track.
@@ -108,312 +109,36 @@ public:
     /** Sets the duration/length of the file in milliseconds. */
     void setDurationMSecs(qint64 milliseconds);
 
-    /**
-     * CUE start/end INDEX info.
-     *
-     * Inside a CUE sheet file, INDEX is the position where the media should start to play.
-     *
-     * Numbers given are in milliseconds.
-     * Strings given are of the format:
-     * Format: [mm:ss:ff]
-     * mm:ss:ff - Starting time in minutes, seconds, and frames (75 frames/second)
-     * Example:
-     * 00:00:00
-     * 02:34:50
-     *
-     * @see http://digitalx.org/cuesheetsyntax.php#indx
-     */
-    static const int CUE_INDEX_INVALID = -1;
-    void setCueStartIndex(const QString & cueIndex);
-    void setCueEndIndex(const QString & cueIndex);
-    QString cueStartIndexFormatted() const;
-    QString cueEndIndexFormatted() const;
-    qint64 cueStartIndex() const;
-    qint64 cueEndIndex() const;
-
-    /**
-     * Gets the overall bitrate = audio bitrate + video bitrate if any.
-     *
-     * Uses kilobits per second (kbps or kbit/s).
-     *
-     * @see http://en.wikipedia.org/wiki/Bit_rate
-     *
-     * Seems like Bitrate is a better name than BitRate:
-     * Bitrate (Java): 3000 answers
-     * http://www.google.com/codesearch?as_q=Bitrate&btnG=Search+Code&hl=en&as_lang=java&as_case=y
-     * BitRate (Java): 1000 answers
-     * http://www.google.com/codesearch?as_q=BitRate&btnG=Search+Code&hl=en&as_lang=java&as_case=y
-     *
-     * @return the overall bitrate of the media file in kbps or -1 if failed
-     */
-    int bitrate() const;
-    void setBitrate(int kbps);
-
-    /** Gets the application used to encode the file. */
-    QString encodedApplication() const;
-    void setEncodedApplication(const QString & encodedApplication);
 
     QString format() const;
     void setFormat(const QString & format);
 
-    /**
-     * MetaData.
-     *
-     * @see http://en.wikipedia.org/wiki/Metadata
-     *
-     * Seems like MetaData is a better name than Metadata:
-     * MetaData (Java): 90,500 answers
-     * http://www.google.com/codesearch?as_q=MetaData&btnG=Search+Code&hl=en&as_lang=java&as_case=y
-     * Metadata (Java): 81,200 answers
-     * http://www.google.com/codesearch?as_q=Metadata&btnG=Search+Code&hl=en&as_lang=java&as_case=y
-     */
-    enum MetaData {
-        /** In order to loop over this enum. */
-        MIN,
-
-        /**
-         * int
-         * Returns 0 if no track number.
-         */
-        TrackNumber = MIN,
-
-        /**
-         * int
-         * Returns 0 if no disc number
-         */
-        DiscNumber,
-
-        Format,
-
-        /** QString */
-        Title,
-
-        /** QString */
-        Artist,
-
-        /** QString */
-        OriginalArtist,
-
-        /** QString */
-        Album,
-
-        /** QString */
-        AlbumArtist,
-
-        /** QDate */
-        Year,
-
-        /** QString */
-        Genre,
-
-        /** QString */
-        Comment,
-
-        /** QString */
-        Composer,
-
-        /** QString */
-        Publisher,
-
-        /** QString */
-        Copyright,
-
-        /** QUrl */
-        URL,
-
-        /** QString */
-        EncodedBy,
-
-        /** QString */
-        AlbumArtistSort,
-
-        /**
-         * FIXME QString -> QUuid
-         * Cannot be a QUuid, see http://bugreports.qt.nokia.com/browse/QTBUG-373
-         *
-         * @see http://musicbrainz.org/doc/ArtistID
-         */
-        MusicBrainzArtistId,
-
-        /**
-         * FIXME QString -> QUuid
-         * For MusicBrainz, release = album.
-         * Cannot be a QUuid, see http://bugreports.qt.nokia.com/browse/QTBUG-373
-         *
-         * @see http://musicbrainz.org/doc/ReleaseID
-         */
-        MusicBrainzReleaseId,
-
-        /**
-         * FIXME QString -> QUuid
-         * Cannot be a QUuid, see http://bugreports.qt.nokia.com/browse/QTBUG-373
-         *
-         * @see http://musicbrainz.org/doc/TrackID
-         */
-        MusicBrainzTrackId,
-
-        /**
-         * QString
-         *
-         * Contains characters and numbers.
-         * @see http://en.wikipedia.org/wiki/Amazon_Standard_Identification_Number
-         */
-        AmazonASIN,
-
-        /**
-         * Beats per minute is a unit used as a measure of tempo in music.
-         *
-         * int
-         * @see http://en.wikipedia.org/wiki/Beats_per_minute
-         */
-        BPM,
-
-        /** In order to loop over this enum. */
-        MAX = BPM
-    };
-
-    QVariant metaDataValue(MetaData metaData) const;
-    void setMetaData(MetaData metaData, const QVariant & value);
-
-    /**
-     * Associates a QVariant with this MediaInfo.
-     *
-     * This function was added in order to easily extend MediaInfo
-     * without inheriting from it (overly complex).
-     *
-     * @param key
-     * @param value the meaning of value is up to the user
-     */
-    void setExtendedMetaData(const QString & key, const QVariant & value);
-    QVariant extendedMetaData(const QString & key) const;
-
-
-    QString firstVideoCodec() const;
+     QString firstVideoCodec() const;
     void setFirstVideoCodec(const QString& videoCodec);
 
-    //Audio
-    enum AudioStream {
-        /**
-         * int
-         * Uses kilobits per second (kbps or kbit/s).
-         */
-        AudioBitrate,
+    void setALanguages(const QStringList& alanguages);
+    QStringList alanguages() const;
 
-        /** QString */
-        AudioBitrateMode,
+    void  setTLanguages(const QStringList& tlanguages);
+    QStringList  tlanguages() const ;
 
-        /**
-         * Defines the number of samples per second taken from a continuous signal to make a discrete signal.
-         *
-         * int
-         * Uses kilohertz (kHz).
-         *
-         * @see http://en.wikipedia.org/wiki/Sample_rate
-         */
-        AudioSampleRate,
+    void setVCodec(const QString& vcodec) { _vcodec = vcodec; }
+    QString vcodec() const { return _vcodec; }
 
-        /** int */
-        AudioBitsPerSample,
+    void setVResolution(const QSize& vresolution) { _vresolution = vresolution; }
+    QSize vresolution() const { return _vresolution; }
 
-        /** int */
-        AudioChannelCount,
+    void setVAspect(const QString& vaspect) { _vaspect = vaspect; }
+    QString vaspect() const { return _vaspect; }
 
-        /** QString */
-        AudioCodec,
+    void setVScanType(const QString& vscantype) { _vscantype = vscantype; }
+    QString vscantype() const { return _vscantype; }
 
-        /** QString */
-        AudioCodecProfile,
-
-        /** QString */
-        AudioLanguage,
-
-        /** QString */
-        AudioEncodedLibrary
-    };
-
-    int audioStreamCount() const;
-    QVariant audioStreamValue(int audioStreamId, AudioStream audioStream) const;
-    void insertAudioStream(int audioStreamId, AudioStream audioStream, const QVariant & value);
-
-    //Video
-    enum VideoStream {
-        /** int */
-        VideoBitrate,
-
-        /**
-         * QSize
-         * QSize(int width, int height) in pixels.
-         */
-        VideoResolution,
-
-        /**
-         * Frame rate, or frame frequency, is the frequency (rate) at which an imaging
-         * device produces unique consecutive images called frames.
-         *
-         * int
-         * Uses frames per second (FPS).
-         * @see http://en.wikipedia.org/wiki/Frame_rate
-         */
-        VideoFrameRate,
-
-        /** QString */
-        VideoFormat,
-
-        /** QString */
-        VideoCodec,
-
-        /** QString */
-        VideoEncodedLibrary,
-
-        VideoAspectRatioString,
-
-        VideoScanType,
-
-        VideoDisplayAspectRatioString
-    };
-
-    int videoStreamCount() const;
-    QVariant videoStreamValue(int videoStreamId, VideoStream videoStream) const;
-    void insertVideoStream(int videoStreamId, VideoStream videoStream, const QVariant & value);
-
-    //Text
-    enum TextStream {
-        /** QString */
-        TextFormat,
-
-        /** QString */
-        TextLanguage
-    };
-
-    int textStreamCount() const;
-    QVariant textStreamValue(int textStreamId, TextStream textStream) const;
-    void insertTextStream(int textStreamId, TextStream textStream, const QVariant & value);
-
-    //Stream
-    enum NetworkStream {
-        /** QString */
-        StreamName,
-
-        /** QString */
-        StreamGenre,
-
-        /** QUrl */
-        StreamWebsite,
-
-        /** QUrl */
-        StreamURL
-    };
-
-    QVariant networkStreamValue(NetworkStream networkStream) const;
-    void insertNetworkStream(NetworkStream networkStream, const QVariant & value);
+    void setVDisplayAspect(const QString& vdisplayaspect) { _vdisplayaspect = vdisplayaspect; }
+    QString vdisplayaspect() const { return _vdisplayaspect; }
 
 private:
 
-    /** Factorization code: parses a CUE index string. */
-    static qint64 parseCueIndexString(const QString & cueIndexString);
-
-    /** Factorization code: generates a CUE index string given a CUE index number. */
-    static QString cueIndexFormatted(qint64 cueIndex);
 
     bool _fetched;
     QString _fileName;
@@ -423,39 +148,14 @@ private:
     /** Duration/length of the file in milliseconds. */
     qint64 _duration;
 
-    int _bitrate;
-    QString _encodedApplication;
-
-    /**
-     * CUE feature: position in milliseconds where to start the file.
-     * CUE_INDEX_INVALID if unset.
-     */
-    qint64 _cueStartIndex;
-    qint64 _cueEndIndex;
-
-    /** MetaData. */
-    QHash<MetaData, QVariant> _metaDataHash;
-
-    /** Audio. */
-    int _audioStreamCount;
-    QHash<int, QVariant> _audioStreamHash;
-
-    /** Video. */
-    int _videoStreamCount;
-    QHash<int, QVariant> _videoStreamHash;
-
-    /** Text. */
-    int _textStreamCount;
-    QHash<int, QVariant> _textStreamHash;
-
-    /** Network stream metadata. */
-    QHash<NetworkStream, QVariant> _networkStreamHash;
-
-    /** Extended metadata. */
-    QHash<QString, QVariant> _extendedMetaData;
-
     QString _format;
-    QString _firstVideoCodec;
+    QStringList _alanguages;
+    QStringList _tlanguages;
+    QString _vcodec;
+    QSize _vresolution;
+    QString _vaspect;
+    QString _vscantype;
+    QString _vdisplayaspect;
 };
 
 Q_DECLARE_METATYPE(MediaInfo);

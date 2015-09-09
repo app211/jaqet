@@ -142,15 +142,27 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-340</y>
+                <y>-353</y>
                 <width>917</width>
-                <height>742</height>
+                <height>755</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
                 <widget class="QWidget" name="widget_22" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QWidget" name="widget_23" native="true">
                     <property name="minimumSize">
@@ -160,6 +172,21 @@
                      </size>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBox_3">
                        <property name="text">
@@ -179,6 +206,21 @@
                   <item>
                    <widget class="QWidget" name="widget_24" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_19">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBox_5">
                        <property name="text">
@@ -191,6 +233,101 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="originalTitleEdit"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widgetEpisode" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_110">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QWidget" name="widget_123" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_118">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="CheckLock" name="checkBox_13">
+                       <property name="text">
+                        <string>Title</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="titleEpisodeEdit"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_124" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_119">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="CheckLock" name="checkBox_15">
+                       <property name="text">
+                        <string>Original Title</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="originalEpisodeTitleEdit"/>
                      </item>
                     </layout>
                    </widget>
@@ -689,7 +826,7 @@
                      <item>
                       <widget class="QComboBox" name="comboBoxFormat">
                        <property name="editable">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <item>
                         <property name="text">
@@ -748,7 +885,7 @@
                        </item>
                        <item>
                         <property name="text">
-                         <string>WindowMedia</string>
+                         <string>Windows Media</string>
                         </property>
                        </item>
                       </widget>
@@ -798,7 +935,7 @@
                      <item>
                       <widget class="QComboBox" name="comboBoxVideoCodec">
                        <property name="editable">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <item>
                         <property name="text">
@@ -976,7 +1113,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>927</x>
-     <y>55</y>
+     <y>38</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -1008,7 +1145,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>891</x>
-     <y>66</y>
+     <y>-18</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1023,8 +1160,8 @@
    <slot>castRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>891</x>
-     <y>207</y>
+     <x>218</x>
+     <y>146</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1039,8 +1176,8 @@
    <slot>enableCastRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>558</x>
-     <y>218</y>
+     <x>181</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1055,8 +1192,8 @@
    <slot>enableDirectorRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>436</x>
-     <y>304</y>
+     <x>413</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1071,8 +1208,8 @@
    <slot>directorRemove()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>879</x>
-     <y>320</y>
+     <x>452</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1087,8 +1224,8 @@
    <slot>backgroundSelected(MediaChoosed)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>238</x>
-     <y>310</y>
+     <x>226</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1103,8 +1240,8 @@
    <slot>posterSelected(MediaChoosed)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
-     <y>406</y>
+     <x>448</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1119,8 +1256,8 @@
    <slot>thumbnailSelected(MediaChoosed)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>755</x>
-     <y>406</y>
+     <x>669</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>
@@ -1135,8 +1272,8 @@
    <slot>bannerSelected(MediaChoosed)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>792</x>
-     <y>406</y>
+     <x>891</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>468</x>

@@ -291,6 +291,16 @@ void PanelView::updateUI(){
 
     ui->titleEdit->setText(currentSearch.title());
     ui->originalTitleEdit->setText(currentSearch.originalTitle());
+
+    if (currentSearch.isTV()){
+        ui->titleEpisodeEdit->setText(currentSearch.episodeTitle());
+        ui->originalEpisodeTitleEdit->setText(currentSearch.originalEpisodeTitle());
+        ui->widgetEpisode->setVisible(true);
+    } else {
+        ui->widgetEpisode->setVisible(false);
+    }
+
+
     ui->chooseBackgroundButton->setMedia(currentSearch.currentBackdrop);
     ui->choosePosterButton->setMedia(currentSearch.currentPoster);
 
@@ -341,9 +351,13 @@ void PanelView::updateUI(){
 
     ui->comboDisplayAspectRatio->setCurrentText(currentSearch.vdisplayaspect());
 
-    ui->comboBoxFormat->setCurrentText(currentSearch.mediaInfo().format());
+    whileBlocking(ui->comboBoxFormat, [&](){
+        ui->comboBoxFormat->setCurrentText(currentSearch.mediaInfo().format());
+    });
 
-     ui->comboBoxVideoCodec->setCurrentText(currentSearch.mediaInfo().firstVideoCodec());
+    whileBlocking(ui->comboBoxVideoCodec, [&](){
+        ui->comboBoxVideoCodec->setCurrentText(currentSearch.vcodec());
+    });
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -880,5 +894,17 @@ void PanelView::on_countriesListWidget_itemChanged(QListWidgetItem *item)
 
     updateUI();
 
+    buildPreview(currentSearch);
+}
+
+void PanelView::on_comboBoxVideoCodec_currentIndexChanged(const QString &arg1)
+{
+    currentSearch.setVCodec(arg1);
+    buildPreview(currentSearch);
+}
+
+void PanelView::on_comboBoxFormat_currentIndexChanged(const QString &arg1)
+{
+    currentSearch.setFormat(arg1);
     buildPreview(currentSearch);
 }

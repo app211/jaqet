@@ -88,7 +88,12 @@ struct FoundResult {
     }
 
     QString getOriginalTitle() const {
-        return isNull()?"":(isTV()?showPtr->title:filmPtr->originalTitle);
+        return isNull()?"":(isTV()?showPtr->originalTitle:filmPtr->originalTitle);
+
+    }
+
+    QString getTitle() const {
+        return isNull()?"":(isTV()?showPtr->title:filmPtr->title);
 
     }
     Scraper *getScraper() const {
@@ -658,14 +663,15 @@ public:
     {
         if (!mediaInfo.isEmpty()){
             setVDurationSecs(mediaInfo.durationSecs());
-
-            if (mediaInfo.videoStreamCount()>0){
-                setVCodec(mediaInfo.videoStreamValue(0, MediaInfo::VideoCodec).toString().trimmed());
-                setVResolution(mediaInfo.videoStreamValue(0, MediaInfo::VideoResolution).toSize());
-                setVAspect(mediaInfo.videoStreamValue(0, MediaInfo::VideoAspectRatioString).toString().trimmed());
-                setVScanType(mediaInfo.videoStreamValue(0, MediaInfo::VideoScanType).toString().trimmed());
-                setVDisplayAspect(mediaInfo.videoStreamValue(0, MediaInfo::VideoDisplayAspectRatioString).toString().trimmed());
-            }
+            setVCodec(mediaInfo.vcodec());
+            setVResolution(mediaInfo.vresolution());
+            setVAspect(mediaInfo.vaspect());
+            setVScanType(mediaInfo.vscantype());
+            setFormat(mediaInfo.format());
+            setALanguages(mediaInfo.alanguages());
+            setTLanguages(mediaInfo.tlanguages());
+            setVDisplayAspect(mediaInfo.vdisplayaspect());
+/*
 
             if (mediaInfo.audioStreamCount()>0){
                 if(!mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).isNull()){
@@ -675,30 +681,10 @@ public:
                 setACodec(mediaInfo.audioStreamValue(0, MediaInfo::AudioCodec).toString().trimmed());
 
 
-                QStringList audioLanguages;
-                for (int i=0; i<mediaInfo.audioStreamCount();i++){
-                    QString audioLanguage=mediaInfo.audioStreamValue(i, MediaInfo::AudioLanguage).toString();
-                    if (!audioLanguage.isEmpty()){
-                        audioLanguages << audioLanguage;
-                    }
-                }
 
-                setALanguages(audioLanguages);
-
-
-                QStringList textLanguages;
-                for (int i=0; i<mediaInfo.textStreamCount();i++){
-                    QString textLanguage=mediaInfo.textStreamValue(i, MediaInfo::TextLanguage).toString();
-                    if (!textLanguage.isEmpty()){
-                        textLanguages << textLanguage;
-                    }
-                }
-
-                setTLanguages(textLanguages);
             }
 
-            setFormat(mediaInfo.metaDataValue( MediaInfo::Format).toString().trimmed());
-        }
+      */ }
     }
 
     CurrentItemData(const CurrentItemData &other)
@@ -801,6 +787,9 @@ public:
 
     void setEpisodeTitle(const QString& episodeTitle) { d->episodeTitle = episodeTitle; }
     QString episodeTitle() const { return d->episodeTitle; }
+
+    void setOriginalEpisodeTitle(const QString& originalEpisodeTitle) { d->originalEpisodeTitle = originalEpisodeTitle; }
+    QString originalEpisodeTitle() const { return d->originalEpisodeTitle; }
 
     void setRating( double rating) { d->rating=rating; }
     double rating() const { return d->rating;}

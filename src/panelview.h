@@ -91,6 +91,8 @@ private slots:
     void bannerSelected(const MediaChoosed& mediaChoosed);
 
     void on_countriesListWidget_itemChanged(QListWidgetItem *item);
+    void on_comboBoxVideoCodec_currentIndexChanged(const QString &arg1);
+    void on_comboBoxFormat_currentIndexChanged(const QString &arg1);
 };
 
 #endif // PANELVIEW_H
