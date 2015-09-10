@@ -9,7 +9,7 @@
 #include <QMovie>
 #include <QCompleter>
 #include <QDir>
-
+#include <QInputDialog>
 #include <limits>
 
 #include "scrapers/themoviedbscraper.h"
@@ -145,6 +145,18 @@ PanelView::PanelView(QWidget *parent) :
                                       R1080P
 
                                   });
+
+    ui->comboBoxYear->addItem("");
+    for (int i=1900; i<=QDate::currentDate().year()+1;i++){
+        ui->comboBoxYear->addItem(QString::number(i));
+    }
+
+    ui->comboBoxRating->addItem("");
+    for (int i=0; i<=100;i++){
+        ui->comboBoxRating->addItem(QString::number(float(i)/10.),'f');
+    }
+
+
     /*     QCompleter* resolutionCompleter= new QCompleter(l,this);
          resolutionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
          resolutionCompleter->setCompletionMode(QCompleter::PopupCompletion);
@@ -331,7 +343,7 @@ void PanelView::updateUI(){
 
 
     if (!currentSearch.isTV()){
-        ui->doubleSpinBoxRating->setValue(currentSearch.rating());
+        //ui->doubleSpinBoxRating->setValue(currentSearch.rating());
     }
 
     bool progressive=QString::compare(currentSearch.vscantype(),"Progressive",Qt::CaseInsensitive)==0;
@@ -358,6 +370,16 @@ void PanelView::updateUI(){
     whileBlocking(ui->comboBoxVideoCodec, [&](){
         ui->comboBoxVideoCodec->setCurrentText(currentSearch.vcodec());
     });
+
+    whileBlocking(ui->comboBoxAudioCodec, [&](){
+        ui->comboBoxAudioCodec->setCurrentText(currentSearch.acodec());
+    });
+
+    if (currentSearch.year() >0){
+        ui->comboBoxYear->setCurrentText(QString::number(currentSearch.year()));
+    } else {
+        ui->comboBoxYear->setCurrentIndex(0);
+    }
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -415,7 +437,7 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
 
     CurrentItemData newData(mediaTVSearchPtr->engine(),true, mediaTVSearchPtr->mediaInfo(),mediaTVSearchPtr->fileInfo() );
 
-    if (!ui->checkBoxLockSynopsis->isLock()){
+    if (!ui->checkBoxSynopsis->isLock()){
         newData.setSynopsis(mediaTVSearchPtr->synopsis());
     } else {
         newData.setSynopsis(ui->synopsis->toPlainText());
@@ -498,7 +520,7 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
 
     CurrentItemData newData(mediaMovieSearchPtr->engine(),false, mediaMovieSearchPtr->mediaInfo(),mediaMovieSearchPtr->fileInfo());
 
-    if (!ui->checkBoxLockSynopsis->isLock()){
+    if (!ui->checkBoxSynopsis->isLock()){
         newData.setSynopsis(mediaMovieSearchPtr->synopsis());
     } else {
         newData.setSynopsis(ui->synopsis->toPlainText());
@@ -907,4 +929,37 @@ void PanelView::on_comboBoxFormat_currentIndexChanged(const QString &arg1)
 {
     currentSearch.setFormat(arg1);
     buildPreview(currentSearch);
+}
+
+void PanelView::on_comboBoxAudioCodec_currentIndexChanged(const QString &arg1)
+{
+    currentSearch.setACodec(arg1);
+    buildPreview(currentSearch);
+
+}
+
+void PanelView::on_toolButton_5_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                         tr("User name:"), QLineEdit::Normal,
+                                         currentSearch.title(), &ok);
+    if (ok && !text.isEmpty()){
+        currentSearch.setTitle(text);
+        ui->titleEdit->setText(currentSearch.title());
+        buildPreview(currentSearch);
+    }
+}
+
+void PanelView::on_toolButtonEditOriginalTitle_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                         tr("User name:"), QLineEdit::Normal,
+                                         currentSearch.title(), &ok);
+    if (ok && !text.isEmpty()){
+        currentSearch.setTitle(text);
+        ui->titleEdit->setText(currentSearch.title());
+        buildPreview(currentSearch);
+    }
 }

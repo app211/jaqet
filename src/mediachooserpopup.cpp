@@ -10,6 +10,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
 #include <QFileDialog>
+#include <QDebug>
 
 #include "mediachooserbutton.h"
 #include "scrapers/scraper.h"
@@ -23,6 +24,7 @@ class MediaChooserGraphicsObject : public QGraphicsObject {
     QGraphicsPixmapItem* const m_p;
     QGraphicsItemGroup * m_group;
     const QFlags<ImageType> m_type;
+    QList<QGraphicsItem*> _groupItems;
 
 public :
     MediaChooserGraphicsObject(QGraphicsPixmapItem* p,  QFlags<ImageType> type) : QGraphicsObject(p), m_p(p), m_group(nullptr), m_type(type){
@@ -76,21 +78,37 @@ protected:
 
 };
 
-class ClickQGraphicsPixmapItem : public QGraphicsPixmapItem {
+class ClickButtonMediaChooserGraphicsObject : public QGraphicsObject {
+
+    QGraphicsPixmapItem* const m_p;
     QPointer<MediaChooserPopup> _itemToUpdate;
-
-
     MediaChoosed _mediaChoosed;
 
 public :
-
-    ClickQGraphicsPixmapItem( QPointer<MediaChooserPopup> itemToUpdate,const MediaChoosed& mediaChoosed, const QPixmap &pixmap, QGraphicsItem *parent = 0)
-        : QGraphicsPixmapItem (pixmap,parent),
-          _itemToUpdate(itemToUpdate), _mediaChoosed(mediaChoosed){
+    ClickButtonMediaChooserGraphicsObject(QGraphicsPixmapItem* p, QPointer<MediaChooserPopup> itemToUpdate,const MediaChoosed& mediaChoosed) :
+        QGraphicsObject(p),
+        m_p(p),
+        _itemToUpdate(itemToUpdate),
+        _mediaChoosed(mediaChoosed)
+    {
         setFlag(QGraphicsItem::ItemIsSelectable);
     }
 
-    enum { Type = UserType + 2 };
+    QRectF boundingRect() const
+    {
+        return m_p->boundingRect();
+    }
+
+    QPainterPath shape() const
+    {
+        return m_p->shape();
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+        m_p->paint(painter,  option, widget);
+    }
+
+    enum { Type = UserType + 3 };
 
     int type() const
     {
@@ -98,10 +116,30 @@ public :
     }
 
 
-    void click(){
+    virtual void click(){
         if (!_itemToUpdate.isNull()){
             _itemToUpdate->mediaSelected(_mediaChoosed);
         }
+    }
+
+protected:
+    bool sceneEvent(QEvent *event){
+        Q_UNUSED(event);
+        return false ; //m_p->sceneEvent(event);
+    }
+
+};
+
+class ClickButtonMediaChooserGraphicsObject2 : public ClickButtonMediaChooserGraphicsObject {
+public :
+    ClickButtonMediaChooserGraphicsObject2(QGraphicsPixmapItem* p, QPointer<MediaChooserPopup> itemToUpdate,const MediaChoosed& mediaChoosed) :
+        ClickButtonMediaChooserGraphicsObject(p,itemToUpdate,mediaChoosed){
+
+    }
+
+    virtual void click(){
+        qDebug() << "reload();";
+
     }
 };
 
@@ -111,8 +149,8 @@ public:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *e) {
         QGraphicsItem *item= this->itemAt( e-> scenePos(),QTransform());
-        if (item && item->type()==ClickQGraphicsPixmapItem::Type){
-            ClickQGraphicsPixmapItem* m = static_cast<ClickQGraphicsPixmapItem*>(item);
+        if (item && item->type()==ClickButtonMediaChooserGraphicsObject::Type){
+            ClickButtonMediaChooserGraphicsObject* m = static_cast<ClickButtonMediaChooserGraphicsObject*>(item);
             m->click();
         }
     }
@@ -130,6 +168,8 @@ struct M_M {
     QString url;
     QPointer<MediaChooserGraphicsObject> itemToUpdate;
     QPointer<QGraphicsProxyWidget> busyIndicator;
+    QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton;
+    QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton;
     int x;
     int y;
     int w;
@@ -160,11 +200,11 @@ void MediaChooserPopup::startPromise( QNetworkAccessManager* manager){
             if (px.loadFromData(qb)){
                 setImageFromInternet(px,url.itemToUpdate,url.x,url.y,url.w,url.h);
             } else {
-                addError(QString(tr("Unable to load %1")).arg(url.url),url.itemToUpdate,url.busyIndicator,url.x,url.y,url.w,url.h);
+                addError(QString(tr("Unable to load %1")).arg(url.url),url.itemToUpdate,url.busyIndicator,url.chooseButton, url.reloadButton, url.x,url.y,url.w,url.h);
             }
 
         } else {
-            addError(currentPromise->replyErrorString(),url.itemToUpdate,url.busyIndicator,url.x,url.y,url.w,url.h);
+            addError(currentPromise->replyErrorString(),url.itemToUpdate,url.busyIndicator,url.chooseButton,url.reloadButton,url.x,url.y,url.w,url.h);
 
         }
 
@@ -225,7 +265,7 @@ void MediaChooserPopup::setImageFromInternet(const QPixmap& pixmap,  QPointer<Me
     itemToUpdate->parentItem()->setPos(x+(w-scaled.width())/2,y+(h-scaled.height())/2);
 }
 
-void MediaChooserPopup::addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator, int x, int y, int w, int h){
+void MediaChooserPopup::addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator,QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton, int x, int y, int w, int h){
 
     if (!busyIndicator.isNull()){
         busyIndicator->setVisible(false);
@@ -235,16 +275,22 @@ void MediaChooserPopup::addFile(const QUrl& url,  QPointer<MediaChooserGraphicsO
     if (pixmap.load(url.toLocalFile())){
         setImageFromInternet(pixmap,itemToUpdate, x, y, w, h);
     } else {
-        addError(QString(tr("Unable to load file %1")).arg(url.toLocalFile()),itemToUpdate,busyIndicator, x, y, w, h);
+        addError(QString(tr("Unable to load file %1")).arg(url.toLocalFile()),itemToUpdate,busyIndicator, chooseButton,reloadButton,x, y, w, h);
     }
 }
 
-void MediaChooserPopup::addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator,  int x, int y, int w, int h){
+void MediaChooserPopup::addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator,  QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton,  int x, int y, int w, int h){
     if (!busyIndicator.isNull()){
         busyIndicator->setVisible(false);
     }
 
+    if (!chooseButton.isNull()){
+        chooseButton->parentItem()->hide();
+   }
 
+    if (!reloadButton.isNull()){
+        reloadButton->parentItem()->show();
+   }
     QPixmap result(w,h);
     result.fill(Qt::transparent);
 
@@ -274,8 +320,8 @@ void MediaChooserPopup::addImage(const QUrl& url, const MediaChoosed& mediaChoos
 
     int x=0;
     int y=0;
-     int h=200;
-     int w=200;
+    int h=200;
+    int w=200;
 
     QList<QGraphicsItem*> groupItems;
 
@@ -292,14 +338,20 @@ void MediaChooserPopup::addImage(const QUrl& url, const MediaChoosed& mediaChoos
     gif_anim->setMovie(movie);
     movie->start();
 
-    QGraphicsProxyWidget *proxy = scene->addWidget(gif_anim);
-    proxy->setPos(x+(w-32)/2,y+(h-32)/2);
-    groupItems.append(proxy);
+    QGraphicsProxyWidget *proxyGifAnim = scene->addWidget(gif_anim);
+    proxyGifAnim->setPos(x+(w-32)/2,y+(h-32)/2);
+    groupItems.append(proxyGifAnim);
 
-    ClickQGraphicsPixmapItem *pbutton= new ClickQGraphicsPixmapItem(QPointer<MediaChooserPopup>(this), mediaChoosed, QPixmap(":/resources/images/bingo16x16.png"));
-    scene->addItem(pbutton);
-    pbutton->setPos(x,h);
-    groupItems.append(pbutton);
+    QGraphicsPixmapItem* bt = scene->addPixmap(QPixmap(":/resources/images/bingo16x16.png"));
+    ClickButtonMediaChooserGraphicsObject* vv = new ClickButtonMediaChooserGraphicsObject(bt, QPointer<MediaChooserPopup>(this), mediaChoosed);
+    vv->parentItem()->setPos(x,h);
+    groupItems.append(vv->parentItem());
+
+    QGraphicsPixmapItem* bt2 = scene->addPixmap(QPixmap(":/resources/images/reload.png"));
+    ClickButtonMediaChooserGraphicsObject2* vv2 = new ClickButtonMediaChooserGraphicsObject2(bt2, QPointer<MediaChooserPopup>(this), mediaChoosed);
+    vv2->parentItem()->setPos(x,h);
+    groupItems.append(vv2->parentItem());
+    vv2->parentItem()->hide();
 
     QGraphicsItemGroup * cliGroup = scene->createItemGroup(groupItems);
     cliGroup->setPos(0,y);
@@ -307,18 +359,18 @@ void MediaChooserPopup::addImage(const QUrl& url, const MediaChoosed& mediaChoos
     pi->setItemGroup(cliGroup);
 
     if (!url.isValid()){
-        addError(QString(tr("Invalid URL: %1")).arg(url.toString()),QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxy), x,  y,  w,  h);
+        addError(QString(tr("Invalid URL: %1")).arg(url.toString()),QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxyGifAnim), QPointer<ClickButtonMediaChooserGraphicsObject>(vv), QPointer<ClickButtonMediaChooserGraphicsObject>(vv2), x,  y,  w,  h);
     } else if (url.scheme()=="file"){
-        addFile(url,QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxy), x,  y,  w,  h);
+        addFile(url,QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxyGifAnim),QPointer<ClickButtonMediaChooserGraphicsObject>(vv),QPointer<ClickButtonMediaChooserGraphicsObject>(vv2), x,  y,  w,  h);
     } else if (url.scheme()=="http"){
-        addHttpRequest(url, QPointer<MediaChooserGraphicsObject>(pi),  x,  y,  w,  h,QPointer<QGraphicsProxyWidget>(proxy));
+        addHttpRequest(url, QPointer<MediaChooserGraphicsObject>(pi),  x,  y,  w,  h,QPointer<QGraphicsProxyWidget>(proxyGifAnim), QPointer<ClickButtonMediaChooserGraphicsObject>(vv), QPointer<ClickButtonMediaChooserGraphicsObject>(vv2) );
     } else {
-        addError(QString(tr("Don't known how to open %1")).arg(url.toDisplayString()),QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxy), x,  y,  w,  h);
+        addError(QString(tr("Don't known how to open %1")).arg(url.toDisplayString()),QPointer<MediaChooserGraphicsObject>(pi), QPointer<QGraphicsProxyWidget>(proxyGifAnim), QPointer<ClickButtonMediaChooserGraphicsObject>(vv),QPointer<ClickButtonMediaChooserGraphicsObject>(vv2), x,  y,  w,  h);
     }
 }
 
 
-void MediaChooserPopup::addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator){
+void MediaChooserPopup::addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton){
     M_M f;
 
     f.url=url.toString();
@@ -328,6 +380,8 @@ void MediaChooserPopup::addHttpRequest(const QUrl& url,  QPointer<MediaChooserGr
     f.h=h;
     f.itemToUpdate=itemToUpdate;
     f.busyIndicator=busyIndicator;
+    f.chooseButton=chooseButton;
+    f.reloadButton= reloadButton;
 
     urls.append(f);
 
@@ -387,15 +441,18 @@ void MediaChooserPopup::doFilter( QFlags<ImageType> filter){
             MediaChooserGraphicsObject* m = static_cast<MediaChooserGraphicsObject*>(item);
             if (m->group()){
 
+
+
                 if (m->imageType() & filter){
-                    m->group()->setVisible(true);
+                    m->group()->show();
+
                     m->group()->setHandlesChildEvents(false);
                     m->group()->setX(x);
 
                     x+=210;
                     w+=210;
                 } else {
-                    m->group()->setVisible(false);                
+                    m->group()->hide();
                     m->group()->setX(0); // for itemsBoundingRect
                 }
             }
@@ -420,8 +477,8 @@ void MediaChooserPopup::popup(MediaChooserButton *button, QFlags<ImageType> filt
     disconnect(SIGNAL(popupClosed()));
     connect(this, SIGNAL(popupClosed()), button, SLOT(popupClosed()), Qt::UniqueConnection);
 
-    disconnect(SIGNAL(mediaSelected(const MediaChoosed& )));
-    connect(this,SIGNAL(mediaSelected(const MediaChoosed&)), button,SLOT(mediaSelected(const MediaChoosed&)), Qt::UniqueConnection);
+    disconnect(SIGNAL(mediaChoosed(const MediaChoosed& )));
+    connect(this,SIGNAL(mediaChoosed(const MediaChoosed&)), button,SLOT(mediaSelected(const MediaChoosed&)), Qt::UniqueConnection);
 
     doFilter(filter);
 
@@ -431,11 +488,17 @@ void MediaChooserPopup::popup(MediaChooserButton *button, QFlags<ImageType> filt
 void MediaChooserPopup::clear(){
     urls.clear();
 
-        ui->graphicsView->scene()->clear();
+    ui->graphicsView->scene()->clear();
 
 
 
 }
+
+void MediaChooserPopup::mediaSelected(const MediaChoosed& url){
+    qDebug() << url.localFilePath();
+    emit mediaChoosed(url);
+}
+
 
 
 void MediaChooserPopup::on_pushButton_clicked()

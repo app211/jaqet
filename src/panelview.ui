@@ -142,9 +142,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-353</y>
+                <y>-16</y>
                 <width>917</width>
-                <height>755</height>
+                <height>662</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -188,7 +188,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="CheckLock" name="checkBox_3">
+                      <widget class="CheckLock" name="checkBoxTitle">
                        <property name="text">
                         <string>Title</string>
                        </property>
@@ -198,7 +198,43 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="titleEdit"/>
+                      <widget class="QWidget" name="widget_33" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_14">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLineEdit" name="titleEdit">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButtonEditTitle">
+                          <property name="text">
+                           <string>...</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../resources/resources.qrc">
+                            <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                     </layout>
                    </widget>
@@ -222,7 +258,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="CheckLock" name="checkBox_5">
+                      <widget class="CheckLock" name="checkBoxOriginalTitle">
                        <property name="text">
                         <string>Original Title</string>
                        </property>
@@ -232,7 +268,43 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="originalTitleEdit"/>
+                      <widget class="QWidget" name="widget_34" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_15">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLineEdit" name="originalTitleEdit">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButtonEditOriginalTitle">
+                          <property name="text">
+                           <string>...</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../resources/resources.qrc">
+                            <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                     </layout>
                    </widget>
@@ -283,7 +355,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="CheckLock" name="checkBox_13">
+                      <widget class="CheckLock" name="checkBoxEpisodeTitle">
                        <property name="text">
                         <string>Title</string>
                        </property>
@@ -336,54 +408,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="widget_25" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_11">
-                  <item>
-                   <widget class="QWidget" name="widget_26" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_20">
-                     <item>
-                      <widget class="CheckLock" name="checkBoxYear">
-                       <property name="text">
-                        <string>Year</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLineEdit" name="lineEdit_3"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_28" native="true"/>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_29" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_22">
-                     <item>
-                      <widget class="QCheckBox" name="checkBoxRating">
-                       <property name="text">
-                        <string>Rating</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBoxRating"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="CheckLock" name="checkBoxLockSynopsis">
+                <widget class="CheckLock" name="checkBoxSynopsis">
                  <property name="text">
                   <string>Synopsis</string>
                  </property>
@@ -395,6 +420,18 @@
                <item>
                 <widget class="QWidget" name="widget_5" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QTextEdit" name="synopsis">
                     <property name="enabled">
@@ -408,6 +445,18 @@
                   <item>
                    <widget class="QWidget" name="widget_7" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_9">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="QToolButton" name="toolButtonSysnopsis">
                        <property name="text">
@@ -429,8 +478,139 @@
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="widget_25" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QWidget" name="widget_26" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_20">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="CheckLock" name="checkBoxYear">
+                       <property name="text">
+                        <string>Year</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="comboBoxYear">
+                       <property name="toolTip">
+                        <string notr="true"/>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_35" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_30">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_2">
+                       <property name="text">
+                        <string>Classification</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_28" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_29">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox">
+                       <property name="text">
+                        <string>Duration</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_29" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_22">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QCheckBox" name="checkBoxRating">
+                       <property name="text">
+                        <string>Rating</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="comboBoxRating"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QWidget" name="widget_12" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QWidget" name="widget_14" native="true">
                     <property name="minimumSize">
@@ -440,6 +620,21 @@
                      </size>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_12">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockCast">
                        <property name="text">
@@ -459,6 +654,21 @@
                      <item>
                       <widget class="QWidget" name="widget_2" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
                         <item>
                          <widget class="QListWidget" name="castListWidget">
                           <property name="enabled">
@@ -469,6 +679,18 @@
                         <item>
                          <widget class="QWidget" name="widget_3" native="true">
                           <layout class="QVBoxLayout" name="verticalLayout_5">
+                           <property name="spacing">
+                            <number>0</number>
+                           </property>
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
                            <item>
                             <widget class="QToolButton" name="toolButton_3">
                              <property name="text">
@@ -508,6 +730,21 @@
                   <item>
                    <widget class="QWidget" name="widget_13" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_13">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockDirectors">
                        <property name="text">
@@ -521,6 +758,21 @@
                      <item>
                       <widget class="QWidget" name="widget_8" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_5">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
                         <item>
                          <widget class="QListWidget" name="directorListWidget">
                           <property name="enabled">
@@ -531,6 +783,21 @@
                         <item>
                          <widget class="QWidget" name="widget_9" native="true">
                           <layout class="QVBoxLayout" name="verticalLayout_10">
+                           <property name="spacing">
+                            <number>0</number>
+                           </property>
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
                            <item>
                             <widget class="QToolButton" name="toolButton">
                              <property name="text">
@@ -557,6 +824,21 @@
                   <item>
                    <widget class="QWidget" name="widget_19" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_16">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockGenre">
                        <property name="text">
@@ -570,12 +852,42 @@
                      <item>
                       <widget class="QWidget" name="widget_20" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
                         <item>
                          <widget class="QListWidget" name="genreListWidget"/>
                         </item>
                         <item>
                          <widget class="QWidget" name="widget_21" native="true">
                           <layout class="QVBoxLayout" name="verticalLayout_17">
+                           <property name="spacing">
+                            <number>0</number>
+                           </property>
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>0</number>
+                           </property>
                            <item>
                             <widget class="QToolButton" name="toolButton_2">
                              <property name="text">
@@ -602,8 +914,23 @@
                   <item>
                    <widget class="QWidget" name="widget_30" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_23">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
-                      <widget class="QCheckBox" name="checkBox">
+                      <widget class="QCheckBox" name="checkBoxCountries">
                        <property name="text">
                         <string>CheckBox</string>
                        </property>
@@ -612,6 +939,21 @@
                      <item>
                       <widget class="QWidget" name="widget_31" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_12">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
                         <item>
                          <widget class="QListWidget" name="countriesListWidget"/>
                         </item>
@@ -636,6 +978,21 @@
                   <item>
                    <widget class="QWidget" name="widget_16" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockBackground">
                        <property name="text">
@@ -668,6 +1025,21 @@
                   <item>
                    <widget class="QWidget" name="widget_17" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_15">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockPoster">
                        <property name="text">
@@ -689,6 +1061,21 @@
                   <item>
                    <widget class="QWidget" name="widget_11" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockThumbail">
                        <property name="text">
@@ -714,7 +1101,22 @@
                   </item>
                   <item>
                    <widget class="QWidget" name="panelBanner" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_21">
+                    <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
                      <item>
                       <widget class="CheckLock" name="checkBoxLockBanner">
                        <property name="text">
@@ -1000,6 +1402,89 @@
                        <item>
                         <property name="text">
                          <string>XviD</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_32" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                     <item>
+                      <widget class="QComboBox" name="comboBoxAudioCodec">
+                       <property name="toolTip">
+                        <string notr="true"/>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>AAC</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>AC3</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>AC3+</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>DTS</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>DTS-HD</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>DTS-HD HRA</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>DTS-HD MA</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>FLAC</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>MP3</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>PCM</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>TrueHD</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Vorbis</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>WMA</string>
                         </property>
                        </item>
                       </widget>

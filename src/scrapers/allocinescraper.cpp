@@ -833,6 +833,8 @@ QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& o
     Q_UNUSED(mode);
     Q_UNUSED(imageType);
 
+    qDebug() << filePath;
+
     if (!originalSize.isNull() && size.expandedTo(originalSize)==size){
         return filePath;
     } else {
@@ -840,7 +842,9 @@ QString AlloCineScraper::getBestImageUrl(const QString& filePath, const QSize& o
         QUrl url(filePath);
         QSize scaledSize = originalSize.scaled(size, mode);
         // Cf. https://raw.githubusercontent.com/etienne-gauvin/api-allocine-helper/master/AlloImage.class.php
-        return QString(QStringLiteral("http://%1/r_%2_%3%4")).arg(url.host()).arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
+        QString result= QString (QStringLiteral("http://%1/r_%2_%3%4")).arg(url.host()).arg(scaledSize.width()).arg(scaledSize.height()).arg(url.path());
+        qDebug() << result;
+          return result;
     }
 }
 

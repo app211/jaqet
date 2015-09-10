@@ -658,7 +658,7 @@ bool TemplateYadis::execLanguages(const QDomElement& languagesElement, QPainter 
         count_subtitle=3;
     }
 
-    QString direction_subtitle=audioElement.attribute("direction");
+    QString direction_subtitle=subtitlesElement.attribute("direction");
 
     int width=backimageElement.attribute("width").toInt(&bOk);
     if (!bOk){

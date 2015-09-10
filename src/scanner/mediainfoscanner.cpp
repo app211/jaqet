@@ -42,6 +42,11 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
 
     //Audio
     int audioStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Audio);
+    if (audioStreamCount>0){
+        _mediaInfo.setAChannelsCount(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, 0,__T("Channel(s)"))).trimmed().toUInt());
+        _mediaInfo.setACodec(QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, 0,__T("Codec/String"))));
+
+    }
     for (int audioStreamId = 0; audioStreamId < audioStreamCount; audioStreamId++) {
 //        _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioBitrate, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("BitRate"))).trimmed().toInt() / 1000);
 //        _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioBitrateMode, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("BitRate_Mode"))).trimmed());
@@ -53,9 +58,10 @@ Scanner::AnalysisResult MediaInfoScanner::analyze( const QFileInfo& fi ) const {
 //        _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioLanguage, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Language/String2"))).trimmed());
 //        _mediaInfo.insertAudioStream(audioStreamId, MediaInfo::AudioEncodedLibrary, QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Encoded_Library/String"))).trimmed());
 
-        qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Codec/String")));
+      //  qDebug() << QString::fromStdWString(mediaInfo.Get(MediaInfoLib::Stream_Audio, audioStreamId,__T("Codec/String")));
 
     }
+
 
     //Video
     int videoStreamCount = mediaInfo.Count_Get(MediaInfoLib::Stream_Video);

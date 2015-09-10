@@ -214,9 +214,9 @@ public:
 
     QStringList backdropsHref() const { return d->backdropsHref; }
     QList<QSize> backdropsSize() const { return d->backdropsSize; }
-     QStringList thumbailHref() const { return d->thumbailHref; }
+    QStringList thumbailHref() const { return d->thumbailHref; }
     QList<QSize> thumbailSize() const { return d->thumbailSize; }
-     QList<media> posters() const { return d->posters; }
+    QList<media> posters() const { return d->posters; }
 
     void addPoster(const QString& posterPath, const QSize& posterSize=QSize(), const QString language=QString::null, float rating=10.f){
         if (!posterPath.isEmpty()){
@@ -571,8 +571,6 @@ private:
               linkHref(other.linkHref),
               season(other.season),
               episode(other.episode),
-              showTitle(other.showTitle),
-              originalShowTitle(other.originalShowTitle),
               year(other.year),
               actors(other.actors),
               runtimeInSec(other.runtimeInSec),
@@ -617,8 +615,6 @@ private:
         QString linkHref;
         int season=-1;
         int episode=-1;
-        QString showTitle;
-        QString originalShowTitle;
         int year=0;
         QStringList actors;
         int runtimeInSec=0;
@@ -671,20 +667,9 @@ public:
             setALanguages(mediaInfo.alanguages());
             setTLanguages(mediaInfo.tlanguages());
             setVDisplayAspect(mediaInfo.vdisplayaspect());
-/*
-
-            if (mediaInfo.audioStreamCount()>0){
-                if(!mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).isNull()){
-                    setAChannelsCount(mediaInfo.audioStreamValue(0, MediaInfo::AudioChannelCount).toInt());
-                }
-
-                setACodec(mediaInfo.audioStreamValue(0, MediaInfo::AudioCodec).toString().trimmed());
-
-
-
-            }
-
-      */ }
+            setACodec(mediaInfo.acodec());
+            setAChannelsCount(mediaInfo.aChannelsCount());
+        }
     }
 
     CurrentItemData(const CurrentItemData &other)

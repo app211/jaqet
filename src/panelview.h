@@ -93,6 +93,9 @@ private slots:
     void on_countriesListWidget_itemChanged(QListWidgetItem *item);
     void on_comboBoxVideoCodec_currentIndexChanged(const QString &arg1);
     void on_comboBoxFormat_currentIndexChanged(const QString &arg1);
+    void on_comboBoxAudioCodec_currentIndexChanged(const QString &arg1);
+    void on_toolButton_5_clicked();
+    void on_toolButtonEditOriginalTitle_clicked();
 };
 
 #endif // PANELVIEW_H

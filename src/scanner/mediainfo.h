@@ -137,6 +137,12 @@ public:
     void setVDisplayAspect(const QString& vdisplayaspect) { _vdisplayaspect = vdisplayaspect; }
     QString vdisplayaspect() const { return _vdisplayaspect; }
 
+     void setAChannelsCount(const uint& aChannelsCount) { _aChannelsCount = aChannelsCount; }
+     uint aChannelsCount() const { return _aChannelsCount; }
+
+     void setACodec(const QString& acodec) { _acodec = acodec; }
+     QString acodec() const { return _acodec; }
+
 private:
 
 
@@ -156,6 +162,8 @@ private:
     QString _vaspect;
     QString _vscantype;
     QString _vdisplayaspect;
+    uint _aChannelsCount=0;
+    QString _acodec;
 };
 
 Q_DECLARE_METATYPE(MediaInfo);

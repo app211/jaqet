@@ -13,6 +13,7 @@ class MediaChooserGraphicsObject;
 class MediaChooserButton;
 class Scraper;
 class QNetworkAccessManager;
+class ClickButtonMediaChooserGraphicsObject;
 
 namespace Ui {
 class MediaChooserPopup;
@@ -41,7 +42,7 @@ protected:
      void closeEvent(QCloseEvent *event);
      void doFilter( QFlags<ImageType> filter);
 signals:
-     void mediaSelected(const MediaChoosed& url);
+     void mediaChoosed(const MediaChoosed& url);
      void popupClosed();
 
 private slots:
@@ -50,13 +51,16 @@ private slots:
 
       void on_pushButton_clicked();
 
+public slots:
+      void mediaSelected(const MediaChoosed& url);
+
 private:
     Ui::MediaChooserPopup *ui;
 
     void setImageFromInternet(const QPixmap& pixmap,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h);
-    void addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator ,  int x, int y, int w, int h);
-    void addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator, int x, int y, int w, int h);
-    void addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator);
+    void addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator , QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton,  int x, int y, int w, int h);
+    void addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton, int x, int y, int w, int h);
+    void addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton );
     void addImage(const QUrl&, const MediaChoosed &mediaChoosed, QFlags<ImageType> type);
 
     void startPromise( QNetworkAccessManager* manager);

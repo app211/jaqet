@@ -171,5 +171,6 @@
         <file>images/flags/flag_ua.png</file>
         <file>images/flags/flag_us.png</file>
         <file>images/flags/flag_vn.png</file>
+        <file>images/reload.png</file>
     </qresource>
 </RCC>
