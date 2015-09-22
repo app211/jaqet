@@ -38,11 +38,20 @@ public:
 
     QFlags<ImageType> currentFilter();
 
+    uint getMediaWidth() const {
+        return 200;
+    }
+
+    uint getMediaHeigth() const {
+        return 200;
+    }
+
 protected:
      void closeEvent(QCloseEvent *event);
      void doFilter( QFlags<ImageType> filter);
 signals:
      void mediaChoosed(const MediaChoosed& url);
+
      void popupClosed();
 
 private slots:
@@ -53,17 +62,21 @@ private slots:
 
 public slots:
       void mediaSelected(const MediaChoosed& url);
+      void reload(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate,  QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton);
 
 private:
     Ui::MediaChooserPopup *ui;
 
-    void setImageFromInternet(const QPixmap& pixmap,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h);
-    void addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator , QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton,  int x, int y, int w, int h);
-    void addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton, int x, int y, int w, int h);
-    void addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, int x, int y, int w, int h,  QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton );
+    void setImageFromInternet(const QPixmap& pixmap,  QPointer<MediaChooserGraphicsObject> itemToUpdate);
+    void addFile(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator , QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton);
+    void addError(const QString& errorMessage,  QPointer<MediaChooserGraphicsObject> itemToUpdate, QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton);
+    void addHttpRequest(const QUrl& url,  QPointer<MediaChooserGraphicsObject> itemToUpdate,  QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton, QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton );
     void addImage(const QUrl&, const MediaChoosed &mediaChoosed, QFlags<ImageType> type);
+    void addPixmap(const QPixmap& pixmap,  QPointer<MediaChooserGraphicsObject> itemToUpdate,QPointer<QGraphicsProxyWidget> busyIndicator, QPointer<ClickButtonMediaChooserGraphicsObject> chooseButton,QPointer<ClickButtonMediaChooserGraphicsObject> reloadButton);
 
     void startPromise( QNetworkAccessManager* manager);
+
+    QPixmap createDefaultPoster() const;
 
 
     QFlags<ImageType> _currentFilter;

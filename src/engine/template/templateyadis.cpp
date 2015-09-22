@@ -61,7 +61,7 @@ QString TemplateYadis::getAbsoluteFilePath(const QString& fileName){
 #endif
     QString absoluteFilename= QFileInfo(QDir(absoluteTemplateFilePath),fileName).absoluteFilePath();
     if (isCaseSensitive){
-        // Template come from an unsensitive file system... On sensitive system, we have sometimes to correct the filename
+        // Template come from an unsensitive file system... On a sensitive system, we have sometimes to correct the filename
         QFileInfo fileInfo(absoluteFilename);
         if (!fileInfo.exists()){
             QDir parent_dir = fileInfo.absoluteDir();

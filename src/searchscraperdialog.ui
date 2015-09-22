@@ -32,6 +32,21 @@
          </sizepolicy>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLineEdit" name="lineEditTitle">
            <property name="enabled">
@@ -42,14 +57,11 @@
          <item>
           <widget class="QToolButton" name="toolButton">
            <property name="text">
-            <string/>
+            <string notr="true">...</string>
            </property>
            <property name="icon">
             <iconset resource="../resources/resources.qrc">
              <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -381,7 +393,10 @@
       <enum>Qt::Vertical</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel</set>
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -436,38 +451,6 @@
     <hint type="destinationlabel">
      <x>414</x>
      <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEditTitle</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>520</x>
-     <y>51</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>42</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>buttonBox</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>518</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>583</x>
-     <y>121</y>
     </hint>
    </hints>
   </connection>

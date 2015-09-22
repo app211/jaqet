@@ -883,7 +883,10 @@ public slots:
     void closeDialog();
     void showErrorDialog(const QString& error=QString::null);
 
+
 signals:
+
+    void canceled() const;
     void scraperError() const;
     void scraperError(const QString& error) const;
     void found(FilmPrtList films) const;

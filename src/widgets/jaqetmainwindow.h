@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class InProgressDialog;
+
 class JaqetMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -13,7 +15,7 @@ public:
     explicit JaqetMainWindow(QWidget *parent = 0);
     ~JaqetMainWindow();
 
-    void showWaitDialog();
+    QPointer<InProgressDialog> showWaitDialog();
     void hideWaitDialog();
 
     static JaqetMainWindow* getInstance();

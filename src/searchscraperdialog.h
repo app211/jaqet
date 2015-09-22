@@ -30,13 +30,14 @@ private:
 
     FoundResult result;
     QPushButton* findButton=nullptr;
+    QPushButton* createButton=nullptr;
 
 private slots:
     void searchScraper();
     void found(FilmPrtList result);
     void found(ShowPtrList shows);
     void updateMenu();
-
+    void on_toolButton_clicked();
 };
 
 #endif // SEARCHSCRAPERDIALOG_H

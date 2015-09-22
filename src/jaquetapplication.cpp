@@ -70,6 +70,7 @@ int JaquetApplication::go(){
     qDebug() << QApplication::style()->metaObject()->className();
     qDebug() << QApplication::style()->objectName();
 
+
     QString style;
     QFile styleFile( ":/resources/styles/default.qss" );
     if (styleFile.open( QFile::ReadOnly )){

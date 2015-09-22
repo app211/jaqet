@@ -19,7 +19,6 @@ class Promise : public QObject
 public:
     Promise();
     static Promise* loadAsync( QNetworkAccessManager & manager, const QString& url, bool useRandomIP=true, bool useRandomUserAgent=true, QNetworkRequest::Priority priority=QNetworkRequest::NormalPriority);
-    static Promise* loadAsync( QNetworkAccessManager & manager, const QString& url, QByteArray& , bool useRandomIP=true, bool useRandomUserAgent=true, QNetworkRequest::Priority priority=QNetworkRequest::NormalPriority);
 
      QNetworkReply::NetworkError replyError();
      QString replyErrorString();

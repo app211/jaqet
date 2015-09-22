@@ -19,6 +19,8 @@ InProgressDialog::InProgressDialog(QWidget *parent) :
 
     const QRect screen = QApplication::desktop()->screenGeometry();
     this->move( screen.center() - this->rect().center() );
+
+    connect(ui->pushButton,SIGNAL (released()), this, SIGNAL(canceled()));
 }
 
 InProgressDialog::~InProgressDialog()
@@ -32,3 +34,8 @@ InProgressDialog* InProgressDialog::create(){
      return p;
  }
 
+
+void InProgressDialog::closeAndDeleteLater(){
+    close();
+    deleteLater();
+}

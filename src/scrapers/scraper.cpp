@@ -53,9 +53,15 @@ void Scraper::searchTV( QNetworkAccessManager* manager, const QString& toSearch,
 }
 
 
+
 void  Scraper::findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor, const QString& language)  {
 
-    JaqetMainWindow::getInstance()->showWaitDialog();
+    QPointer<InProgressDialog> waitDialog = JaqetMainWindow::getInstance()->showWaitDialog();
+    if (!waitDialog.isNull()){
+        connect(waitDialog.data(), SIGNAL(canceled()), this,
+                SIGNAL(canceled()), Qt::UniqueConnection);
+
+    }
 
     internalFindMovieInfo(manager,  mediaMovieSearchPtr, searchFor, language);
 }

@@ -16,11 +16,12 @@ public:
 
     static InProgressDialog* create();
 
-    void closeAndDeleteLater(){
-        close();
-        deleteLater();
-    }
+    void closeAndDeleteLater();
 
+
+
+signals:
+     void canceled();
 
 private:
     Ui::InProgressDialog *ui;

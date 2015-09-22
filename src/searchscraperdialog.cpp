@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "scanner/filenamescanner.h"
 #include "chooseitemdialog.h"
@@ -127,12 +128,13 @@ void SearchScraperDialog::init(QList<Scraper*> scrapers){
 
     }
 
-
-    findButton = new QPushButton(tr("&Search"));
-
+    findButton =  ui->buttonBox->addButton(tr("&Search"), QDialogButtonBox::AcceptRole);
     findButton->setMenu(menuFichier);
 
-    ui->buttonBox->addButton(findButton, QDialogButtonBox::AcceptRole);
+    createButton=ui->buttonBox->addButton(tr("&Create"), QDialogButtonBox::AcceptRole);
+
+    ui->buttonBox->addButton(QDialogButtonBox::Cancel);
+
 }
 
 void SearchScraperDialog::searchScraper(){
@@ -234,4 +236,19 @@ FoundResult SearchScraperDialog::getResult() const {
 SearchScraperDialog::~SearchScraperDialog()
 {
     delete ui;
+}
+
+
+void SearchScraperDialog::on_toolButton_clicked()
+{
+    QInputDialog dialog;
+    dialog.setInputMode( QInputDialog::TextInput);
+    dialog.setLabelText(tr("Title:"));
+    dialog.setWindowTitle("dfdfdfd");
+    dialog.resize(500,100);
+    dialog.setTextValue(ui->lineEditTitle->text());
+    bool ok=dialog.exec();
+     if (ok && !dialog.textValue().isEmpty()){
+        ui->lineEditTitle->setText(dialog.textValue());
+    }
 }

@@ -33,10 +33,12 @@ JaqetMainWindow* JaqetMainWindow::getInstance()
 
 QPointer<InProgressDialog> p;
 
-void JaqetMainWindow::showWaitDialog(){
+QPointer<InProgressDialog> JaqetMainWindow::showWaitDialog(){
         if (p.isNull()) {
             p=InProgressDialog::create();
         }
+
+        return p;
 }
 
 void JaqetMainWindow::hideWaitDialog(){
