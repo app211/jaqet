@@ -599,7 +599,8 @@ private:
               countries(other.countries),
               tagLine(other.tagLine),
               certificate(other.certificate),
-              mediaInfo(other.mediaInfo)
+              mediaInfo(other.mediaInfo),
+              userdurationSecs(other.userdurationSecs)
 
         { }
 
@@ -617,7 +618,9 @@ private:
         int episode=-1;
         int year=0;
         QStringList actors;
-        int runtimeInSec=0;
+        uint runtimeInSec=0;
+        uint vdurationSecs=0;
+        uint userdurationSecs=0;
         double rating=-1.;
         QStringList directors;
         QStringList network;
@@ -630,7 +633,6 @@ private:
         QString vaspect;
         QString vdisplayaspect;
         QString vscantype;
-        int vdurationSecs=0;
         int achannelsCount=-1;
         QStringList alanguages;
         bool tv=false;
@@ -658,7 +660,7 @@ public:
         : d(new CurrentItemDataPrivate(engine,tv,fileInfo,mediaInfo))
     {
         if (!mediaInfo.isEmpty()){
-            setVDurationSecs(mediaInfo.durationSecs());
+            setPhysicalDurationInSec(mediaInfo.durationSecs());
             setVCodec(mediaInfo.vcodec());
             setVResolution(mediaInfo.vresolution());
             setVAspect(mediaInfo.vaspect());
@@ -749,11 +751,14 @@ public:
     void setVScanType(const QString& vscantype) { d->vscantype = vscantype; }
     QString vscantype() const { return d->vscantype; }
 
-    void setRuntimeInSec( int runtimeInSec) { d->runtimeInSec=runtimeInSec; }
-    int runtimeInSec() const { return d->runtimeInSec;}
+    void setLogicalDurationInSec( uint runtimeInSec) { d->runtimeInSec=runtimeInSec; }
+    uint logicalDurationInSec() const { return d->runtimeInSec;}
 
-    void setVDurationSecs( int vdurationSecs) { d->vdurationSecs=vdurationSecs; }
-    int vdurationSecs() const { return d->vdurationSecs;}
+    void setPhysicalDurationInSec( uint vdurationSecs) { d->vdurationSecs=vdurationSecs; }
+    uint physicalDurationInSec() const { return d->vdurationSecs;}
+
+    void setRuntimeInSec( uint userdurationSecs) { d->userdurationSecs=userdurationSecs; }
+    uint runtimeInSec() const { return (d->userdurationSecs>0) ? d->userdurationSecs : ((physicalDurationInSec()>0) ? physicalDurationInSec():logicalDurationInSec());}
 
     void setYear( int year) { d->year=year; }
     int year() const { return d->year;}

@@ -142,9 +142,9 @@
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-16</y>
+                <y>0</y>
                 <width>917</width>
-                <height>662</height>
+                <height>704</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -553,10 +553,34 @@
                    <widget class="QWidget" name="widget_28" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_29">
                      <item>
-                      <widget class="QCheckBox" name="checkBox">
+                      <widget class="CheckLock" name="checkBox">
                        <property name="text">
                         <string>Duration</string>
                        </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_36" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_16">
+                        <item>
+                         <widget class="QLineEdit" name="durationEdit">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QToolButton" name="toolButton_5">
+                          <property name="text">
+                           <string>...</string>
+                          </property>
+                          <property name="icon">
+                           <iconset resource="../resources/resources.qrc">
+                            <normaloff>:/resources/Edit.png</normaloff>:/resources/Edit.png</iconset>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                     </layout>
@@ -581,7 +605,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QCheckBox" name="checkBoxRating">
+                      <widget class="CheckLock" name="checkBoxRating">
                        <property name="text">
                         <string>Rating</string>
                        </property>

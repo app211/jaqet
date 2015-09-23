@@ -157,6 +157,10 @@ PanelView::PanelView(QWidget *parent) :
     }
 
 
+    QRegExp exp("[ \\d]{3}(:[0-5 ][ \\d]){2}");
+    ui->durationEdit->setValidator(new QRegExpValidator(exp, this));
+ ui->durationEdit->setText("000:00:00");
+
     /*     QCompleter* resolutionCompleter= new QCompleter(l,this);
          resolutionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
          resolutionCompleter->setCompletionMode(QCompleter::PopupCompletion);
@@ -380,6 +384,12 @@ void PanelView::updateUI(){
     } else {
         ui->comboBoxYear->setCurrentIndex(0);
     }
+
+    uint duration   = currentSearch.runtimeInSec();
+    uint sec        = duration % 60;
+    uint min        = (duration / 60) % 60;
+    uint hou        = duration / 3600;
+    ui->durationEdit->setText(QString("%1:%2:%3").arg(hou,3,10,QLatin1Char( '0' )).arg(min,2,10,QLatin1Char( '0' )).arg(sec,2,10,QLatin1Char( '0' )));
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -461,7 +471,7 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
         newData.setGenre(getItemsListWidget(ui->genreListWidget));
     }
 
-    newData.setRuntimeInSec(mediaTVSearchPtr->runtimeInSec());
+    newData.setLogicalDurationInSec(mediaTVSearchPtr->runtimeInSec());
     newData.setYear(mediaTVSearchPtr->productionYear());
     newData.setTitle(mediaTVSearchPtr->title());
     newData.setEpisodeRating(mediaTVSearchPtr->episodeRating());
@@ -546,7 +556,7 @@ void PanelView::foundMovie(const Scraper* scraper, MediaMovieSearchPtr mediaMovi
 
     newData.setTitle(mediaMovieSearchPtr->title());
     newData.setOriginalTitle(mediaMovieSearchPtr->originalTitle());
-    newData.setRuntimeInSec(mediaMovieSearchPtr->runtimeInSec());
+    newData.setLogicalDurationInSec(mediaMovieSearchPtr->runtimeInSec());
     newData.setCountries(mediaMovieSearchPtr->countries());
     newData.setRating(mediaMovieSearchPtr->rating());
     newData.setYear(mediaMovieSearchPtr->productionYear());

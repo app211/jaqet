@@ -29,6 +29,8 @@ QString Q(QStringLiteral("q"));
 QString TITLE(QStringLiteral("title"));
 QString ORIGINALTITLE(QStringLiteral("originalTitle"));
 QString TVSERIES(QStringLiteral("tvseries"));
+QString RUNTIME(QStringLiteral("runtime"));
+
 QString LARGE(QStringLiteral("large"));
 QString MEDIUM(QStringLiteral("medium"));
 
@@ -65,7 +67,7 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
 
     QString fullQuery= QStringLiteral("http://api.allocine.fr/%2?%3&sig=%4").arg( type, searchQuery, QUrl::toPercentEncoding(QCryptographicHash::hash(toEncrypt.toUtf8(), QCryptographicHash::Sha1).toBase64()));
 
-    qDebug() << fullQuery;
+    qDebug().noquote() << fullQuery;
 
     return fullQuery;
 }
@@ -139,6 +141,8 @@ void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QSt
     {
         if (promise->replyError() ==QNetworkReply::NoError){
             const QByteArray data=promise->replyData();
+            qDebug().noquote() << "internalSearchTV:" << data;
+
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -221,6 +225,8 @@ void AlloCineScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, Me
     {
         if (promise->replyError() ==QNetworkReply::NoError){
             const QByteArray data=promise->replyData();
+            qDebug().noquote() << "internalFindEpisodeInfo:" << data;
+
              QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -308,7 +314,8 @@ void AlloCineScraper::findSeasonInfoByCode(QNetworkAccessManager *manager, const
     {
         if (promise->replyError() ==QNetworkReply::NoError){
             const QByteArray data=promise->replyData();
-            qDebug() <<  data;
+            qDebug().noquote() << "findSeasonInfoByCode:" << data;
+
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -549,7 +556,8 @@ void AlloCineScraper::findEpisodeInfoByCode(QNetworkAccessManager *manager, cons
     {
         if (promise->replyError() ==QNetworkReply::NoError){
             const QByteArray data=promise->replyData();
-            qDebug() << data;
+            qDebug().noquote() << "findEpisodeInfoByCode:" << data;
+
             QJsonParseError e;
             QJsonDocument doc=  QJsonDocument::fromJson(data,&e);
             if (e.error== QJsonParseError::NoError){
@@ -837,14 +845,13 @@ bool AlloCineScraper::parseMovieInfo(QNetworkAccessManager *manager, const QJson
     mediaMovieSearchPtr->setOriginalTitle(movieObject[ORIGINALTITLE].toString());
     mediaMovieSearchPtr->setSynopsis(movieObject[QStringLiteral("synopsis")].toString());
     mediaMovieSearchPtr->setProductionYear(movieObject[QStringLiteral("productionYear")].toInt());
+    mediaMovieSearchPtr->setRuntimeInSec(movieObject[RUNTIME].toInt());
 
     extractNationality(movieObject[QStringLiteral("nationality")].toArray(),mediaMovieSearchPtr);
     extractCertificate(movieObject[QStringLiteral("movieCertificate")].toObject(),mediaMovieSearchPtr);
 
     extractGenre<MediaMovieSearchPtr>(movieObject,mediaMovieSearchPtr);
 
-
-    // mediaMovieSearchPtr.runtime = movieObject["runtime"].toInt();
 
     //    if(movieObject["poster"].isObject()){
     //        info.posterHref = movieObject["poster"].toObject()["href"].toString();

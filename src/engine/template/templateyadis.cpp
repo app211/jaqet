@@ -345,8 +345,6 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
     }else if (type=="runtime") {
         if (data.runtimeInSec()>0){
             textToDraw=QDateTime::fromTime_t(data.runtimeInSec()).toUTC().toString("h'H 'mm");
-        } else if (data.vdurationSecs()>0 ){
-            textToDraw=QDateTime::fromTime_t(data.vdurationSecs()).toUTC().toString("h'H 'mm");
         }
     }else if (type=="rating"){
         if (context==Context::tv_synopsis_episode_episodeicon){
