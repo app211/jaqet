@@ -64,6 +64,7 @@ private:
     void buildPreview( const CurrentItemData& currentSearch);
     void buildPoster( const CurrentItemData& currentSearch);
 
+    void lock(bool bLock);
 private slots:
 
     void search(Engine *engine, const QModelIndex &index);
@@ -96,6 +97,8 @@ private slots:
     void on_comboBoxAudioCodec_currentIndexChanged(const QString &arg1);
     void on_toolButton_5_clicked();
     void on_toolButtonEditOriginalTitle_clicked();
+    void on_toolButtonUnlockAll_clicked();
+    void on_toolButtonLockAll_clicked();
 };
 
 #endif // PANELVIEW_H

@@ -15,3 +15,7 @@ CheckLock::~CheckLock()
  bool CheckLock::isLock() const {
      return !isChecked();
  }
+
+   bool CheckLock::lock(bool bLock){
+       this->setChecked(!bLock);
+   }

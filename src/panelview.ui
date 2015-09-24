@@ -117,6 +117,28 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="toolButtonUnlockAll">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/resources.qrc">
+              <normaloff>:/resources/images/un_lock.png</normaloff>:/resources/images/un_lock.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonLockAll">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/resources.qrc">
+              <normaloff>:/resources/images/lock.png</normaloff>:/resources/images/lock.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="ProceedToolButton">
             <property name="text">
              <string>...</string>
@@ -389,7 +411,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="CheckLock" name="checkBox_15">
+                      <widget class="CheckLock" name="checkBoxOriginalEpisodeTitle">
                        <property name="text">
                         <string>Original Title</string>
                        </property>
@@ -524,6 +546,9 @@
                        <property name="text">
                         <string>Year</string>
                        </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -540,9 +565,12 @@
                    <widget class="QWidget" name="widget_35" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_30">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_2">
+                      <widget class="CheckLock" name="checkBox_2">
                        <property name="text">
                         <string>Classification</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -556,6 +584,9 @@
                       <widget class="CheckLock" name="checkBox">
                        <property name="text">
                         <string>Duration</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -608,6 +639,9 @@
                       <widget class="CheckLock" name="checkBoxRating">
                        <property name="text">
                         <string>Rating</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -954,9 +988,12 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QCheckBox" name="checkBoxCountries">
+                      <widget class="CheckLock" name="checkBoxCountries">
                        <property name="text">
-                        <string>CheckBox</string>
+                        <string>Nationality</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1145,6 +1182,9 @@
                       <widget class="CheckLock" name="checkBoxLockBanner">
                        <property name="text">
                         <string>Banner</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>

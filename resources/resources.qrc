@@ -172,5 +172,6 @@
         <file>images/flags/flag_us.png</file>
         <file>images/flags/flag_vn.png</file>
         <file>images/reload.png</file>
+        <file>images/posterMaquant.png</file>
     </qresource>
 </RCC>

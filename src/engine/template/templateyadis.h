@@ -55,7 +55,7 @@ private:
     bool exec(QPainter &result,const CurrentItemData &data);
     bool execTV(QDomElement e,QPainter &result,const CurrentItemData &data);
     bool execMovie(const QDomElement& e, QPainter &result,const CurrentItemData &data);
-    bool execImage(const QDomElement& imageElement, QPainter &result,const CurrentItemData &data);
+    bool execImage(const QDomElement& imageElement, QPainter &result,Context context,const CurrentItemData &data);
     bool execNode(QDomElement e, QPainter &result, Context context,const CurrentItemData &data);
     bool execText(const QDomElement& textElement, QPainter &pixPaint, Context context,const CurrentItemData &data);
     bool execLanguages(const QDomElement& languagesElement, QPainter &pixPaint, Context context,const CurrentItemData &data);

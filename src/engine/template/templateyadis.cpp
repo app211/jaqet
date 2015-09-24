@@ -131,6 +131,10 @@ void TemplateYadis::proceed(const CurrentItemData& data){
     }
 
     QString title=data.title();
+    if (title.isEmpty()){
+        title="NOTITLE";
+    }
+
     if (data.isTV()){
         title= QString("%1.s%2e%3").arg(data.title()).arg(data.season(),2, 10, QChar('0')).arg(data.episode(),2, 10, QChar('0'));
     }
@@ -160,12 +164,13 @@ void TemplateYadis::proceed(const CurrentItemData& data){
     QPixmap poster=data.getPoster();
 
     if (!poster.isNull()){
-        //
-        //    folder.jpg: celui-là, on le connait, c’est l’image de la jaquette au format portrait (138×186 pixels).
         poster=poster.scaled(QSize(138,186),Qt::KeepAspectRatio);
-
-        poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
+    } else {
+        poster=QPixmap(":/resources/images/posterMaquant.png").scaled(QSize(138,186),Qt::KeepAspectRatio);
     }
+
+    poster.save(QFileInfo(d,"folder.jpg").absoluteFilePath());
+
 }
 
 QPixmap TemplateYadis::internalCreate(const CurrentItemData& data){
@@ -279,10 +284,12 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
         return false;
     }
 
-    QString type = textElement.attribute("type");
+    QString type = textElement.attribute("type").toLower();
     QString color = textElement.attribute("color");
-    QString language = textElement.attribute("language");
+    QString language = textElement.attribute("language").toLower();
     QString font = textElement.attribute("font");
+
+    qDebug() << type;
 
     bool bOk;
     int size=-1;
@@ -324,6 +331,7 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
 
     QString textToDraw;
     if (type=="static" && !value.isEmpty() && (language.isEmpty() ||language=="fr")){
+        qDebug() << value;
         textToDraw=value;
     } else if (type=="plot"){
         textToDraw=data.synopsis();
@@ -437,13 +445,13 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
     return true;
 }
 
-bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPaint, const CurrentItemData &data){
+bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPaint, Context context,const CurrentItemData &data){
 
     if (!imageElement.hasAttribute("type")){
         return false;
     }
 
-    QString type = imageElement.attribute("type");
+    QString type = imageElement.attribute("type").toLower();
 
     if (!imageElement.hasAttribute("x")){
         return false;
@@ -577,6 +585,27 @@ bool TemplateYadis::execImage(const QDomElement& imageElement, QPainter &pixPain
                 pixPaint.drawPixmap(x,y,w,h,pstatic);
             }
         }
+    }else if (type=="rating"){
+        QString f;
+        if (context==Context::tv_synopsis_episode_episodeicon){
+            if (data.epidodeRating()>0.f && data.rating()<=10.f) {
+                f=QString("%1.png").arg(qRound(data.epidodeRating()));
+            }
+        } else if (context==Context::movie_synopsis){
+            if (data.rating()>0. && data.rating()<=10.){
+                f=QString("%1.png").arg(qRound(data.rating()));
+            }
+        } else if (context==Context::tv_synopsis_common) {
+            if (data.showRating()>0. && data.showRating()<=10.){
+                f=QString("%1.png").arg(qRound(data.showRating()));
+            }
+        }
+
+        QPixmap pstatic;
+        if (pstatic.load(getAbsoluteFilePath(f)) ){
+            pixPaint.drawPixmap(x,y,w,h,pstatic);
+        }
+
     }else if (type=="aspect"){
         if (!data.vaspect().isEmpty()){
             QStringList ratio=data.vaspect().split(QRegExp("(/|:)"));
@@ -780,7 +809,7 @@ bool TemplateYadis::execNode(QDomElement synopsisNode, QPainter &result, Context
                     return false;
                 }
             } else if (e.tagName()=="image"){
-                if (!execImage(e,result,data)){
+                if (!execImage(e,result,context,data)){
                     return false;
                 }
             }else if (e.tagName()=="text"){

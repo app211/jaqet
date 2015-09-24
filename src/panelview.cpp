@@ -159,7 +159,7 @@ PanelView::PanelView(QWidget *parent) :
 
     QRegExp exp("[ \\d]{3}(:[0-5 ][ \\d]){2}");
     ui->durationEdit->setValidator(new QRegExpValidator(exp, this));
- ui->durationEdit->setText("000:00:00");
+    ui->durationEdit->setText("000:00:00");
 
     /*     QCompleter* resolutionCompleter= new QCompleter(l,this);
          resolutionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -473,7 +473,13 @@ void PanelView::foundEpisode(const Scraper* scraper, MediaTVSearchPtr mediaTVSea
 
     newData.setLogicalDurationInSec(mediaTVSearchPtr->runtimeInSec());
     newData.setYear(mediaTVSearchPtr->productionYear());
-    newData.setTitle(mediaTVSearchPtr->title());
+
+    if (!ui->checkBoxTitle->isLock()){
+        newData.setTitle(mediaTVSearchPtr->title());
+    } else {
+        newData.setTitle(ui->titleEdit->text());
+    }
+
     newData.setEpisodeRating(mediaTVSearchPtr->episodeRating());
     newData.setShowRating(mediaTVSearchPtr->showRating());
     newData.setSeasonRating(mediaTVSearchPtr->seasonRating());
@@ -972,4 +978,29 @@ void PanelView::on_toolButtonEditOriginalTitle_clicked()
         ui->titleEdit->setText(currentSearch.title());
         buildPreview(currentSearch);
     }
+}
+
+void PanelView::lock(bool bLock){
+    ui->checkBoxSynopsis->lock(bLock);
+    ui->checkBoxLockCast->lock(bLock);
+    ui->checkBoxLockDirectors->lock(bLock);
+    ui->checkBoxLockGenre->lock(bLock);
+    ui->checkBoxLockBackground->lock(bLock);
+    ui->checkBoxLockBanner->lock(bLock);
+    ui->checkBoxLockPoster->lock(bLock);
+    ui->checkBoxLockThumbail->lock(bLock);
+    ui->checkBoxTitle->lock(bLock);
+    ui->checkBoxOriginalTitle->lock(bLock);
+    ui->checkBoxEpisodeTitle->lock(bLock);
+    ui->checkBoxOriginalEpisodeTitle->lock(bLock);
+}
+
+void PanelView::on_toolButtonUnlockAll_clicked()
+{
+    lock(false);
+}
+
+void PanelView::on_toolButtonLockAll_clicked()
+{
+     lock(true);
 }

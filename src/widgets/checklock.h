@@ -11,6 +11,8 @@ public:
     ~CheckLock();
 
     bool isLock() const;
+    bool lock(bool bLock);
+
 signals:
 
 public slots:
