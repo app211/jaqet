@@ -72,21 +72,74 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="chooseTizzBirdFolderButton">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QListView" name="listView"/>
+            </item>
+            <item>
+             <widget class="QWidget" name="widget_4" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>1</number>
+               </property>
+               <property name="leftMargin">
+                <number>1</number>
+               </property>
+               <property name="topMargin">
+                <number>1</number>
+               </property>
+               <property name="rightMargin">
+                <number>1</number>
+               </property>
+               <property name="bottomMargin">
+                <number>1</number>
+               </property>
+               <item>
+                <widget class="QToolButton" name="toolButtonChooseFolder">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/resources/images/folder.png</normaloff>:/resources/images/folder.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QToolButton" name="toolButtonSettings">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/resources/images/settings.png</normaloff>:/resources/images/settings.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="toolButtonExit">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/resources.qrc">
+                   <normaloff>:/resources/images/exit.png</normaloff>:/resources/images/exit.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -109,45 +162,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections>
-  <connection>
-   <sender>chooseTizzBirdFolderButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>chooseTizzBirdFolder()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>235</x>
-     <y>36</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>settings()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>86</x>
-     <y>49</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>264</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections/>
  <slots>
   <slot>searchAllocine()</slot>
   <slot>searchAllocineMovie()</slot>
-  <slot>chooseTizzBirdFolder()</slot>
   <slot>changeFileName()</slot>
   <slot>setSynopsis()</slot>
   <slot>savePix()</slot>

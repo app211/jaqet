@@ -53,7 +53,11 @@ SOURCES += src/main.cpp\
     src/widgets/jaqetmainwindow.cpp \
     src/settingdialog.cpp \
     src/scrapers/fanarttvprovider.cpp \
-    src/jaquetapplication.cpp
+    src/jaquetapplication.cpp \
+    src/configdialog/pages.cpp \
+    src/configdialog/configdialog.cpp \
+    src/configdialog/networkproxysettingspage.cpp \
+    src/configdialog/settingspage.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -86,7 +90,11 @@ HEADERS  += src/mainwindow.h \
     src/jsonhelper.h \
     src/settingdialog.h \
     src/scrapers/fanarttvprovider.h \
-    src/jaquetapplication.h
+    src/jaquetapplication.h \
+    src/configdialog/pages.h \
+    src/configdialog/configdialog.h \
+    src/configdialog/networkproxysettingspage.h \
+    src/configdialog/settingspage.h
 
 
 FORMS    += src/mainwindow.ui \
@@ -95,10 +103,12 @@ FORMS    += src/mainwindow.ui \
     src/inprogressdialog.ui \
     src/panelview.ui \
     src/mediachooserpopup.ui \
-    src/settingdialog.ui
+    src/settingdialog.ui \
+    src/configdialog/networkproxysettingspage.ui
 
 RESOURCES += \
-    resources/resources.qrc
+    resources/resources.qrc \
+    src/configdialog/configdialog.qrc
 
 OTHER_FILES += \
     attribution.txt

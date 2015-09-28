@@ -33,6 +33,7 @@
 #include "engine/tvixengine.h"
 #include "promise.h"
 #include "searchscraperdialog.h"
+#include "configdialog/configdialog.h"
 
 void MainWindow::doubleClicked ( const QModelIndex & ){
 
@@ -115,16 +116,29 @@ void MainWindow::currentChanged ( const QModelIndex & current, const QModelIndex
 
 #include "settingdialog.h"
 
-void MainWindow::settings(){
-    SettingDialog d;
-    d.exec();
+
+
+
+
+
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 
 
 
+void MainWindow::on_toolButtonExit_clicked()
+{
+    QApplication::exit();
+}
 
-void MainWindow::chooseTizzBirdFolder() {
+
+
+void MainWindow::on_toolButtonChooseFolder_clicked()
+{
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
@@ -137,11 +151,11 @@ void MainWindow::chooseTizzBirdFolder() {
 }
 
 
-
-MainWindow::~MainWindow()
+void MainWindow::on_toolButtonSettings_clicked()
 {
-    delete ui;
+  /*  SettingDialog d;
+    d.exec();
+    */
+    ConfigDialog dialog;
+   /* return*/ dialog.exec();
 }
-
-
-

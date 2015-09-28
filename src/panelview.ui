@@ -32,7 +32,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="pageProceed">
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1601,31 +1601,7 @@
      <widget class="QWidget" name="page_3">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTabWidget" name="tabWidget_2">
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="tab_4">
-          <attribute name="title">
-           <string>Preview</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_26">
-           <item>
-            <widget class="QGraphicsView" name="graphicsViewBingo"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tab_5">
-          <attribute name="title">
-           <string>Poster</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_27">
-           <item>
-            <widget class="QGraphicsView" name="graphicsViewPosterBingo"/>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+        <widget class="QGraphicsView" name="graphicsViewBingo"/>
        </item>
       </layout>
      </widget>

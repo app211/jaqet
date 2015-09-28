@@ -34,14 +34,20 @@ private:
 private slots:
 
     void currentChanged ( const QModelIndex & current, const QModelIndex & previous );
-    void chooseTizzBirdFolder();
-    void settings();
 
     void doubleClicked (const QModelIndex &);
 
     void modelReset();
     void modelAboutToBeReset();
 
+
+    void on_toolButtonExit_clicked();
+
+
+    void on_toolButtonChooseFolder_clicked();
+
+
+    void on_toolButtonSettings_clicked();
 
 private:
     MyProxyModel* model;
