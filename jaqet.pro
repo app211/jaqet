@@ -2,7 +2,7 @@ TARGET = jaqet
 
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++14
 QMAKE_CXXFLAGS_WARN_ON += -Wno-reorder
 
 DEFINES += QUAZIP_STATIC
@@ -57,7 +57,8 @@ SOURCES += src/main.cpp\
     src/configdialog/pages.cpp \
     src/configdialog/configdialog.cpp \
     src/configdialog/networkproxysettingspage.cpp \
-    src/configdialog/settingspage.cpp
+    src/configdialog/settingspage.cpp \
+    src/maskinputdialog.cpp
 
 
 HEADERS  += src/mainwindow.h \
@@ -94,7 +95,8 @@ HEADERS  += src/mainwindow.h \
     src/configdialog/pages.h \
     src/configdialog/configdialog.h \
     src/configdialog/networkproxysettingspage.h \
-    src/configdialog/settingspage.h
+    src/configdialog/settingspage.h \
+    src/maskinputdialog.h
 
 
 FORMS    += src/mainwindow.ui \

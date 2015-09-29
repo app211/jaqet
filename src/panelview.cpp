@@ -390,6 +390,15 @@ void PanelView::updateUI(){
     uint min        = (duration / 60) % 60;
     uint hou        = duration / 3600;
     ui->durationEdit->setText(QString("%1:%2:%3").arg(hou,3,10,QLatin1Char( '0' )).arg(min,2,10,QLatin1Char( '0' )).arg(sec,2,10,QLatin1Char( '0' )));
+
+
+    QString alanguages2;
+    for (int i=0; i<qMin<int>(4,currentSearch.alanguages().size());i++){
+       alanguages2.append(currentSearch.alanguages().at(i).toUpper());
+    }
+
+    ui->lineEditLanguges->setText(alanguages2);
+
 }
 
 void PanelView::addImages( const Scraper* scraper, const QStringList&  hrefs, const QList<QSize>& sizes,  QFlags<ImageType> type){
@@ -1003,4 +1012,22 @@ void PanelView::on_toolButtonUnlockAll_clicked()
 void PanelView::on_toolButtonLockAll_clicked()
 {
      lock(true);
+}
+
+#include "maskinputdialog.h"
+
+void PanelView::on_toolButtonEditALanguages_clicked()
+{
+    bool ok;
+    QString text = MaskInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                        tr("Languages") ,"", ">aa/aa/aa/aa", &ok);
+    if (ok && !text.isEmpty()){
+        QStringList languages;
+        for (int i=0; i<text.length(); i+=2){
+            languages.append(text.mid(i,2));
+        }
+        currentSearch.setALanguages(languages);
+  //      ui->titleEdit->setText(currentSearch.title());
+        buildPreview(currentSearch);
+    }
 }

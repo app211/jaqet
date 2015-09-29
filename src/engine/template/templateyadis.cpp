@@ -153,7 +153,7 @@ void TemplateYadis::proceed(const CurrentItemData& data){
     d.setPath(QFileInfo(f.absoluteDir(),title+suffixe).absoluteFilePath());
 
     QFile file(f.absoluteFilePath());
-    if (!file.rename(QFileInfo(d,f.completeBaseName()).absoluteFilePath())){
+    if (!file.rename(QFileInfo(d,f.fileName()).absoluteFilePath())){
         return;
     }
 
@@ -632,159 +632,198 @@ bool TemplateYadis::execLanguages(const QDomElement& languagesElement, QPainter 
 
     Q_UNUSED(context);
 
-    QDomElement  audioElement = languagesElement.firstChildElement("audio");
-    if (audioElement.isNull()){
-        return false;
+    qDebug() << languagesElement.tagName();
+    qDebug() << languagesElement.firstChild().toElement().tagName();
+
+    QDomElement  audioElement;
+    QDomElement  backimageElement;
+    QDomElement textElement;
+    QDomElement subtitlesElement;
+
+    QDomNode n = languagesElement.firstChild();
+    while(!n.isNull()) {
+        QDomElement e = n.toElement();
+        if(!e.isNull()) {
+            if (e.tagName()=="audio"){
+                audioElement=e;
+            } else if (e.tagName()=="backimage"){
+                backimageElement=e;
+            } else if (e.tagName()=="text"){
+                textElement=e;
+            } else if (e.tagName()=="subtitles"){
+                subtitlesElement=e;
+            }
+        }
+        n = n.nextSibling();
     }
 
-    QDomElement  backimageElement = languagesElement.firstChildElement("backimage");
-    if (backimageElement.isNull()){
-        return false;
-    }
 
-    QDomElement  textElement = languagesElement.firstChildElement("text");
-    if (textElement.isNull()){
-        return false;
-    }
+    if (!audioElement.isNull() && !textElement.isNull() && !backimageElement.isNull()){
 
-    QDomElement  subtitlesElement = languagesElement.firstChildElement("subtitles");
-    if (subtitlesElement.isNull()){
-        return false;
-    }
+        bool bOk;
+        int x_audio=audioElement.attribute("x").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    bool bOk;
-    int x_audio=audioElement.attribute("x").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        int y_audio=audioElement.attribute("y").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    int y_audio=audioElement.attribute("y").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        int count=audioElement.attribute("count").toInt(&bOk);
+        if (!bOk){
+            count=3;
+        }
 
-    int count=audioElement.attribute("count").toInt(&bOk);
-    if (!bOk){
-        count=3;
-    }
+        QString direction=audioElement.attribute("direction");
 
-    QString direction=audioElement.attribute("direction");
+        int width=backimageElement.attribute("width").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    int x_subtitle=subtitlesElement.attribute("x").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        int height=backimageElement.attribute("height").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    int y_subtitle=subtitlesElement.attribute("y").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        int spacing=backimageElement.attribute("spacing").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    int count_subtitle=subtitlesElement.attribute("count").toInt(&bOk);
-    if (!bOk){
-        count_subtitle=3;
-    }
+        QString font=textElement.attribute("font");
 
-    QString direction_subtitle=subtitlesElement.attribute("direction");
+        int size=textElement.attribute("size").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    int width=backimageElement.attribute("width").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        QString color=textElement.attribute("color");
 
-    int height=backimageElement.attribute("height").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        int x= x_audio;
+        int y=y_audio;
+        int w= width;
+        int h=height;
 
-    int spacing=backimageElement.attribute("spacing").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
+        QString image = backimageElement.text();
 
-    QString font=textElement.attribute("font");
+        for (int i=0; i<qMin<int>(count,data.alanguages().size());i++){
+            QString textToDraw=data.alanguages().at(i).toUpper();
 
-    int size=textElement.attribute("size").toInt(&bOk);
-    if (!bOk){
-        return false;
-    }
-
-    QString color=textElement.attribute("color");
-
-    int x= x_audio;
-    int y=y_audio;
-    int w= width;
-    int h=height;
-
-    QString image = backimageElement.text();
-
-    for (int i=0; i<qMin<int>(count,data.alanguages().size());i++){
-        QString textToDraw=data.alanguages().at(i).toUpper();
-
-        if (!textToDraw.isEmpty()){
-            if (!font.isEmpty()){
-                QFont _font(font);
-                if (size>0){
-                    _font.setPointSize(size);
+            if (!textToDraw.isEmpty()){
+                if (!font.isEmpty()){
+                    QFont _font(font);
+                    if (size>0){
+                        _font.setPointSize(size);
+                    }
+                    pixPaint.setFont(_font);
                 }
-                pixPaint.setFont(_font);
-            }
 
-            if (!color.isEmpty()){
-                pixPaint.setPen(QPen(QColor(color)));
-            }
-
-            if (!image.isEmpty()){
-                QPixmap pstatic;
-
-                if (pstatic.load(getAbsoluteFilePath(image)) ){
-                    pixPaint.drawPixmap(getX(x) ,getY(y),w,h,pstatic);
+                if (!color.isEmpty()){
+                    pixPaint.setPen(QPen(QColor(color)));
                 }
-            }
 
-            pixPaint.drawText(getX(x),getY(y),w,h,Qt::AlignCenter,textToDraw);
+                if (!image.isEmpty()){
+                    QPixmap pstatic;
 
-            if (direction=="vertical"){
-                y += spacing;
-            } else {
-                x += spacing;
+                    if (pstatic.load(getAbsoluteFilePath(image)) ){
+                        pixPaint.drawPixmap(getX(x) ,getY(y),w,h,pstatic);
+                    }
+                }
+
+                pixPaint.drawText(getX(x),getY(y),w,h,Qt::AlignCenter,textToDraw);
+
+                if (direction=="vertical"){
+                    y += spacing;
+                } else {
+                    x += spacing;
+                }
             }
         }
     }
 
-    x= x_subtitle;
-    y=y_subtitle;
+    if (!subtitlesElement.isNull() && !textElement.isNull() && !backimageElement.isNull()){
+        bool bOk;
+        int x_subtitle=subtitlesElement.attribute("x").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-    for (int i=0; i<qMin<int>(count_subtitle,data.tlanguages().size());i++){
-        QString textToDraw=data.tlanguages().at(i).toUpper();
+        int y_subtitle=subtitlesElement.attribute("y").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
 
-        if (!textToDraw.isEmpty()){
-            if (!font.isEmpty()){
-                QFont _font(font);
-                if (size>0){
-                    _font.setPointSize(size);
+        int count_subtitle=subtitlesElement.attribute("count").toInt(&bOk);
+        if (!bOk){
+            count_subtitle=3;
+        }
+
+        QString direction_subtitle=subtitlesElement.attribute("direction");
+        int width=backimageElement.attribute("width").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
+
+        int height=backimageElement.attribute("height").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
+
+        int spacing=backimageElement.attribute("spacing").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
+
+        QString font=textElement.attribute("font");
+
+        int size=textElement.attribute("size").toInt(&bOk);
+        if (!bOk){
+            return false;
+        }
+
+        QString color=textElement.attribute("color");
+
+        QString image = backimageElement.text();
+
+        int w= width;
+        int h=height;
+        int x= x_subtitle;
+        int y=y_subtitle;
+
+        for (int i=0; i<qMin<int>(count_subtitle,data.tlanguages().size());i++){
+            QString textToDraw=data.tlanguages().at(i).toUpper();
+
+            if (!textToDraw.isEmpty()){
+                if (!font.isEmpty()){
+                    QFont _font(font);
+                    if (size>0){
+                        _font.setPointSize(size);
+                    }
+                    pixPaint.setFont(_font);
                 }
-                pixPaint.setFont(_font);
-            }
 
-            if (!color.isEmpty()){
-                pixPaint.setPen(QPen(QColor(color)));
-            }
-
-            if (!image.isEmpty()){
-                QPixmap pstatic;
-
-                if (pstatic.load(getAbsoluteFilePath(image)) ){
-                    pixPaint.drawPixmap(getX(x) ,getY(y),w,h,pstatic);
+                if (!color.isEmpty()){
+                    pixPaint.setPen(QPen(QColor(color)));
                 }
-            }
 
-            pixPaint.drawText(getX(x),getY(y),w,h,Qt::AlignCenter,textToDraw);
+                if (!image.isEmpty()){
+                    QPixmap pstatic;
 
-            if (direction_subtitle=="vertical"){
-                y += spacing;
-            } else {
-                x += spacing;
+                    if (pstatic.load(getAbsoluteFilePath(image)) ){
+                        pixPaint.drawPixmap(getX(x) ,getY(y),w,h,pstatic);
+                    }
+                }
+
+                pixPaint.drawText(getX(x),getY(y),w,h,Qt::AlignCenter,textToDraw);
+
+                if (direction_subtitle=="vertical"){
+                    y += spacing;
+                } else {
+                    x += spacing;
+                }
             }
         }
     }

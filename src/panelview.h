@@ -99,6 +99,7 @@ private slots:
     void on_toolButtonEditOriginalTitle_clicked();
     void on_toolButtonUnlockAll_clicked();
     void on_toolButtonLockAll_clicked();
+    void on_toolButtonEditALanguages_clicked();
 };
 
 #endif // PANELVIEW_H
