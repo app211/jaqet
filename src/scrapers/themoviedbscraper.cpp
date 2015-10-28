@@ -40,7 +40,7 @@ QString TheMovieDBScraper::createURL(const QString& type, const QMap<QString, QS
     return fullQuery;
 }
 
-void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
+void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  {
 
     QMap<QString,QString> params;
     QString url=createURL("configuration",params);
@@ -67,7 +67,7 @@ void TheMovieDBScraper::internalSearchTV( QNetworkAccessManager* manager, const 
     });
 }
 
-void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language, int year) const {
+void TheMovieDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString &language, int year) {
     QMap<QString,QString> params;
 
     QString url=createURL("configuration",params);

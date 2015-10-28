@@ -38,7 +38,17 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
+#include <QWidget>
+#include <QGroupBox>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QCheckBox>
+#include <QListWidget>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QDateTimeEdit>
 
 #include "pages.h"
 

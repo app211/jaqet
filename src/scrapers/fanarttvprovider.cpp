@@ -346,11 +346,11 @@ void FanArtTVProvider::internalFindMovieInfo(QNetworkAccessManager* manager,  Me
     });
 }
 
-void FanArtTVProvider::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const{
+void FanArtTVProvider::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) {
     m_tvdbscraper->searchTV(manager,toSearch,language);
 }
 
-void FanArtTVProvider::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const {
+void FanArtTVProvider::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) {
     m_moviedbscraper->searchFilm(manager,toSearch,year,language);
 }
 

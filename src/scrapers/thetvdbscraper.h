@@ -18,7 +18,7 @@ private:
     bool parseActors(const QByteArray &data, MediaTVSearchPtr mediaTVSearchPtr);
     bool parseLanguageList( const QByteArray& data);
 
-    void retriveLanguages(QNetworkAccessManager* manager) const;
+    void retriveLanguages(QNetworkAccessManager* manager) ;
 
     QString getXMLURL() const ;
     QString getZIPURL() const ;
@@ -28,8 +28,8 @@ private:
     QIcon loadIcon() const;
 
 protected:
-    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const override ;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const override;
+    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year)  override ;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  override;
     void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) override;
     void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) override ;
 

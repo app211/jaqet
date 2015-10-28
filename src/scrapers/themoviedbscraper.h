@@ -33,8 +33,8 @@ class TheMovieDBScraper: public Scraper
     QIcon loadIcon() const;
 
 protected :
-    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const;
+    void internalSearchFilm( QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) ;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) ;
     void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor &searchFor, const QString& language) ;
     void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor &searchFor, const QString& language)  ;
 

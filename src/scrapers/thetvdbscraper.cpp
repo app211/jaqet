@@ -622,7 +622,7 @@ void TheTVDBScraper::internalFindEpisodeInfo(QNetworkAccessManager *manager, Med
 }
 
 
-void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const {
+void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year)  {
     Q_UNUSED(manager);
     Q_UNUSED(toSearch);
     Q_UNUSED(language);
@@ -631,7 +631,7 @@ void TheTVDBScraper::internalSearchFilm(QNetworkAccessManager* manager, const QS
     emit scraperError("Unsupported Operation");
 }
 
-void TheTVDBScraper::retriveLanguages(QNetworkAccessManager* manager) const {
+void TheTVDBScraper::retriveLanguages(QNetworkAccessManager* manager)  {
 
     QString url = QString("http://thetvdb.com/api/%1/languages.xml").arg(API_KEY);
     Promise* promise=Promise::loadAsync(*manager,url,false);
@@ -648,7 +648,7 @@ void TheTVDBScraper::retriveLanguages(QNetworkAccessManager* manager) const {
 
 }
 
-void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const{
+void TheTVDBScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) {
     if  (retrieveMirror){
         QString url = QString("http://thetvdb.com/api/%1/mirrors.xml").arg(API_KEY);
         Promise* promise=Promise::loadAsync(*manager,url,false);

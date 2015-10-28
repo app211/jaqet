@@ -869,7 +869,7 @@ public:
 
     virtual QString createURL(const QString& , const QMap<QString, QString>& params) const=0;
 
-    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year, const QString &language) const;
+    void searchFilm(QNetworkAccessManager* manager, const QString& toSearch, int year, const QString &language);
     void searchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString &language) ;
     void findMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString &language) ;
     void findEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString &language) ;
@@ -879,8 +879,8 @@ public:
 
 
 protected:
-    virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const=0;
-    virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const=0;
+    virtual void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) =0;
+    virtual void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) =0;
     virtual void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) =0;
     virtual void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) =0;
 

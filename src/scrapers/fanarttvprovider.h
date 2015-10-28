@@ -22,8 +22,8 @@ class FanArtTVProvider: public Scraper
     bool isImageForLanguage(const QJsonObject& imageObject, const QString& language);
 
 protected:
-    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year) const override ;
-    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const override;
+    void internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString& language, int year)  override ;
+    void internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language)  override;
     void internalFindMovieInfo(QNetworkAccessManager *manager, MediaMovieSearchPtr mediaMovieSearchPtr, const SearchFor& searchFor, const QString& language) override;
     void internalFindEpisodeInfo(QNetworkAccessManager *manager, MediaTVSearchPtr mediaTVSearchPtr, const SearchFor& searchFor, const QString& language) override ;
 

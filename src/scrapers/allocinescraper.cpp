@@ -72,7 +72,7 @@ QString AlloCineScraper::createURL(const QString& type, const QMap<QString, QStr
     return fullQuery;
 }
 
-void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString&, int year) const
+void AlloCineScraper::internalSearchFilm(QNetworkAccessManager* manager, const QString& toSearch, const QString&, int year)
 {
     Q_UNUSED(year)
 
@@ -123,7 +123,7 @@ bool extractGenre(const QJsonObject mediaObject,  T& mediaSearchPtr ){
     return true;
 }
 
-void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) const {
+void AlloCineScraper::internalSearchTV(QNetworkAccessManager* manager, const QString& toSearch, const QString& language) {
 
     Q_UNUSED(language);
 
