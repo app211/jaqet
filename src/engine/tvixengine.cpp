@@ -7,11 +7,11 @@ TVIXEngine::TVIXEngine(QObject *parent, const QString& path):
 }
 
 void TVIXEngine::init(const QString& path){
-  //  b.loadTemplate(":/resources/templates/CryFibril/template.xml");
+    b.loadTemplate(":/resources/templates/CryFibril/template.xml");
 
     // b.loadTemplate("C:/Program Files (x86)/yaDIS/templates/Origins/template.xml");
 
-    b.loadTemplate("/home/teddy/developpement/Filmoscope/template.xml");
+  //  b.loadTemplate("/home/teddy/developpement/Filmoscope/template.xml");
 
     visibleFileExtensions << "*.asf"
                           <<"*.avi"

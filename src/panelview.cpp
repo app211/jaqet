@@ -1019,15 +1019,18 @@ void PanelView::on_toolButtonLockAll_clicked()
 void PanelView::on_toolButtonEditALanguages_clicked()
 {
     bool ok;
+    QString currentLangages=ui->lineEditLanguges->text();
+
     QString text = MaskInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                        tr("Languages") ,"", ">aa/aa/aa/aa", &ok);
+                                        tr("Languages") ,currentLangages, ">aa/aa/aa/aa", &ok);
     if (ok && !text.isEmpty()){
+        text.remove("/");
         QStringList languages;
         for (int i=0; i<text.length(); i+=2){
             languages.append(text.mid(i,2));
         }
         currentSearch.setALanguages(languages);
-  //      ui->titleEdit->setText(currentSearch.title());
+        ui->lineEditLanguges->setText(text);
         buildPreview(currentSearch);
     }
 }
