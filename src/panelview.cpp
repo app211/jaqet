@@ -207,6 +207,7 @@ void PanelView::castRemove(){
     this->currentSearch.setActors(getItemsListWidget(ui->castListWidget,true));
 
     updateUI();
+    buildPreview(currentSearch);
 }
 
 void PanelView::directorRemove(){
@@ -833,12 +834,12 @@ void PanelView::buildPoster( const CurrentItemData& currentSearch){
     //ui->graphicsViewPoster->setScene(&currentSearch.engine()->poster(currentSearch));
 }
 
-void PanelView::buildPreview( const CurrentItemData& currentSearch){
-    if (!currentSearch.engine()){
+void PanelView::buildPreview( const CurrentItemData& search){
+    if (!search.engine()){
         return;
     }
 
-    ui->graphicsView->setScene(&currentSearch.engine()->preview(currentSearch));
+    ui->graphicsView->setScene(&search.engine()->preview(search));
 }
 
 

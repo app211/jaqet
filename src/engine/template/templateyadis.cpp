@@ -413,10 +413,24 @@ bool TemplateYadis::execText(const QDomElement& textElement, QPainter &pixPaint,
 
     if (!textToDraw.isEmpty()){
 
+        qDebug() << textToDraw;
+
         QFont _font(font);
-        if (size>0){
+        _font.setKerning(false);
+        _font.setHintingPreference(QFont::PreferNoHinting);
+          if (size>0){
             _font.setPointSize(size);
         }
+
+
+        QFontMetrics fm(_font);
+
+        qDebug () << font << _font.capitalization() << _font.hintingPreference() << _font.bold() << fm.inFont('a') << fm.inFont('A');
+
+        if (textToDraw.toUpper().compare(textToDraw,Qt::CaseSensitive)==0){
+            _font.setCapitalization(QFont::AllUppercase);
+        }
+
         pixPaint.setFont(_font);
         pixPaint.setPen(QPen(QColor(color)));
 
